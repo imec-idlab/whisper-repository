@@ -1,0 +1,2493 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"opentimers.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.rodata
+  20              		.align	2
+  23              	rreg_uriquery:
+  24 0000 683D7563 		.ascii	"h=ucb\000"
+  24      6200
+  25 0006 0000     		.align	2
+  28              	infoBoardname:
+  29 0008 43433235 		.ascii	"CC2538\000"
+  29      333800
+  30 000f 00       		.align	2
+  33              	infouCName:
+  34 0010 43433235 		.ascii	"CC2538\000"
+  34      333800
+  35 0017 00       		.align	2
+  38              	infoRadioName:
+  39 0018 43433235 		.ascii	"CC2538 SoC\000"
+  39      33382053 
+  39      6F4300
+  40 0023 00       		.align	2
+  43              	infoStackName:
+  44 0024 4F70656E 		.ascii	"OpenWSN \000"
+  44      57534E20 
+  44      00
+  45              		.comm	opentimers_vars,360,4
+  46              		.text
+  47              		.align	2
+  48              		.global	opentimers_init
+  49              		.thumb
+  50              		.thumb_func
+  52              	opentimers_init:
+  53              	.LFB0:
+  54              		.file 1 "build/openmote-cc2538_armgcc/drivers/common/opentimers.c"
+   1:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+   2:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief Definition of the "opentimers" driver.
+   3:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+   4:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** This driver uses a single hardware timer, which it virtualizes to support
+   5:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** at most MAX_NUM_TIMERS timers.
+   6:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+   7:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \author Tengfei Chang <tengfei.chang@inria.fr>, April 2017.
+   8:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+   9:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  10:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** #include "opendefs.h"
+  11:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** #include "opentimers.h"
+  12:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** #include "sctimer.h"
+  13:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** #include "leds.h"
+  14:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  15:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** //=========================== define ==========================================
+  16:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  17:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** //=========================== variables =======================================
+  18:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  19:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** opentimers_vars_t opentimers_vars;
+  20:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  21:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** //=========================== prototypes ======================================
+  22:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  23:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void  opentimers_timer_callback(void);
+  24:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  25:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** //=========================== public ==========================================
+  26:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  27:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+  28:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief Initialize this module.
+  29:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  30:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** Initializes data structures and hardware timer.
+  31:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+  32:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_init(void){
+  55              		.loc 1 32 0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 8
+  58              		@ frame_needed = 1, uses_anonymous_args = 0
+  59 0000 80B5     		push	{r7, lr}
+  60              		.cfi_def_cfa_offset 8
+  61              		.cfi_offset 7, -8
+  62              		.cfi_offset 14, -4
+  63 0002 82B0     		sub	sp, sp, #8
+  64              		.cfi_def_cfa_offset 16
+  65 0004 00AF     		add	r7, sp, #0
+  66              		.cfi_def_cfa_register 7
+  33:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t i;
+  34:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // initialize local variables
+  35:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     memset(&opentimers_vars,0,sizeof(opentimers_vars_t));
+  67              		.loc 1 35 0
+  68 0006 4FF4B472 		mov	r2, #360
+  69 000a 0021     		movs	r1, #0
+  70 000c 0E48     		ldr	r0, .L4
+  71 000e FFF7FEFF 		bl	memset
+  36:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+  72              		.loc 1 36 0
+  73 0012 0023     		movs	r3, #0
+  74 0014 FB71     		strb	r3, [r7, #7]
+  75 0016 0CE0     		b	.L2
+  76              	.L3:
+  37:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // by default, all timers have the priority of 0xff (lowest priority)
+  38:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[i].priority = 0xff;
+  77              		.loc 1 38 0 discriminator 3
+  78 0018 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+  79 001a 0B49     		ldr	r1, .L4
+  80 001c 1346     		mov	r3, r2
+  81 001e DB00     		lsls	r3, r3, #3
+  82 0020 9B1A     		subs	r3, r3, r2
+  83 0022 9B00     		lsls	r3, r3, #2
+  84 0024 0B44     		add	r3, r3, r1
+  85 0026 1433     		adds	r3, r3, #20
+  86 0028 FF22     		movs	r2, #255
+  87 002a 1A70     		strb	r2, [r3]
+  36:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+  88              		.loc 1 36 0 discriminator 3
+  89 002c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  90 002e 0133     		adds	r3, r3, #1
+  91 0030 FB71     		strb	r3, [r7, #7]
+  92              	.L2:
+  36:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+  93              		.loc 1 36 0 is_stmt 0 discriminator 1
+  94 0032 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  95 0034 092B     		cmp	r3, #9
+  96 0036 EFD9     		bls	.L3
+  39:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+  40:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // set callback for sctimer module
+  41:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     sctimer_set_callback(opentimers_timer_callback);
+  97              		.loc 1 41 0 is_stmt 1
+  98 0038 0448     		ldr	r0, .L4+4
+  99 003a FFF7FEFF 		bl	sctimer_set_callback
+  42:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** } 
+ 100              		.loc 1 42 0
+ 101 003e 00BF     		nop
+ 102 0040 0837     		adds	r7, r7, #8
+ 103              		.cfi_def_cfa_offset 8
+ 104 0042 BD46     		mov	sp, r7
+ 105              		.cfi_def_cfa_register 13
+ 106              		@ sp needed
+ 107 0044 80BD     		pop	{r7, pc}
+ 108              	.L5:
+ 109 0046 00BF     		.align	2
+ 110              	.L4:
+ 111 0048 00000000 		.word	opentimers_vars
+ 112 004c 00000000 		.word	opentimers_timer_callback
+ 113              		.cfi_endproc
+ 114              	.LFE0:
+ 116              		.align	2
+ 117              		.global	opentimers_create
+ 118              		.thumb
+ 119              		.thumb_func
+ 121              	opentimers_create:
+ 122              	.LFB1:
+  43:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  44:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+  45:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief create a timer by assigning an entry from timer buffer.
+  46:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  47:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** create a timer by assigning an Id for the timer.
+  48:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  49:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \returns the id of the timer will be returned
+  50:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+  51:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** opentimers_id_t opentimers_create(void){
+ 123              		.loc 1 51 0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 8
+ 126              		@ frame_needed = 1, uses_anonymous_args = 0
+ 127              		@ link register save eliminated.
+ 128 0050 80B4     		push	{r7}
+ 129              		.cfi_def_cfa_offset 4
+ 130              		.cfi_offset 7, -4
+ 131 0052 83B0     		sub	sp, sp, #12
+ 132              		.cfi_def_cfa_offset 16
+ 133 0054 00AF     		add	r7, sp, #0
+ 134              		.cfi_def_cfa_register 7
+  52:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t id;
+  53:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (id=0;id<MAX_NUM_TIMERS;id++){
+ 135              		.loc 1 53 0
+ 136 0056 0023     		movs	r3, #0
+ 137 0058 FB71     		strb	r3, [r7, #7]
+ 138 005a 1CE0     		b	.L7
+ 139              	.L10:
+  54:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[id].isUsed  == FALSE){
+ 140              		.loc 1 54 0
+ 141 005c FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 142 005e 1249     		ldr	r1, .L11
+ 143 0060 1346     		mov	r3, r2
+ 144 0062 DB00     		lsls	r3, r3, #3
+ 145 0064 9B1A     		subs	r3, r3, r2
+ 146 0066 9B00     		lsls	r3, r3, #2
+ 147 0068 0B44     		add	r3, r3, r1
+ 148 006a 1133     		adds	r3, r3, #17
+ 149 006c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150 006e 83F00103 		eor	r3, r3, #1
+ 151 0072 DBB2     		uxtb	r3, r3
+ 152 0074 002B     		cmp	r3, #0
+ 153 0076 0BD0     		beq	.L8
+  55:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             opentimers_vars.timersBuf[id].isUsed   = TRUE;
+ 154              		.loc 1 55 0
+ 155 0078 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 156 007a 0B49     		ldr	r1, .L11
+ 157 007c 1346     		mov	r3, r2
+ 158 007e DB00     		lsls	r3, r3, #3
+ 159 0080 9B1A     		subs	r3, r3, r2
+ 160 0082 9B00     		lsls	r3, r3, #2
+ 161 0084 0B44     		add	r3, r3, r1
+ 162 0086 1133     		adds	r3, r3, #17
+ 163 0088 0122     		movs	r2, #1
+ 164 008a 1A70     		strb	r2, [r3]
+  56:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             return id;
+ 165              		.loc 1 56 0
+ 166 008c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 167 008e 06E0     		b	.L9
+ 168              	.L8:
+  53:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[id].isUsed  == FALSE){
+ 169              		.loc 1 53 0 discriminator 2
+ 170 0090 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 171 0092 0133     		adds	r3, r3, #1
+ 172 0094 FB71     		strb	r3, [r7, #7]
+ 173              	.L7:
+  53:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[id].isUsed  == FALSE){
+ 174              		.loc 1 53 0 is_stmt 0 discriminator 1
+ 175 0096 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 176 0098 092B     		cmp	r3, #9
+ 177 009a DFD9     		bls	.L10
+  57:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+  58:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+  59:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // there is no available buffer for this timer
+  60:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     return TOO_MANY_TIMERS_ERROR;
+ 178              		.loc 1 60 0 is_stmt 1
+ 179 009c FF23     		movs	r3, #255
+ 180              	.L9:
+  61:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 181              		.loc 1 61 0
+ 182 009e 1846     		mov	r0, r3
+ 183 00a0 0C37     		adds	r7, r7, #12
+ 184              		.cfi_def_cfa_offset 4
+ 185 00a2 BD46     		mov	sp, r7
+ 186              		.cfi_def_cfa_register 13
+ 187              		@ sp needed
+ 188 00a4 80BC     		pop	{r7}
+ 189              		.cfi_restore 7
+ 190              		.cfi_def_cfa_offset 0
+ 191 00a6 7047     		bx	lr
+ 192              	.L12:
+ 193              		.align	2
+ 194              	.L11:
+ 195 00a8 00000000 		.word	opentimers_vars
+ 196              		.cfi_endproc
+ 197              	.LFE1:
+ 199              		.align	2
+ 200              		.global	opentimers_scheduleIn
+ 201              		.thumb
+ 202              		.thumb_func
+ 204              	opentimers_scheduleIn:
+ 205              	.LFB2:
+  62:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  63:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+  64:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief schedule a period refer to comparing value set last time.
+  65:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  66:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** This function will schedule a timer which expires when the timer count reach 
+  67:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** to current counter + duration.
+  68:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+  69:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] id indicates the timer id
+  70:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] duration indicates the period asked for schedule since last comparing value
+  71:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] uint_type indicates the unit type of this schedule: ticks or ms
+  72:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] timer_type indicates the timer type of this schedule: oneshot or periodic
+  73:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] cb indicates when this scheduled timer fired, call this callback function.
+  74:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+  75:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_scheduleIn(opentimers_id_t    id, 
+  76:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                            uint32_t           duration,
+  77:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                            time_type_t        uint_type, 
+  78:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                            timer_type_t       timer_type, 
+  79:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                            opentimers_cbt     cb){
+ 206              		.loc 1 79 0
+ 207              		.cfi_startproc
+ 208              		@ args = 4, pretend = 0, frame = 24
+ 209              		@ frame_needed = 1, uses_anonymous_args = 0
+ 210 00ac B0B5     		push	{r4, r5, r7, lr}
+ 211              		.cfi_def_cfa_offset 16
+ 212              		.cfi_offset 4, -16
+ 213              		.cfi_offset 5, -12
+ 214              		.cfi_offset 7, -8
+ 215              		.cfi_offset 14, -4
+ 216 00ae 86B0     		sub	sp, sp, #24
+ 217              		.cfi_def_cfa_offset 40
+ 218 00b0 00AF     		add	r7, sp, #0
+ 219              		.cfi_def_cfa_register 7
+ 220 00b2 3960     		str	r1, [r7]
+ 221 00b4 1146     		mov	r1, r2
+ 222 00b6 1A46     		mov	r2, r3
+ 223 00b8 0346     		mov	r3, r0
+ 224 00ba FB71     		strb	r3, [r7, #7]
+ 225 00bc 0B46     		mov	r3, r1
+ 226 00be BB71     		strb	r3, [r7, #6]
+ 227 00c0 1346     		mov	r3, r2
+ 228 00c2 7B71     		strb	r3, [r7, #5]
+  80:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t  i;
+  81:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t  idToSchedule;
+  82:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH timerGap;
+  83:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH tempTimerGap;
+  84:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 1. make sure the timer exist
+  85:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+ 229              		.loc 1 85 0
+ 230 00c4 0023     		movs	r3, #0
+ 231 00c6 FB75     		strb	r3, [r7, #23]
+ 232 00c8 11E0     		b	.L14
+ 233              	.L17:
+  86:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 234              		.loc 1 86 0
+ 235 00ca FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 236 00cc A049     		ldr	r1, .L35
+ 237 00ce 1346     		mov	r3, r2
+ 238 00d0 DB00     		lsls	r3, r3, #3
+ 239 00d2 9B1A     		subs	r3, r3, r2
+ 240 00d4 9B00     		lsls	r3, r3, #2
+ 241 00d6 0B44     		add	r3, r3, r1
+ 242 00d8 1133     		adds	r3, r3, #17
+ 243 00da 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 244 00dc 002B     		cmp	r3, #0
+ 245 00de 03D0     		beq	.L15
+ 246              		.loc 1 86 0 is_stmt 0 discriminator 1
+ 247 00e0 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 248 00e2 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 249 00e4 9A42     		cmp	r2, r3
+ 250 00e6 06D0     		beq	.L33
+ 251              	.L15:
+  85:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 252              		.loc 1 85 0 is_stmt 1 discriminator 2
+ 253 00e8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 254 00ea 0133     		adds	r3, r3, #1
+ 255 00ec FB75     		strb	r3, [r7, #23]
+ 256              	.L14:
+  85:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 257              		.loc 1 85 0 is_stmt 0 discriminator 1
+ 258 00ee FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 259 00f0 092B     		cmp	r3, #9
+ 260 00f2 EAD9     		bls	.L17
+ 261 00f4 00E0     		b	.L16
+ 262              	.L33:
+  87:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             break;
+ 263              		.loc 1 87 0 is_stmt 1
+ 264 00f6 00BF     		nop
+ 265              	.L16:
+  88:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+  89:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+  90:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (i==MAX_NUM_TIMERS){
+ 266              		.loc 1 90 0
+ 267 00f8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 268 00fa 0A2B     		cmp	r3, #10
+ 269 00fc 00F02381 		beq	.L34
+  91:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // doesn't find the timer
+  92:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         return;
+  93:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+  94:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+  95:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].timerType = timer_type;
+ 270              		.loc 1 95 0
+ 271 0100 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 272 0102 9349     		ldr	r1, .L35
+ 273 0104 1346     		mov	r3, r2
+ 274 0106 DB00     		lsls	r3, r3, #3
+ 275 0108 9B1A     		subs	r3, r3, r2
+ 276 010a 9B00     		lsls	r3, r3, #2
+ 277 010c 0B44     		add	r3, r3, r1
+ 278 010e 1233     		adds	r3, r3, #18
+ 279 0110 7A79     		ldrb	r2, [r7, #5]
+ 280 0112 1A70     		strb	r2, [r3]
+  96:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+  97:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 2. updat the timer content
+  98:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     switch (uint_type){
+ 281              		.loc 1 98 0
+ 282 0114 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 283 0116 002B     		cmp	r3, #0
+ 284 0118 02D0     		beq	.L21
+ 285 011a 012B     		cmp	r3, #1
+ 286 011c 23D0     		beq	.L22
+ 287 011e 3FE0     		b	.L20
+ 288              	.L21:
+  99:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     case TIME_MS:
+ 100:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].totalTimerPeriod = duration*PORT_TICS_PER_MS;
+ 289              		.loc 1 100 0
+ 290 0120 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 291 0122 3968     		ldr	r1, [r7]
+ 292 0124 0B46     		mov	r3, r1
+ 293 0126 5B01     		lsls	r3, r3, #5
+ 294 0128 1944     		add	r1, r1, r3
+ 295 012a 8948     		ldr	r0, .L35
+ 296 012c 1346     		mov	r3, r2
+ 297 012e DB00     		lsls	r3, r3, #3
+ 298 0130 9B1A     		subs	r3, r3, r2
+ 299 0132 9B00     		lsls	r3, r3, #2
+ 300 0134 0344     		add	r3, r3, r0
+ 301 0136 1960     		str	r1, [r3]
+ 101:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].wraps_remaining  = (uint32_t)(duration*PORT_TICS_PER_MS)/MAX_
+ 302              		.loc 1 101 0
+ 303 0138 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 304 013a 3A68     		ldr	r2, [r7]
+ 305 013c 1346     		mov	r3, r2
+ 306 013e 5B01     		lsls	r3, r3, #5
+ 307 0140 1A44     		add	r2, r2, r3
+ 308 0142 0323     		movs	r3, #3
+ 309 0144 A3FB0203 		umull	r0, r3, r3, r2
+ 310 0148 D21A     		subs	r2, r2, r3
+ 311 014a 5208     		lsrs	r2, r2, #1
+ 312 014c 1344     		add	r3, r3, r2
+ 313 014e 9B0F     		lsrs	r3, r3, #30
+ 314 0150 98B2     		uxth	r0, r3
+ 315 0152 7F4A     		ldr	r2, .L35
+ 316 0154 0B46     		mov	r3, r1
+ 317 0156 DB00     		lsls	r3, r3, #3
+ 318 0158 5B1A     		subs	r3, r3, r1
+ 319 015a 9B00     		lsls	r3, r3, #2
+ 320 015c 1344     		add	r3, r3, r2
+ 321 015e 0833     		adds	r3, r3, #8
+ 322 0160 0246     		mov	r2, r0	@ movhi
+ 323 0162 1A80     		strh	r2, [r3]	@ movhi
+ 102:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         break;
+ 324              		.loc 1 102 0
+ 325 0164 1CE0     		b	.L20
+ 326              	.L22:
+ 103:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     case TIME_TICS:
+ 104:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].totalTimerPeriod = duration;
+ 327              		.loc 1 104 0
+ 328 0166 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 329 0168 7949     		ldr	r1, .L35
+ 330 016a 1346     		mov	r3, r2
+ 331 016c DB00     		lsls	r3, r3, #3
+ 332 016e 9B1A     		subs	r3, r3, r2
+ 333 0170 9B00     		lsls	r3, r3, #2
+ 334 0172 0B44     		add	r3, r3, r1
+ 335 0174 3A68     		ldr	r2, [r7]
+ 336 0176 1A60     		str	r2, [r3]
+ 105:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].wraps_remaining  = (uint32_t)(duration)/MAX_TICKS_IN_SINGLE_C
+ 337              		.loc 1 105 0
+ 338 0178 F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 339 017a 3A68     		ldr	r2, [r7]
+ 340 017c 0323     		movs	r3, #3
+ 341 017e A3FB0203 		umull	r0, r3, r3, r2
+ 342 0182 D21A     		subs	r2, r2, r3
+ 343 0184 5208     		lsrs	r2, r2, #1
+ 344 0186 1344     		add	r3, r3, r2
+ 345 0188 9B0F     		lsrs	r3, r3, #30
+ 346 018a 98B2     		uxth	r0, r3
+ 347 018c 704A     		ldr	r2, .L35
+ 348 018e 0B46     		mov	r3, r1
+ 349 0190 DB00     		lsls	r3, r3, #3
+ 350 0192 5B1A     		subs	r3, r3, r1
+ 351 0194 9B00     		lsls	r3, r3, #2
+ 352 0196 1344     		add	r3, r3, r2
+ 353 0198 0833     		adds	r3, r3, #8
+ 354 019a 0246     		mov	r2, r0	@ movhi
+ 355 019c 1A80     		strh	r2, [r3]	@ movhi
+ 106:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         break;
+ 356              		.loc 1 106 0
+ 357 019e 00BF     		nop
+ 358              	.L20:
+ 107:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 108:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 109:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (opentimers_vars.timersBuf[id].wraps_remaining==0){
+ 359              		.loc 1 109 0
+ 360 01a0 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 361 01a2 6B49     		ldr	r1, .L35
+ 362 01a4 1346     		mov	r3, r2
+ 363 01a6 DB00     		lsls	r3, r3, #3
+ 364 01a8 9B1A     		subs	r3, r3, r2
+ 365 01aa 9B00     		lsls	r3, r3, #2
+ 366 01ac 0B44     		add	r3, r3, r1
+ 367 01ae 0833     		adds	r3, r3, #8
+ 368 01b0 1B88     		ldrh	r3, [r3]
+ 369 01b2 002B     		cmp	r3, #0
+ 370 01b4 15D1     		bne	.L23
+ 110:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].currentCompareValue = opentimers_vars.timersBuf[id].totalTime
+ 371              		.loc 1 110 0
+ 372 01b6 FC79     		ldrb	r4, [r7, #7]	@ zero_extendqisi2
+ 373 01b8 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 374 01ba 6549     		ldr	r1, .L35
+ 375 01bc 1346     		mov	r3, r2
+ 376 01be DB00     		lsls	r3, r3, #3
+ 377 01c0 9B1A     		subs	r3, r3, r2
+ 378 01c2 9B00     		lsls	r3, r3, #2
+ 379 01c4 0B44     		add	r3, r3, r1
+ 380 01c6 1D68     		ldr	r5, [r3]
+ 381 01c8 FFF7FEFF 		bl	sctimer_readCounter
+ 382 01cc 0346     		mov	r3, r0
+ 383 01ce EA18     		adds	r2, r5, r3
+ 384 01d0 5F49     		ldr	r1, .L35
+ 385 01d2 2346     		mov	r3, r4
+ 386 01d4 DB00     		lsls	r3, r3, #3
+ 387 01d6 1B1B     		subs	r3, r3, r4
+ 388 01d8 9B00     		lsls	r3, r3, #2
+ 389 01da 0B44     		add	r3, r3, r1
+ 390 01dc 0433     		adds	r3, r3, #4
+ 391 01de 1A60     		str	r2, [r3]
+ 392 01e0 0EE0     		b	.L24
+ 393              	.L23:
+ 111:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     } else {
+ 112:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].currentCompareValue = MAX_TICKS_IN_SINGLE_CLOCK+sctimer_readC
+ 394              		.loc 1 112 0
+ 395 01e2 FC79     		ldrb	r4, [r7, #7]	@ zero_extendqisi2
+ 396 01e4 FFF7FEFF 		bl	sctimer_readCounter
+ 397 01e8 0346     		mov	r3, r0
+ 398 01ea 03F10042 		add	r2, r3, #-2147483648
+ 399 01ee 013A     		subs	r2, r2, #1
+ 400 01f0 5749     		ldr	r1, .L35
+ 401 01f2 2346     		mov	r3, r4
+ 402 01f4 DB00     		lsls	r3, r3, #3
+ 403 01f6 1B1B     		subs	r3, r3, r4
+ 404 01f8 9B00     		lsls	r3, r3, #2
+ 405 01fa 0B44     		add	r3, r3, r1
+ 406 01fc 0433     		adds	r3, r3, #4
+ 407 01fe 1A60     		str	r2, [r3]
+ 408              	.L24:
+ 113:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 114:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 115:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].isrunning           = TRUE;
+ 409              		.loc 1 115 0
+ 410 0200 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 411 0202 5349     		ldr	r1, .L35
+ 412 0204 1346     		mov	r3, r2
+ 413 0206 DB00     		lsls	r3, r3, #3
+ 414 0208 9B1A     		subs	r3, r3, r2
+ 415 020a 9B00     		lsls	r3, r3, #2
+ 416 020c 0B44     		add	r3, r3, r1
+ 417 020e 1033     		adds	r3, r3, #16
+ 418 0210 0122     		movs	r2, #1
+ 419 0212 1A70     		strb	r2, [r3]
+ 116:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].callback            = cb;
+ 420              		.loc 1 116 0
+ 421 0214 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 422 0216 4E49     		ldr	r1, .L35
+ 423 0218 1346     		mov	r3, r2
+ 424 021a DB00     		lsls	r3, r3, #3
+ 425 021c 9B1A     		subs	r3, r3, r2
+ 426 021e 9B00     		lsls	r3, r3, #2
+ 427 0220 0B44     		add	r3, r3, r1
+ 428 0222 1833     		adds	r3, r3, #24
+ 429 0224 BA6A     		ldr	r2, [r7, #40]
+ 430 0226 1A60     		str	r2, [r3]
+ 117:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 118:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 3. find the next timer to fire
+ 119:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 120:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // only execute update the currenttimeout if I am not inside of ISR or the ISR itself will do t
+ 121:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (opentimers_vars.insideISR==FALSE){
+ 431              		.loc 1 121 0
+ 432 0228 494B     		ldr	r3, .L35
+ 433 022a 93F86531 		ldrb	r3, [r3, #357]	@ zero_extendqisi2
+ 434 022e 83F00103 		eor	r3, r3, #1
+ 435 0232 DBB2     		uxtb	r3, r3
+ 436 0234 002B     		cmp	r3, #0
+ 437 0236 00F08180 		beq	.L25
+ 122:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         timerGap     = opentimers_vars.timersBuf[0].currentCompareValue-opentimers_vars.lastTimeout
+ 438              		.loc 1 122 0
+ 439 023a 454B     		ldr	r3, .L35
+ 440 023c 5A68     		ldr	r2, [r3, #4]
+ 441 023e 444B     		ldr	r3, .L35
+ 442 0240 D3F82031 		ldr	r3, [r3, #288]
+ 443 0244 D31A     		subs	r3, r2, r3
+ 444 0246 3B61     		str	r3, [r7, #16]
+ 123:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         idToSchedule = 0;
+ 445              		.loc 1 123 0
+ 446 0248 0023     		movs	r3, #0
+ 447 024a BB75     		strb	r3, [r7, #22]
+ 124:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         for (i=1;i<MAX_NUM_TIMERS;i++){
+ 448              		.loc 1 124 0
+ 449 024c 0123     		movs	r3, #1
+ 450 024e FB75     		strb	r3, [r7, #23]
+ 451 0250 5FE0     		b	.L26
+ 452              	.L32:
+ 125:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 453              		.loc 1 125 0
+ 454 0252 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 455 0254 3E49     		ldr	r1, .L35
+ 456 0256 1346     		mov	r3, r2
+ 457 0258 DB00     		lsls	r3, r3, #3
+ 458 025a 9B1A     		subs	r3, r3, r2
+ 459 025c 9B00     		lsls	r3, r3, #2
+ 460 025e 0B44     		add	r3, r3, r1
+ 461 0260 1033     		adds	r3, r3, #16
+ 462 0262 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 463 0264 002B     		cmp	r3, #0
+ 464 0266 51D0     		beq	.L27
+ 126:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 tempTimerGap = opentimers_vars.timersBuf[i].currentCompareValue-opentimers_vars.las
+ 465              		.loc 1 126 0
+ 466 0268 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 467 026a 3949     		ldr	r1, .L35
+ 468 026c 1346     		mov	r3, r2
+ 469 026e DB00     		lsls	r3, r3, #3
+ 470 0270 9B1A     		subs	r3, r3, r2
+ 471 0272 9B00     		lsls	r3, r3, #2
+ 472 0274 0B44     		add	r3, r3, r1
+ 473 0276 0433     		adds	r3, r3, #4
+ 474 0278 1A68     		ldr	r2, [r3]
+ 475 027a 354B     		ldr	r3, .L35
+ 476 027c D3F82031 		ldr	r3, [r3, #288]
+ 477 0280 D31A     		subs	r3, r2, r3
+ 478 0282 FB60     		str	r3, [r7, #12]
+ 127:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (tempTimerGap < timerGap){
+ 479              		.loc 1 127 0
+ 480 0284 FA68     		ldr	r2, [r7, #12]
+ 481 0286 3B69     		ldr	r3, [r7, #16]
+ 482 0288 9A42     		cmp	r2, r3
+ 483 028a 22D2     		bcs	.L28
+ 128:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // if a timer "i" has low priority but has compare value less than 
+ 129:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // candidate timer "idToSchedule" more than TIMERTHRESHOLD ticks, 
+ 130:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // replace candidate timer by this timer "i".
+ 131:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[i].priority > opentimers_vars.timersBuf[idToSched
+ 484              		.loc 1 131 0
+ 485 028c FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 486 028e 3049     		ldr	r1, .L35
+ 487 0290 1346     		mov	r3, r2
+ 488 0292 DB00     		lsls	r3, r3, #3
+ 489 0294 9B1A     		subs	r3, r3, r2
+ 490 0296 9B00     		lsls	r3, r3, #2
+ 491 0298 0B44     		add	r3, r3, r1
+ 492 029a 1433     		adds	r3, r3, #20
+ 493 029c 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 494 029e BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+ 495 02a0 2B48     		ldr	r0, .L35
+ 496 02a2 1346     		mov	r3, r2
+ 497 02a4 DB00     		lsls	r3, r3, #3
+ 498 02a6 9B1A     		subs	r3, r3, r2
+ 499 02a8 9B00     		lsls	r3, r3, #2
+ 500 02aa 0344     		add	r3, r3, r0
+ 501 02ac 1433     		adds	r3, r3, #20
+ 502 02ae 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 503 02b0 9942     		cmp	r1, r3
+ 504 02b2 09D9     		bls	.L29
+ 132:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         if (timerGap-tempTimerGap > TIMERTHRESHOLD){
+ 505              		.loc 1 132 0
+ 506 02b4 3A69     		ldr	r2, [r7, #16]
+ 507 02b6 FB68     		ldr	r3, [r7, #12]
+ 508 02b8 D31A     		subs	r3, r2, r3
+ 509 02ba 0A2B     		cmp	r3, #10
+ 510 02bc 26D9     		bls	.L27
+ 133:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             timerGap     = tempTimerGap;
+ 511              		.loc 1 133 0
+ 512 02be FB68     		ldr	r3, [r7, #12]
+ 513 02c0 3B61     		str	r3, [r7, #16]
+ 134:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             idToSchedule = i;
+ 514              		.loc 1 134 0
+ 515 02c2 FB7D     		ldrb	r3, [r7, #23]
+ 516 02c4 BB75     		strb	r3, [r7, #22]
+ 517 02c6 21E0     		b	.L27
+ 518              	.L29:
+ 135:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         }
+ 136:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     } else {
+ 137:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 138:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // and compare value less than candidate timer replace candidate 
+ 139:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // timer by timer "i".
+ 140:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         timerGap     = tempTimerGap;
+ 519              		.loc 1 140 0
+ 520 02c8 FB68     		ldr	r3, [r7, #12]
+ 521 02ca 3B61     		str	r3, [r7, #16]
+ 141:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         idToSchedule = i;
+ 522              		.loc 1 141 0
+ 523 02cc FB7D     		ldrb	r3, [r7, #23]
+ 524 02ce BB75     		strb	r3, [r7, #22]
+ 525 02d0 1CE0     		b	.L27
+ 526              	.L28:
+ 142:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 143:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 } else {
+ 144:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // if a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 145:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // and its compare value is larger than timer "i" no more than TIMERTHRESHOLD t
+ 146:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // replace candidate timer by timer "i".
+ 147:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[i].priority < opentimers_vars.timersBuf[idToSched
+ 527              		.loc 1 147 0
+ 528 02d2 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 529 02d4 1E49     		ldr	r1, .L35
+ 530 02d6 1346     		mov	r3, r2
+ 531 02d8 DB00     		lsls	r3, r3, #3
+ 532 02da 9B1A     		subs	r3, r3, r2
+ 533 02dc 9B00     		lsls	r3, r3, #2
+ 534 02de 0B44     		add	r3, r3, r1
+ 535 02e0 1433     		adds	r3, r3, #20
+ 536 02e2 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 537 02e4 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+ 538 02e6 1A48     		ldr	r0, .L35
+ 539 02e8 1346     		mov	r3, r2
+ 540 02ea DB00     		lsls	r3, r3, #3
+ 541 02ec 9B1A     		subs	r3, r3, r2
+ 542 02ee 9B00     		lsls	r3, r3, #2
+ 543 02f0 0344     		add	r3, r3, r0
+ 544 02f2 1433     		adds	r3, r3, #20
+ 545 02f4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 546 02f6 9942     		cmp	r1, r3
+ 547 02f8 08D2     		bcs	.L27
+ 148:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         if (tempTimerGap - timerGap < TIMERTHRESHOLD){
+ 548              		.loc 1 148 0
+ 549 02fa FA68     		ldr	r2, [r7, #12]
+ 550 02fc 3B69     		ldr	r3, [r7, #16]
+ 551 02fe D31A     		subs	r3, r2, r3
+ 552 0300 092B     		cmp	r3, #9
+ 553 0302 03D8     		bhi	.L27
+ 149:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             timerGap     = tempTimerGap;
+ 554              		.loc 1 149 0
+ 555 0304 FB68     		ldr	r3, [r7, #12]
+ 556 0306 3B61     		str	r3, [r7, #16]
+ 150:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             idToSchedule = i;
+ 557              		.loc 1 150 0
+ 558 0308 FB7D     		ldrb	r3, [r7, #23]
+ 559 030a BB75     		strb	r3, [r7, #22]
+ 560              	.L27:
+ 124:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 561              		.loc 1 124 0 discriminator 2
+ 562 030c FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 563 030e 0133     		adds	r3, r3, #1
+ 564 0310 FB75     		strb	r3, [r7, #23]
+ 565              	.L26:
+ 124:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 566              		.loc 1 124 0 is_stmt 0 discriminator 1
+ 567 0312 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 568 0314 092B     		cmp	r3, #9
+ 569 0316 9CD9     		bls	.L32
+ 151:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         }
+ 152:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 153:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 154:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 155:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 156:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         
+ 157:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // if I got here, assign the next to be fired timer to given timer
+ 158:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.currentTimeout = opentimers_vars.timersBuf[idToSchedule].currentCompareValu
+ 570              		.loc 1 158 0 is_stmt 1
+ 571 0318 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+ 572 031a 0D49     		ldr	r1, .L35
+ 573 031c 1346     		mov	r3, r2
+ 574 031e DB00     		lsls	r3, r3, #3
+ 575 0320 9B1A     		subs	r3, r3, r2
+ 576 0322 9B00     		lsls	r3, r3, #2
+ 577 0324 0B44     		add	r3, r3, r1
+ 578 0326 0433     		adds	r3, r3, #4
+ 579 0328 1B68     		ldr	r3, [r3]
+ 580 032a 094A     		ldr	r2, .L35
+ 581 032c C2F81C31 		str	r3, [r2, #284]
+ 159:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         sctimer_setCompare(opentimers_vars.currentTimeout);
+ 582              		.loc 1 159 0
+ 583 0330 074B     		ldr	r3, .L35
+ 584 0332 D3F81C31 		ldr	r3, [r3, #284]
+ 585 0336 1846     		mov	r0, r3
+ 586 0338 FFF7FEFF 		bl	sctimer_setCompare
+ 587              	.L25:
+ 160:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 161:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.running        = TRUE;
+ 588              		.loc 1 161 0
+ 589 033c 044B     		ldr	r3, .L35
+ 590 033e 0122     		movs	r2, #1
+ 591 0340 83F81821 		strb	r2, [r3, #280]
+ 592 0344 00E0     		b	.L13
+ 593              	.L34:
+  92:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 594              		.loc 1 92 0
+ 595 0346 00BF     		nop
+ 596              	.L13:
+ 162:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 597              		.loc 1 162 0
+ 598 0348 1837     		adds	r7, r7, #24
+ 599              		.cfi_def_cfa_offset 16
+ 600 034a BD46     		mov	sp, r7
+ 601              		.cfi_def_cfa_register 13
+ 602              		@ sp needed
+ 603 034c B0BD     		pop	{r4, r5, r7, pc}
+ 604              	.L36:
+ 605 034e 00BF     		.align	2
+ 606              	.L35:
+ 607 0350 00000000 		.word	opentimers_vars
+ 608              		.cfi_endproc
+ 609              	.LFE2:
+ 611              		.align	2
+ 612              		.global	opentimers_scheduleAbsolute
+ 613              		.thumb
+ 614              		.thumb_func
+ 616              	opentimers_scheduleAbsolute:
+ 617              	.LFB3:
+ 163:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 164:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 165:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief schedule a period refer to given reference.
+ 166:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 167:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** This function will schedule a timer which expires when the timer count reach 
+ 168:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** to duration + reference. This function will be used in the implementation of slot FSM.
+ 169:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** All timers use this function are ONE_SHOT type timer.
+ 170:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 171:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] id indicates the timer id
+ 172:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] duration indicates the period asked for schedule after a given time indicated by referen
+ 173:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] uint_type indicates the unit type of this schedule: ticks or ms
+ 174:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] cb indicates when this scheduled timer fired, call this callback function.
+ 175:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 176:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_scheduleAbsolute(opentimers_id_t    id, 
+ 177:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                  uint32_t           duration, 
+ 178:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                  PORT_TIMER_WIDTH   reference , 
+ 179:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                  time_type_t        uint_type, 
+ 180:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                  opentimers_cbt     cb){
+ 618              		.loc 1 180 0
+ 619              		.cfi_startproc
+ 620              		@ args = 4, pretend = 0, frame = 32
+ 621              		@ frame_needed = 1, uses_anonymous_args = 0
+ 622 0354 80B5     		push	{r7, lr}
+ 623              		.cfi_def_cfa_offset 8
+ 624              		.cfi_offset 7, -8
+ 625              		.cfi_offset 14, -4
+ 626 0356 88B0     		sub	sp, sp, #32
+ 627              		.cfi_def_cfa_offset 40
+ 628 0358 00AF     		add	r7, sp, #0
+ 629              		.cfi_def_cfa_register 7
+ 630 035a B960     		str	r1, [r7, #8]
+ 631 035c 7A60     		str	r2, [r7, #4]
+ 632 035e 1A46     		mov	r2, r3
+ 633 0360 0346     		mov	r3, r0
+ 634 0362 FB73     		strb	r3, [r7, #15]
+ 635 0364 1346     		mov	r3, r2
+ 636 0366 BB73     		strb	r3, [r7, #14]
+ 181:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t  i;
+ 182:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t idToSchedule;
+ 183:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH timerGap;
+ 184:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH tempTimerGap;
+ 185:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 1. make sure the timer exist
+ 186:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+ 637              		.loc 1 186 0
+ 638 0368 0023     		movs	r3, #0
+ 639 036a FB77     		strb	r3, [r7, #31]
+ 640 036c 11E0     		b	.L38
+ 641              	.L41:
+ 187:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 642              		.loc 1 187 0
+ 643 036e FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 644 0370 9E49     		ldr	r1, .L59
+ 645 0372 1346     		mov	r3, r2
+ 646 0374 DB00     		lsls	r3, r3, #3
+ 647 0376 9B1A     		subs	r3, r3, r2
+ 648 0378 9B00     		lsls	r3, r3, #2
+ 649 037a 0B44     		add	r3, r3, r1
+ 650 037c 1133     		adds	r3, r3, #17
+ 651 037e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 652 0380 002B     		cmp	r3, #0
+ 653 0382 03D0     		beq	.L39
+ 654              		.loc 1 187 0 is_stmt 0 discriminator 1
+ 655 0384 FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 656 0386 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 657 0388 9A42     		cmp	r2, r3
+ 658 038a 06D0     		beq	.L57
+ 659              	.L39:
+ 186:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 660              		.loc 1 186 0 is_stmt 1 discriminator 2
+ 661 038c FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 662 038e 0133     		adds	r3, r3, #1
+ 663 0390 FB77     		strb	r3, [r7, #31]
+ 664              	.L38:
+ 186:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isUsed && i == id){
+ 665              		.loc 1 186 0 is_stmt 0 discriminator 1
+ 666 0392 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 667 0394 092B     		cmp	r3, #9
+ 668 0396 EAD9     		bls	.L41
+ 669 0398 00E0     		b	.L40
+ 670              	.L57:
+ 188:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             break;
+ 671              		.loc 1 188 0 is_stmt 1
+ 672 039a 00BF     		nop
+ 673              	.L40:
+ 189:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 190:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 191:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (i==MAX_NUM_TIMERS){
+ 674              		.loc 1 191 0
+ 675 039c FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 676 039e 0A2B     		cmp	r3, #10
+ 677 03a0 00F01F81 		beq	.L58
+ 192:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // doesn't find the timer
+ 193:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         return;
+ 194:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 195:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 196:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // absolute scheduling is for one shot timer
+ 197:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].timerType = TIMER_ONESHOT;
+ 678              		.loc 1 197 0
+ 679 03a4 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 680 03a6 9149     		ldr	r1, .L59
+ 681 03a8 1346     		mov	r3, r2
+ 682 03aa DB00     		lsls	r3, r3, #3
+ 683 03ac 9B1A     		subs	r3, r3, r2
+ 684 03ae 9B00     		lsls	r3, r3, #2
+ 685 03b0 0B44     		add	r3, r3, r1
+ 686 03b2 1233     		adds	r3, r3, #18
+ 687 03b4 0122     		movs	r2, #1
+ 688 03b6 1A70     		strb	r2, [r3]
+ 198:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 199:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 2. updat the timer content
+ 200:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     switch (uint_type){
+ 689              		.loc 1 200 0
+ 690 03b8 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 691 03ba 002B     		cmp	r3, #0
+ 692 03bc 02D0     		beq	.L45
+ 693 03be 012B     		cmp	r3, #1
+ 694 03c0 23D0     		beq	.L46
+ 695 03c2 3FE0     		b	.L44
+ 696              	.L45:
+ 201:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     case TIME_MS:
+ 202:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].totalTimerPeriod = duration*PORT_TICS_PER_MS;
+ 697              		.loc 1 202 0
+ 698 03c4 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 699 03c6 B968     		ldr	r1, [r7, #8]
+ 700 03c8 0B46     		mov	r3, r1
+ 701 03ca 5B01     		lsls	r3, r3, #5
+ 702 03cc 1944     		add	r1, r1, r3
+ 703 03ce 8748     		ldr	r0, .L59
+ 704 03d0 1346     		mov	r3, r2
+ 705 03d2 DB00     		lsls	r3, r3, #3
+ 706 03d4 9B1A     		subs	r3, r3, r2
+ 707 03d6 9B00     		lsls	r3, r3, #2
+ 708 03d8 0344     		add	r3, r3, r0
+ 709 03da 1960     		str	r1, [r3]
+ 203:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].wraps_remaining  = (uint32_t)(duration*PORT_TICS_PER_MS)/MAX_
+ 710              		.loc 1 203 0
+ 711 03dc F97B     		ldrb	r1, [r7, #15]	@ zero_extendqisi2
+ 712 03de BA68     		ldr	r2, [r7, #8]
+ 713 03e0 1346     		mov	r3, r2
+ 714 03e2 5B01     		lsls	r3, r3, #5
+ 715 03e4 1A44     		add	r2, r2, r3
+ 716 03e6 0323     		movs	r3, #3
+ 717 03e8 A3FB0203 		umull	r0, r3, r3, r2
+ 718 03ec D21A     		subs	r2, r2, r3
+ 719 03ee 5208     		lsrs	r2, r2, #1
+ 720 03f0 1344     		add	r3, r3, r2
+ 721 03f2 9B0F     		lsrs	r3, r3, #30
+ 722 03f4 98B2     		uxth	r0, r3
+ 723 03f6 7D4A     		ldr	r2, .L59
+ 724 03f8 0B46     		mov	r3, r1
+ 725 03fa DB00     		lsls	r3, r3, #3
+ 726 03fc 5B1A     		subs	r3, r3, r1
+ 727 03fe 9B00     		lsls	r3, r3, #2
+ 728 0400 1344     		add	r3, r3, r2
+ 729 0402 0833     		adds	r3, r3, #8
+ 730 0404 0246     		mov	r2, r0	@ movhi
+ 731 0406 1A80     		strh	r2, [r3]	@ movhi
+ 204:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         break;
+ 732              		.loc 1 204 0
+ 733 0408 1CE0     		b	.L44
+ 734              	.L46:
+ 205:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     case TIME_TICS:
+ 206:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].totalTimerPeriod = duration;
+ 735              		.loc 1 206 0
+ 736 040a FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 737 040c 7749     		ldr	r1, .L59
+ 738 040e 1346     		mov	r3, r2
+ 739 0410 DB00     		lsls	r3, r3, #3
+ 740 0412 9B1A     		subs	r3, r3, r2
+ 741 0414 9B00     		lsls	r3, r3, #2
+ 742 0416 0B44     		add	r3, r3, r1
+ 743 0418 BA68     		ldr	r2, [r7, #8]
+ 744 041a 1A60     		str	r2, [r3]
+ 207:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].wraps_remaining  = (uint32_t)duration/MAX_TICKS_IN_SINGLE_CLO
+ 745              		.loc 1 207 0
+ 746 041c F97B     		ldrb	r1, [r7, #15]	@ zero_extendqisi2
+ 747 041e BA68     		ldr	r2, [r7, #8]
+ 748 0420 0323     		movs	r3, #3
+ 749 0422 A3FB0203 		umull	r0, r3, r3, r2
+ 750 0426 D21A     		subs	r2, r2, r3
+ 751 0428 5208     		lsrs	r2, r2, #1
+ 752 042a 1344     		add	r3, r3, r2
+ 753 042c 9B0F     		lsrs	r3, r3, #30
+ 754 042e 98B2     		uxth	r0, r3
+ 755 0430 6E4A     		ldr	r2, .L59
+ 756 0432 0B46     		mov	r3, r1
+ 757 0434 DB00     		lsls	r3, r3, #3
+ 758 0436 5B1A     		subs	r3, r3, r1
+ 759 0438 9B00     		lsls	r3, r3, #2
+ 760 043a 1344     		add	r3, r3, r2
+ 761 043c 0833     		adds	r3, r3, #8
+ 762 043e 0246     		mov	r2, r0	@ movhi
+ 763 0440 1A80     		strh	r2, [r3]	@ movhi
+ 208:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         break;
+ 764              		.loc 1 208 0
+ 765 0442 00BF     		nop
+ 766              	.L44:
+ 209:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 210:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 211:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (opentimers_vars.timersBuf[id].wraps_remaining==0){
+ 767              		.loc 1 211 0
+ 768 0444 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 769 0446 6949     		ldr	r1, .L59
+ 770 0448 1346     		mov	r3, r2
+ 771 044a DB00     		lsls	r3, r3, #3
+ 772 044c 9B1A     		subs	r3, r3, r2
+ 773 044e 9B00     		lsls	r3, r3, #2
+ 774 0450 0B44     		add	r3, r3, r1
+ 775 0452 0833     		adds	r3, r3, #8
+ 776 0454 1B88     		ldrh	r3, [r3]
+ 777 0456 002B     		cmp	r3, #0
+ 778 0458 13D1     		bne	.L47
+ 212:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].currentCompareValue = opentimers_vars.timersBuf[id].totalTime
+ 779              		.loc 1 212 0
+ 780 045a FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 781 045c F97B     		ldrb	r1, [r7, #15]	@ zero_extendqisi2
+ 782 045e 6348     		ldr	r0, .L59
+ 783 0460 0B46     		mov	r3, r1
+ 784 0462 DB00     		lsls	r3, r3, #3
+ 785 0464 5B1A     		subs	r3, r3, r1
+ 786 0466 9B00     		lsls	r3, r3, #2
+ 787 0468 0344     		add	r3, r3, r0
+ 788 046a 1968     		ldr	r1, [r3]
+ 789 046c 7B68     		ldr	r3, [r7, #4]
+ 790 046e 1944     		add	r1, r1, r3
+ 791 0470 5E48     		ldr	r0, .L59
+ 792 0472 1346     		mov	r3, r2
+ 793 0474 DB00     		lsls	r3, r3, #3
+ 794 0476 9B1A     		subs	r3, r3, r2
+ 795 0478 9B00     		lsls	r3, r3, #2
+ 796 047a 0344     		add	r3, r3, r0
+ 797 047c 0433     		adds	r3, r3, #4
+ 798 047e 1960     		str	r1, [r3]
+ 799 0480 0CE0     		b	.L48
+ 800              	.L47:
+ 213:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     } else {
+ 214:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].currentCompareValue = MAX_TICKS_IN_SINGLE_CLOCK+reference;
+ 801              		.loc 1 214 0
+ 802 0482 F97B     		ldrb	r1, [r7, #15]	@ zero_extendqisi2
+ 803 0484 7B68     		ldr	r3, [r7, #4]
+ 804 0486 03F10042 		add	r2, r3, #-2147483648
+ 805 048a 013A     		subs	r2, r2, #1
+ 806 048c 5748     		ldr	r0, .L59
+ 807 048e 0B46     		mov	r3, r1
+ 808 0490 DB00     		lsls	r3, r3, #3
+ 809 0492 5B1A     		subs	r3, r3, r1
+ 810 0494 9B00     		lsls	r3, r3, #2
+ 811 0496 0344     		add	r3, r3, r0
+ 812 0498 0433     		adds	r3, r3, #4
+ 813 049a 1A60     		str	r2, [r3]
+ 814              	.L48:
+ 215:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 216:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 217:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].isrunning           = TRUE;
+ 815              		.loc 1 217 0
+ 816 049c FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 817 049e 5349     		ldr	r1, .L59
+ 818 04a0 1346     		mov	r3, r2
+ 819 04a2 DB00     		lsls	r3, r3, #3
+ 820 04a4 9B1A     		subs	r3, r3, r2
+ 821 04a6 9B00     		lsls	r3, r3, #2
+ 822 04a8 0B44     		add	r3, r3, r1
+ 823 04aa 1033     		adds	r3, r3, #16
+ 824 04ac 0122     		movs	r2, #1
+ 825 04ae 1A70     		strb	r2, [r3]
+ 218:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].callback            = cb;
+ 826              		.loc 1 218 0
+ 827 04b0 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 828 04b2 4E49     		ldr	r1, .L59
+ 829 04b4 1346     		mov	r3, r2
+ 830 04b6 DB00     		lsls	r3, r3, #3
+ 831 04b8 9B1A     		subs	r3, r3, r2
+ 832 04ba 9B00     		lsls	r3, r3, #2
+ 833 04bc 0B44     		add	r3, r3, r1
+ 834 04be 1833     		adds	r3, r3, #24
+ 835 04c0 BA6A     		ldr	r2, [r7, #40]
+ 836 04c2 1A60     		str	r2, [r3]
+ 219:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 220:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 3. find the next timer to fire
+ 221:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 222:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // only execute update the currenttimeout if I am not inside of ISR or the ISR itself will do t
+ 223:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (opentimers_vars.insideISR==FALSE){
+ 837              		.loc 1 223 0
+ 838 04c4 494B     		ldr	r3, .L59
+ 839 04c6 93F86531 		ldrb	r3, [r3, #357]	@ zero_extendqisi2
+ 840 04ca 83F00103 		eor	r3, r3, #1
+ 841 04ce DBB2     		uxtb	r3, r3
+ 842 04d0 002B     		cmp	r3, #0
+ 843 04d2 00F08180 		beq	.L49
+ 224:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         timerGap     = opentimers_vars.timersBuf[0].currentCompareValue-opentimers_vars.lastTimeout
+ 844              		.loc 1 224 0
+ 845 04d6 454B     		ldr	r3, .L59
+ 846 04d8 5A68     		ldr	r2, [r3, #4]
+ 847 04da 444B     		ldr	r3, .L59
+ 848 04dc D3F82031 		ldr	r3, [r3, #288]
+ 849 04e0 D31A     		subs	r3, r2, r3
+ 850 04e2 BB61     		str	r3, [r7, #24]
+ 225:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         idToSchedule = 0;
+ 851              		.loc 1 225 0
+ 852 04e4 0023     		movs	r3, #0
+ 853 04e6 BB77     		strb	r3, [r7, #30]
+ 226:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         for (i=1;i<MAX_NUM_TIMERS;i++){
+ 854              		.loc 1 226 0
+ 855 04e8 0123     		movs	r3, #1
+ 856 04ea FB77     		strb	r3, [r7, #31]
+ 857 04ec 5FE0     		b	.L50
+ 858              	.L56:
+ 227:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 859              		.loc 1 227 0
+ 860 04ee FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 861 04f0 3E49     		ldr	r1, .L59
+ 862 04f2 1346     		mov	r3, r2
+ 863 04f4 DB00     		lsls	r3, r3, #3
+ 864 04f6 9B1A     		subs	r3, r3, r2
+ 865 04f8 9B00     		lsls	r3, r3, #2
+ 866 04fa 0B44     		add	r3, r3, r1
+ 867 04fc 1033     		adds	r3, r3, #16
+ 868 04fe 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 869 0500 002B     		cmp	r3, #0
+ 870 0502 51D0     		beq	.L51
+ 228:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 tempTimerGap = opentimers_vars.timersBuf[i].currentCompareValue-opentimers_vars.las
+ 871              		.loc 1 228 0
+ 872 0504 FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 873 0506 3949     		ldr	r1, .L59
+ 874 0508 1346     		mov	r3, r2
+ 875 050a DB00     		lsls	r3, r3, #3
+ 876 050c 9B1A     		subs	r3, r3, r2
+ 877 050e 9B00     		lsls	r3, r3, #2
+ 878 0510 0B44     		add	r3, r3, r1
+ 879 0512 0433     		adds	r3, r3, #4
+ 880 0514 1A68     		ldr	r2, [r3]
+ 881 0516 354B     		ldr	r3, .L59
+ 882 0518 D3F82031 		ldr	r3, [r3, #288]
+ 883 051c D31A     		subs	r3, r2, r3
+ 884 051e 7B61     		str	r3, [r7, #20]
+ 229:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (tempTimerGap < timerGap){
+ 885              		.loc 1 229 0
+ 886 0520 7A69     		ldr	r2, [r7, #20]
+ 887 0522 BB69     		ldr	r3, [r7, #24]
+ 888 0524 9A42     		cmp	r2, r3
+ 889 0526 22D2     		bcs	.L52
+ 230:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // if a timer "i" has low priority but has compare value less than 
+ 231:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // candidate timer "idToSchedule" more than TIMERTHRESHOLD ticks, 
+ 232:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // replace candidate timer by this timer "i".
+ 233:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[i].priority > opentimers_vars.timersBuf[idToSched
+ 890              		.loc 1 233 0
+ 891 0528 FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 892 052a 3049     		ldr	r1, .L59
+ 893 052c 1346     		mov	r3, r2
+ 894 052e DB00     		lsls	r3, r3, #3
+ 895 0530 9B1A     		subs	r3, r3, r2
+ 896 0532 9B00     		lsls	r3, r3, #2
+ 897 0534 0B44     		add	r3, r3, r1
+ 898 0536 1433     		adds	r3, r3, #20
+ 899 0538 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 900 053a BA7F     		ldrb	r2, [r7, #30]	@ zero_extendqisi2
+ 901 053c 2B48     		ldr	r0, .L59
+ 902 053e 1346     		mov	r3, r2
+ 903 0540 DB00     		lsls	r3, r3, #3
+ 904 0542 9B1A     		subs	r3, r3, r2
+ 905 0544 9B00     		lsls	r3, r3, #2
+ 906 0546 0344     		add	r3, r3, r0
+ 907 0548 1433     		adds	r3, r3, #20
+ 908 054a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 909 054c 9942     		cmp	r1, r3
+ 910 054e 09D9     		bls	.L53
+ 234:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         if (timerGap-tempTimerGap > TIMERTHRESHOLD){
+ 911              		.loc 1 234 0
+ 912 0550 BA69     		ldr	r2, [r7, #24]
+ 913 0552 7B69     		ldr	r3, [r7, #20]
+ 914 0554 D31A     		subs	r3, r2, r3
+ 915 0556 0A2B     		cmp	r3, #10
+ 916 0558 26D9     		bls	.L51
+ 235:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             timerGap     = tempTimerGap;
+ 917              		.loc 1 235 0
+ 918 055a 7B69     		ldr	r3, [r7, #20]
+ 919 055c BB61     		str	r3, [r7, #24]
+ 236:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             idToSchedule = i;
+ 920              		.loc 1 236 0
+ 921 055e FB7F     		ldrb	r3, [r7, #31]
+ 922 0560 BB77     		strb	r3, [r7, #30]
+ 923 0562 21E0     		b	.L51
+ 924              	.L53:
+ 237:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         }
+ 238:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     } else {
+ 239:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 240:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // and compare value less than candidate timer replace candidate 
+ 241:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         // timer by timer "i".
+ 242:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         timerGap     = tempTimerGap;
+ 925              		.loc 1 242 0
+ 926 0564 7B69     		ldr	r3, [r7, #20]
+ 927 0566 BB61     		str	r3, [r7, #24]
+ 243:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         idToSchedule = i;
+ 928              		.loc 1 243 0
+ 929 0568 FB7F     		ldrb	r3, [r7, #31]
+ 930 056a BB77     		strb	r3, [r7, #30]
+ 931 056c 1CE0     		b	.L51
+ 932              	.L52:
+ 244:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 245:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 } else {
+ 246:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // if a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 247:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // and its compare value is larger than timer "i" no more than TIMERTHRESHOLD t
+ 248:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // replace candidate timer by timer "i".
+ 249:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[i].priority < opentimers_vars.timersBuf[idToSched
+ 933              		.loc 1 249 0
+ 934 056e FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 935 0570 1E49     		ldr	r1, .L59
+ 936 0572 1346     		mov	r3, r2
+ 937 0574 DB00     		lsls	r3, r3, #3
+ 938 0576 9B1A     		subs	r3, r3, r2
+ 939 0578 9B00     		lsls	r3, r3, #2
+ 940 057a 0B44     		add	r3, r3, r1
+ 941 057c 1433     		adds	r3, r3, #20
+ 942 057e 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 943 0580 BA7F     		ldrb	r2, [r7, #30]	@ zero_extendqisi2
+ 944 0582 1A48     		ldr	r0, .L59
+ 945 0584 1346     		mov	r3, r2
+ 946 0586 DB00     		lsls	r3, r3, #3
+ 947 0588 9B1A     		subs	r3, r3, r2
+ 948 058a 9B00     		lsls	r3, r3, #2
+ 949 058c 0344     		add	r3, r3, r0
+ 950 058e 1433     		adds	r3, r3, #20
+ 951 0590 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 952 0592 9942     		cmp	r1, r3
+ 953 0594 08D2     		bcs	.L51
+ 250:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         if (tempTimerGap - timerGap < TIMERTHRESHOLD){
+ 954              		.loc 1 250 0
+ 955 0596 7A69     		ldr	r2, [r7, #20]
+ 956 0598 BB69     		ldr	r3, [r7, #24]
+ 957 059a D31A     		subs	r3, r2, r3
+ 958 059c 092B     		cmp	r3, #9
+ 959 059e 03D8     		bhi	.L51
+ 251:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             timerGap     = tempTimerGap;
+ 960              		.loc 1 251 0
+ 961 05a0 7B69     		ldr	r3, [r7, #20]
+ 962 05a2 BB61     		str	r3, [r7, #24]
+ 252:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                             idToSchedule = i;
+ 963              		.loc 1 252 0
+ 964 05a4 FB7F     		ldrb	r3, [r7, #31]
+ 965 05a6 BB77     		strb	r3, [r7, #30]
+ 966              	.L51:
+ 226:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 967              		.loc 1 226 0 discriminator 2
+ 968 05a8 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 969 05aa 0133     		adds	r3, r3, #1
+ 970 05ac FB77     		strb	r3, [r7, #31]
+ 971              	.L50:
+ 226:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.timersBuf[i].isrunning){
+ 972              		.loc 1 226 0 is_stmt 0 discriminator 1
+ 973 05ae FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 974 05b0 092B     		cmp	r3, #9
+ 975 05b2 9CD9     		bls	.L56
+ 253:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         }
+ 254:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 255:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 256:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 257:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 258:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         
+ 259:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // if I got here, assign the next to be fired timer to given timer
+ 260:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.currentTimeout = opentimers_vars.timersBuf[idToSchedule].currentCompareValu
+ 976              		.loc 1 260 0 is_stmt 1
+ 977 05b4 BA7F     		ldrb	r2, [r7, #30]	@ zero_extendqisi2
+ 978 05b6 0D49     		ldr	r1, .L59
+ 979 05b8 1346     		mov	r3, r2
+ 980 05ba DB00     		lsls	r3, r3, #3
+ 981 05bc 9B1A     		subs	r3, r3, r2
+ 982 05be 9B00     		lsls	r3, r3, #2
+ 983 05c0 0B44     		add	r3, r3, r1
+ 984 05c2 0433     		adds	r3, r3, #4
+ 985 05c4 1B68     		ldr	r3, [r3]
+ 986 05c6 094A     		ldr	r2, .L59
+ 987 05c8 C2F81C31 		str	r3, [r2, #284]
+ 261:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         sctimer_setCompare(opentimers_vars.currentTimeout);
+ 988              		.loc 1 261 0
+ 989 05cc 074B     		ldr	r3, .L59
+ 990 05ce D3F81C31 		ldr	r3, [r3, #284]
+ 991 05d2 1846     		mov	r0, r3
+ 992 05d4 FFF7FEFF 		bl	sctimer_setCompare
+ 993              	.L49:
+ 262:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 263:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.running        = TRUE;
+ 994              		.loc 1 263 0
+ 995 05d8 044B     		ldr	r3, .L59
+ 996 05da 0122     		movs	r2, #1
+ 997 05dc 83F81821 		strb	r2, [r3, #280]
+ 998 05e0 00E0     		b	.L37
+ 999              	.L58:
+ 193:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 1000              		.loc 1 193 0
+ 1001 05e2 00BF     		nop
+ 1002              	.L37:
+ 264:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1003              		.loc 1 264 0
+ 1004 05e4 2037     		adds	r7, r7, #32
+ 1005              		.cfi_def_cfa_offset 8
+ 1006 05e6 BD46     		mov	sp, r7
+ 1007              		.cfi_def_cfa_register 13
+ 1008              		@ sp needed
+ 1009 05e8 80BD     		pop	{r7, pc}
+ 1010              	.L60:
+ 1011 05ea 00BF     		.align	2
+ 1012              	.L59:
+ 1013 05ec 00000000 		.word	opentimers_vars
+ 1014              		.cfi_endproc
+ 1015              	.LFE3:
+ 1017              		.align	2
+ 1018              		.global	opentimers_cancel
+ 1019              		.thumb
+ 1020              		.thumb_func
+ 1022              	opentimers_cancel:
+ 1023              	.LFB4:
+ 265:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 266:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 267:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief cancel a running timer.
+ 268:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 269:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** This function disable the timer temperally by removing its callback and marking
+ 270:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** isrunning as false. The timer may be recover later.
+ 271:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 272:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] id the timer id
+ 273:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 274:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_cancel(opentimers_id_t id){
+ 1024              		.loc 1 274 0
+ 1025              		.cfi_startproc
+ 1026              		@ args = 0, pretend = 0, frame = 8
+ 1027              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1028              		@ link register save eliminated.
+ 1029 05f0 80B4     		push	{r7}
+ 1030              		.cfi_def_cfa_offset 4
+ 1031              		.cfi_offset 7, -4
+ 1032 05f2 83B0     		sub	sp, sp, #12
+ 1033              		.cfi_def_cfa_offset 16
+ 1034 05f4 00AF     		add	r7, sp, #0
+ 1035              		.cfi_def_cfa_register 7
+ 1036 05f6 0346     		mov	r3, r0
+ 1037 05f8 FB71     		strb	r3, [r7, #7]
+ 275:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].isrunning = FALSE;
+ 1038              		.loc 1 275 0
+ 1039 05fa FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1040 05fc 0B49     		ldr	r1, .L62
+ 1041 05fe 1346     		mov	r3, r2
+ 1042 0600 DB00     		lsls	r3, r3, #3
+ 1043 0602 9B1A     		subs	r3, r3, r2
+ 1044 0604 9B00     		lsls	r3, r3, #2
+ 1045 0606 0B44     		add	r3, r3, r1
+ 1046 0608 1033     		adds	r3, r3, #16
+ 1047 060a 0022     		movs	r2, #0
+ 1048 060c 1A70     		strb	r2, [r3]
+ 276:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.timersBuf[id].callback  = NULL;
+ 1049              		.loc 1 276 0
+ 1050 060e FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1051 0610 0649     		ldr	r1, .L62
+ 1052 0612 1346     		mov	r3, r2
+ 1053 0614 DB00     		lsls	r3, r3, #3
+ 1054 0616 9B1A     		subs	r3, r3, r2
+ 1055 0618 9B00     		lsls	r3, r3, #2
+ 1056 061a 0B44     		add	r3, r3, r1
+ 1057 061c 1833     		adds	r3, r3, #24
+ 1058 061e 0022     		movs	r2, #0
+ 1059 0620 1A60     		str	r2, [r3]
+ 277:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1060              		.loc 1 277 0
+ 1061 0622 00BF     		nop
+ 1062 0624 0C37     		adds	r7, r7, #12
+ 1063              		.cfi_def_cfa_offset 4
+ 1064 0626 BD46     		mov	sp, r7
+ 1065              		.cfi_def_cfa_register 13
+ 1066              		@ sp needed
+ 1067 0628 80BC     		pop	{r7}
+ 1068              		.cfi_restore 7
+ 1069              		.cfi_def_cfa_offset 0
+ 1070 062a 7047     		bx	lr
+ 1071              	.L63:
+ 1072              		.align	2
+ 1073              	.L62:
+ 1074 062c 00000000 		.word	opentimers_vars
+ 1075              		.cfi_endproc
+ 1076              	.LFE4:
+ 1078              		.align	2
+ 1079              		.global	opentimers_destroy
+ 1080              		.thumb
+ 1081              		.thumb_func
+ 1083              	opentimers_destroy:
+ 1084              	.LFB5:
+ 278:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 279:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 280:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief destroy a stored timer.
+ 281:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 282:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** Reset the whole entry of given timer including the id.
+ 283:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 284:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] id the timer id
+ 285:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 286:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \returns False if the given can't be found or return Success
+ 287:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 288:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** bool opentimers_destroy(opentimers_id_t id){
+ 1085              		.loc 1 288 0
+ 1086              		.cfi_startproc
+ 1087              		@ args = 0, pretend = 0, frame = 8
+ 1088              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1089 0630 80B5     		push	{r7, lr}
+ 1090              		.cfi_def_cfa_offset 8
+ 1091              		.cfi_offset 7, -8
+ 1092              		.cfi_offset 14, -4
+ 1093 0632 82B0     		sub	sp, sp, #8
+ 1094              		.cfi_def_cfa_offset 16
+ 1095 0634 00AF     		add	r7, sp, #0
+ 1096              		.cfi_def_cfa_register 7
+ 1097 0636 0346     		mov	r3, r0
+ 1098 0638 FB71     		strb	r3, [r7, #7]
+ 289:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (id<MAX_NUM_TIMERS){
+ 1099              		.loc 1 289 0
+ 1100 063a FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1101 063c 092B     		cmp	r3, #9
+ 1102 063e 0DD8     		bhi	.L65
+ 290:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         memset(&opentimers_vars.timersBuf[id],0,sizeof(opentimers_t));
+ 1103              		.loc 1 290 0
+ 1104 0640 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1105 0642 1346     		mov	r3, r2
+ 1106 0644 DB00     		lsls	r3, r3, #3
+ 1107 0646 9B1A     		subs	r3, r3, r2
+ 1108 0648 9B00     		lsls	r3, r3, #2
+ 1109 064a 074A     		ldr	r2, .L67
+ 1110 064c 1344     		add	r3, r3, r2
+ 1111 064e 1C22     		movs	r2, #28
+ 1112 0650 0021     		movs	r1, #0
+ 1113 0652 1846     		mov	r0, r3
+ 1114 0654 FFF7FEFF 		bl	memset
+ 291:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         return TRUE;
+ 1115              		.loc 1 291 0
+ 1116 0658 0123     		movs	r3, #1
+ 1117 065a 00E0     		b	.L66
+ 1118              	.L65:
+ 292:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     } else {
+ 293:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         return FALSE;
+ 1119              		.loc 1 293 0
+ 1120 065c 0023     		movs	r3, #0
+ 1121              	.L66:
+ 294:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 295:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1122              		.loc 1 295 0
+ 1123 065e 1846     		mov	r0, r3
+ 1124 0660 0837     		adds	r7, r7, #8
+ 1125              		.cfi_def_cfa_offset 8
+ 1126 0662 BD46     		mov	sp, r7
+ 1127              		.cfi_def_cfa_register 13
+ 1128              		@ sp needed
+ 1129 0664 80BD     		pop	{r7, pc}
+ 1130              	.L68:
+ 1131 0666 00BF     		.align	2
+ 1132              	.L67:
+ 1133 0668 00000000 		.word	opentimers_vars
+ 1134              		.cfi_endproc
+ 1135              	.LFE5:
+ 1137              		.align	2
+ 1138              		.global	opentimers_getValue
+ 1139              		.thumb
+ 1140              		.thumb_func
+ 1142              	opentimers_getValue:
+ 1143              	.LFB6:
+ 296:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 297:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 298:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief get the current counter value of sctimer.
+ 299:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 300:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \returns the current counter value.
+ 301:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 302:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** PORT_TIMER_WIDTH opentimers_getValue(void){
+ 1144              		.loc 1 302 0
+ 1145              		.cfi_startproc
+ 1146              		@ args = 0, pretend = 0, frame = 0
+ 1147              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1148 066c 80B5     		push	{r7, lr}
+ 1149              		.cfi_def_cfa_offset 8
+ 1150              		.cfi_offset 7, -8
+ 1151              		.cfi_offset 14, -4
+ 1152 066e 00AF     		add	r7, sp, #0
+ 1153              		.cfi_def_cfa_register 7
+ 303:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     return sctimer_readCounter();
+ 1154              		.loc 1 303 0
+ 1155 0670 FFF7FEFF 		bl	sctimer_readCounter
+ 1156 0674 0346     		mov	r3, r0
+ 304:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1157              		.loc 1 304 0
+ 1158 0676 1846     		mov	r0, r3
+ 1159 0678 80BD     		pop	{r7, pc}
+ 1160              		.cfi_endproc
+ 1161              	.LFE6:
+ 1163 067a 00BF     		.align	2
+ 1164              		.global	opentimers_getCurrentTimeout
+ 1165              		.thumb
+ 1166              		.thumb_func
+ 1168              	opentimers_getCurrentTimeout:
+ 1169              	.LFB7:
+ 305:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 306:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 307:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief get the currentTimeout variable of opentimer2.
+ 308:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 309:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \returns currentTimeout.
+ 310:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 311:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** PORT_TIMER_WIDTH opentimers_getCurrentTimeout(void){
+ 1170              		.loc 1 311 0
+ 1171              		.cfi_startproc
+ 1172              		@ args = 0, pretend = 0, frame = 0
+ 1173              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1174              		@ link register save eliminated.
+ 1175 067c 80B4     		push	{r7}
+ 1176              		.cfi_def_cfa_offset 4
+ 1177              		.cfi_offset 7, -4
+ 1178 067e 00AF     		add	r7, sp, #0
+ 1179              		.cfi_def_cfa_register 7
+ 312:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     return opentimers_vars.currentTimeout;
+ 1180              		.loc 1 312 0
+ 1181 0680 034B     		ldr	r3, .L73
+ 1182 0682 D3F81C31 		ldr	r3, [r3, #284]
+ 313:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1183              		.loc 1 313 0
+ 1184 0686 1846     		mov	r0, r3
+ 1185 0688 BD46     		mov	sp, r7
+ 1186              		.cfi_def_cfa_register 13
+ 1187              		@ sp needed
+ 1188 068a 80BC     		pop	{r7}
+ 1189              		.cfi_restore 7
+ 1190              		.cfi_def_cfa_offset 0
+ 1191 068c 7047     		bx	lr
+ 1192              	.L74:
+ 1193 068e 00BF     		.align	2
+ 1194              	.L73:
+ 1195 0690 00000000 		.word	opentimers_vars
+ 1196              		.cfi_endproc
+ 1197              	.LFE7:
+ 1199              		.align	2
+ 1200              		.global	opentimers_isRunning
+ 1201              		.thumb
+ 1202              		.thumb_func
+ 1204              	opentimers_isRunning:
+ 1205              	.LFB8:
+ 314:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 315:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 316:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief is the given timer running?
+ 317:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 318:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \returns isRunning variable.
+ 319:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 320:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** bool opentimers_isRunning(opentimers_id_t id){
+ 1206              		.loc 1 320 0
+ 1207              		.cfi_startproc
+ 1208              		@ args = 0, pretend = 0, frame = 8
+ 1209              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1210              		@ link register save eliminated.
+ 1211 0694 80B4     		push	{r7}
+ 1212              		.cfi_def_cfa_offset 4
+ 1213              		.cfi_offset 7, -4
+ 1214 0696 83B0     		sub	sp, sp, #12
+ 1215              		.cfi_def_cfa_offset 16
+ 1216 0698 00AF     		add	r7, sp, #0
+ 1217              		.cfi_def_cfa_register 7
+ 1218 069a 0346     		mov	r3, r0
+ 1219 069c FB71     		strb	r3, [r7, #7]
+ 321:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     return opentimers_vars.timersBuf[id].isrunning;
+ 1220              		.loc 1 321 0
+ 1221 069e FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1222 06a0 0649     		ldr	r1, .L77
+ 1223 06a2 1346     		mov	r3, r2
+ 1224 06a4 DB00     		lsls	r3, r3, #3
+ 1225 06a6 9B1A     		subs	r3, r3, r2
+ 1226 06a8 9B00     		lsls	r3, r3, #2
+ 1227 06aa 0B44     		add	r3, r3, r1
+ 1228 06ac 1033     		adds	r3, r3, #16
+ 1229 06ae 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 322:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1230              		.loc 1 322 0
+ 1231 06b0 1846     		mov	r0, r3
+ 1232 06b2 0C37     		adds	r7, r7, #12
+ 1233              		.cfi_def_cfa_offset 4
+ 1234 06b4 BD46     		mov	sp, r7
+ 1235              		.cfi_def_cfa_register 13
+ 1236              		@ sp needed
+ 1237 06b6 80BC     		pop	{r7}
+ 1238              		.cfi_restore 7
+ 1239              		.cfi_def_cfa_offset 0
+ 1240 06b8 7047     		bx	lr
+ 1241              	.L78:
+ 1242 06ba 00BF     		.align	2
+ 1243              	.L77:
+ 1244 06bc 00000000 		.word	opentimers_vars
+ 1245              		.cfi_endproc
+ 1246              	.LFE8:
+ 1248              		.align	2
+ 1249              		.global	opentimers_setPriority
+ 1250              		.thumb
+ 1251              		.thumb_func
+ 1253              	opentimers_setPriority:
+ 1254              	.LFB9:
+ 323:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 324:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 325:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 326:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief set the priority of given timer
+ 327:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 328:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] id indicates the timer to be assigned.
+ 329:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \param[in] priority indicates the priority of given timer.
+ 330:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 331:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_setPriority(opentimers_id_t id, uint8_t priority){
+ 1255              		.loc 1 331 0
+ 1256              		.cfi_startproc
+ 1257              		@ args = 0, pretend = 0, frame = 8
+ 1258              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1259              		@ link register save eliminated.
+ 1260 06c0 80B4     		push	{r7}
+ 1261              		.cfi_def_cfa_offset 4
+ 1262              		.cfi_offset 7, -4
+ 1263 06c2 83B0     		sub	sp, sp, #12
+ 1264              		.cfi_def_cfa_offset 16
+ 1265 06c4 00AF     		add	r7, sp, #0
+ 1266              		.cfi_def_cfa_register 7
+ 1267 06c6 0346     		mov	r3, r0
+ 1268 06c8 0A46     		mov	r2, r1
+ 1269 06ca FB71     		strb	r3, [r7, #7]
+ 1270 06cc 1346     		mov	r3, r2
+ 1271 06ce BB71     		strb	r3, [r7, #6]
+ 332:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (opentimers_vars.timersBuf[id].isUsed  == TRUE){
+ 1272              		.loc 1 332 0
+ 1273 06d0 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1274 06d2 0C49     		ldr	r1, .L82
+ 1275 06d4 1346     		mov	r3, r2
+ 1276 06d6 DB00     		lsls	r3, r3, #3
+ 1277 06d8 9B1A     		subs	r3, r3, r2
+ 1278 06da 9B00     		lsls	r3, r3, #2
+ 1279 06dc 0B44     		add	r3, r3, r1
+ 1280 06de 1133     		adds	r3, r3, #17
+ 1281 06e0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1282 06e2 002B     		cmp	r3, #0
+ 1283 06e4 09D0     		beq	.L81
+ 333:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         opentimers_vars.timersBuf[id].priority = priority;
+ 1284              		.loc 1 333 0
+ 1285 06e6 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1286 06e8 0649     		ldr	r1, .L82
+ 1287 06ea 1346     		mov	r3, r2
+ 1288 06ec DB00     		lsls	r3, r3, #3
+ 1289 06ee 9B1A     		subs	r3, r3, r2
+ 1290 06f0 9B00     		lsls	r3, r3, #2
+ 1291 06f2 0B44     		add	r3, r3, r1
+ 1292 06f4 1433     		adds	r3, r3, #20
+ 1293 06f6 BA79     		ldrb	r2, [r7, #6]
+ 1294 06f8 1A70     		strb	r2, [r3]
+ 1295              	.L81:
+ 334:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     } else {
+ 335:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // the given timer is not used, do nothing.
+ 336:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 337:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }
+ 1296              		.loc 1 337 0
+ 1297 06fa 00BF     		nop
+ 1298 06fc 0C37     		adds	r7, r7, #12
+ 1299              		.cfi_def_cfa_offset 4
+ 1300 06fe BD46     		mov	sp, r7
+ 1301              		.cfi_def_cfa_register 13
+ 1302              		@ sp needed
+ 1303 0700 80BC     		pop	{r7}
+ 1304              		.cfi_restore 7
+ 1305              		.cfi_def_cfa_offset 0
+ 1306 0702 7047     		bx	lr
+ 1307              	.L83:
+ 1308              		.align	2
+ 1309              	.L82:
+ 1310 0704 00000000 		.word	opentimers_vars
+ 1311              		.cfi_endproc
+ 1312              	.LFE9:
+ 1314              		.align	2
+ 1315              		.global	opentimers_timer_callback
+ 1316              		.thumb
+ 1317              		.thumb_func
+ 1319              	opentimers_timer_callback:
+ 1320              	.LFB10:
+ 338:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 339:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** // ========================== callback ========================================
+ 340:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 341:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** /**
+ 342:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** \brief this is the callback function of opentimer2.
+ 343:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** 
+ 344:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** This function is called when sctimer interrupt happens. The function looks the 
+ 345:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** whole timer buffer and find out the correct timer responding to the interrupt
+ 346:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** and call the callback recorded for that timer.
+ 347:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****  */
+ 348:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** void opentimers_timer_callback(void){
+ 1321              		.loc 1 348 0
+ 1322              		.cfi_startproc
+ 1323              		@ args = 0, pretend = 0, frame = 16
+ 1324              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1325 0708 90B5     		push	{r4, r7, lr}
+ 1326              		.cfi_def_cfa_offset 12
+ 1327              		.cfi_offset 4, -12
+ 1328              		.cfi_offset 7, -8
+ 1329              		.cfi_offset 14, -4
+ 1330 070a 87B0     		sub	sp, sp, #28
+ 1331              		.cfi_def_cfa_offset 40
+ 1332 070c 02AF     		add	r7, sp, #8
+ 1333              		.cfi_def_cfa 7, 32
+ 349:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t i;
+ 350:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t j;
+ 351:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t idToCallCB;
+ 352:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     uint8_t idToSchedule;
+ 353:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH timerGap;
+ 354:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH tempTimerGap;
+ 355:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     PORT_TIMER_WIDTH tempLastTimeout = opentimers_vars.currentTimeout;
+ 1334              		.loc 1 355 0
+ 1335 070e A34B     		ldr	r3, .L107
+ 1336 0710 D3F81C31 		ldr	r3, [r3, #284]
+ 1337 0714 7B60     		str	r3, [r7, #4]
+ 356:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 1. find the expired timer
+ 357:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=0;i<MAX_NUM_TIMERS;i++){
+ 1338              		.loc 1 357 0
+ 1339 0716 0023     		movs	r3, #0
+ 1340 0718 FB73     		strb	r3, [r7, #15]
+ 1341 071a 3CE0     		b	.L85
+ 1342              	.L87:
+ 358:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning==TRUE){
+ 1343              		.loc 1 358 0
+ 1344 071c FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1345 071e 9F49     		ldr	r1, .L107
+ 1346 0720 1346     		mov	r3, r2
+ 1347 0722 DB00     		lsls	r3, r3, #3
+ 1348 0724 9B1A     		subs	r3, r3, r2
+ 1349 0726 9B00     		lsls	r3, r3, #2
+ 1350 0728 0B44     		add	r3, r3, r1
+ 1351 072a 1033     		adds	r3, r3, #16
+ 1352 072c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1353 072e 002B     		cmp	r3, #0
+ 1354 0730 2ED0     		beq	.L86
+ 359:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             // all timers in the past within TIMERTHRESHOLD ticks
+ 360:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             // (probably with low priority) will mared as Expired.
+ 361:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (opentimers_vars.currentTimeout-opentimers_vars.timersBuf[i].currentCompareValue <= 
+ 1355              		.loc 1 361 0
+ 1356 0732 9A4B     		ldr	r3, .L107
+ 1357 0734 D3F81C11 		ldr	r1, [r3, #284]
+ 1358 0738 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1359 073a 9848     		ldr	r0, .L107
+ 1360 073c 1346     		mov	r3, r2
+ 1361 073e DB00     		lsls	r3, r3, #3
+ 1362 0740 9B1A     		subs	r3, r3, r2
+ 1363 0742 9B00     		lsls	r3, r3, #2
+ 1364 0744 0344     		add	r3, r3, r0
+ 1365 0746 0433     		adds	r3, r3, #4
+ 1366 0748 1B68     		ldr	r3, [r3]
+ 1367 074a CB1A     		subs	r3, r1, r3
+ 1368 074c 0A2B     		cmp	r3, #10
+ 1369 074e 1FD8     		bhi	.L86
+ 362:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // this timer expired, mark as expired
+ 363:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 opentimers_vars.timersBuf[i].hasExpired = TRUE;
+ 1370              		.loc 1 363 0
+ 1371 0750 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1372 0752 9249     		ldr	r1, .L107
+ 1373 0754 1346     		mov	r3, r2
+ 1374 0756 DB00     		lsls	r3, r3, #3
+ 1375 0758 9B1A     		subs	r3, r3, r2
+ 1376 075a 9B00     		lsls	r3, r3, #2
+ 1377 075c 0B44     		add	r3, r3, r1
+ 1378 075e 1333     		adds	r3, r3, #19
+ 1379 0760 0122     		movs	r2, #1
+ 1380 0762 1A70     		strb	r2, [r3]
+ 364:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // find the fired timer who has the smallest currentTimeout as last Timeout
+ 365:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (tempLastTimeout>opentimers_vars.timersBuf[i].currentCompareValue){
+ 1381              		.loc 1 365 0
+ 1382 0764 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1383 0766 8D49     		ldr	r1, .L107
+ 1384 0768 1346     		mov	r3, r2
+ 1385 076a DB00     		lsls	r3, r3, #3
+ 1386 076c 9B1A     		subs	r3, r3, r2
+ 1387 076e 9B00     		lsls	r3, r3, #2
+ 1388 0770 0B44     		add	r3, r3, r1
+ 1389 0772 0433     		adds	r3, r3, #4
+ 1390 0774 1A68     		ldr	r2, [r3]
+ 1391 0776 7B68     		ldr	r3, [r7, #4]
+ 1392 0778 9A42     		cmp	r2, r3
+ 1393 077a 09D2     		bcs	.L86
+ 366:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     tempLastTimeout = opentimers_vars.timersBuf[i].currentCompareValue;
+ 1394              		.loc 1 366 0
+ 1395 077c FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1396 077e 8749     		ldr	r1, .L107
+ 1397 0780 1346     		mov	r3, r2
+ 1398 0782 DB00     		lsls	r3, r3, #3
+ 1399 0784 9B1A     		subs	r3, r3, r2
+ 1400 0786 9B00     		lsls	r3, r3, #2
+ 1401 0788 0B44     		add	r3, r3, r1
+ 1402 078a 0433     		adds	r3, r3, #4
+ 1403 078c 1B68     		ldr	r3, [r3]
+ 1404 078e 7B60     		str	r3, [r7, #4]
+ 1405              	.L86:
+ 357:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning==TRUE){
+ 1406              		.loc 1 357 0 discriminator 2
+ 1407 0790 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 1408 0792 0133     		adds	r3, r3, #1
+ 1409 0794 FB73     		strb	r3, [r7, #15]
+ 1410              	.L85:
+ 357:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning==TRUE){
+ 1411              		.loc 1 357 0 is_stmt 0 discriminator 1
+ 1412 0796 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 1413 0798 092B     		cmp	r3, #9
+ 1414 079a BFD9     		bls	.L87
+ 367:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 368:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 369:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 370:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 371:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 372:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // update lastTimeout
+ 373:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.lastTimeout                               = tempLastTimeout;
+ 1415              		.loc 1 373 0 is_stmt 1
+ 1416 079c 7F4A     		ldr	r2, .L107
+ 1417 079e 7B68     		ldr	r3, [r7, #4]
+ 1418 07a0 C2F82031 		str	r3, [r2, #288]
+ 374:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 375:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 2. call the callback of expired timers
+ 376:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.insideISR = TRUE;
+ 1419              		.loc 1 376 0
+ 1420 07a4 7D4B     		ldr	r3, .L107
+ 1421 07a6 0122     		movs	r2, #1
+ 1422 07a8 83F86521 		strb	r2, [r3, #357]
+ 377:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 378:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     idToCallCB = TOO_MANY_TIMERS_ERROR;
+ 1423              		.loc 1 378 0
+ 1424 07ac FF23     		movs	r3, #255
+ 1425 07ae 7B73     		strb	r3, [r7, #13]
+ 379:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // find out the timer expired with highest priority 
+ 380:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (j=0;j<MAX_NUM_TIMERS;j++){
+ 1426              		.loc 1 380 0
+ 1427 07b0 0023     		movs	r3, #0
+ 1428 07b2 BB73     		strb	r3, [r7, #14]
+ 1429 07b4 29E0     		b	.L88
+ 1430              	.L91:
+ 381:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[j].hasExpired == TRUE){
+ 1431              		.loc 1 381 0
+ 1432 07b6 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1433 07b8 7849     		ldr	r1, .L107
+ 1434 07ba 1346     		mov	r3, r2
+ 1435 07bc DB00     		lsls	r3, r3, #3
+ 1436 07be 9B1A     		subs	r3, r3, r2
+ 1437 07c0 9B00     		lsls	r3, r3, #2
+ 1438 07c2 0B44     		add	r3, r3, r1
+ 1439 07c4 1333     		adds	r3, r3, #19
+ 1440 07c6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1441 07c8 002B     		cmp	r3, #0
+ 1442 07ca 1BD0     		beq	.L89
+ 382:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (idToCallCB==TOO_MANY_TIMERS_ERROR){
+ 1443              		.loc 1 382 0
+ 1444 07cc 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 1445 07ce FF2B     		cmp	r3, #255
+ 1446 07d0 02D1     		bne	.L90
+ 383:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 idToCallCB = j;
+ 1447              		.loc 1 383 0
+ 1448 07d2 BB7B     		ldrb	r3, [r7, #14]
+ 1449 07d4 7B73     		strb	r3, [r7, #13]
+ 1450 07d6 15E0     		b	.L89
+ 1451              	.L90:
+ 384:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             } else {
+ 385:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (opentimers_vars.timersBuf[j].priority<opentimers_vars.timersBuf[idToCallCB].pri
+ 1452              		.loc 1 385 0
+ 1453 07d8 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1454 07da 7049     		ldr	r1, .L107
+ 1455 07dc 1346     		mov	r3, r2
+ 1456 07de DB00     		lsls	r3, r3, #3
+ 1457 07e0 9B1A     		subs	r3, r3, r2
+ 1458 07e2 9B00     		lsls	r3, r3, #2
+ 1459 07e4 0B44     		add	r3, r3, r1
+ 1460 07e6 1433     		adds	r3, r3, #20
+ 1461 07e8 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 1462 07ea 7A7B     		ldrb	r2, [r7, #13]	@ zero_extendqisi2
+ 1463 07ec 6B48     		ldr	r0, .L107
+ 1464 07ee 1346     		mov	r3, r2
+ 1465 07f0 DB00     		lsls	r3, r3, #3
+ 1466 07f2 9B1A     		subs	r3, r3, r2
+ 1467 07f4 9B00     		lsls	r3, r3, #2
+ 1468 07f6 0344     		add	r3, r3, r0
+ 1469 07f8 1433     		adds	r3, r3, #20
+ 1470 07fa 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1471 07fc 9942     		cmp	r1, r3
+ 1472 07fe 01D2     		bcs	.L89
+ 386:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     idToCallCB = j;
+ 1473              		.loc 1 386 0
+ 1474 0800 BB7B     		ldrb	r3, [r7, #14]
+ 1475 0802 7B73     		strb	r3, [r7, #13]
+ 1476              	.L89:
+ 380:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[j].hasExpired == TRUE){
+ 1477              		.loc 1 380 0 discriminator 2
+ 1478 0804 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1479 0806 0133     		adds	r3, r3, #1
+ 1480 0808 BB73     		strb	r3, [r7, #14]
+ 1481              	.L88:
+ 380:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[j].hasExpired == TRUE){
+ 1482              		.loc 1 380 0 is_stmt 0 discriminator 1
+ 1483 080a BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1484 080c 092B     		cmp	r3, #9
+ 1485 080e D2D9     		bls	.L91
+ 387:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 388:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 389:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 390:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 391:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     if (idToCallCB==TOO_MANY_TIMERS_ERROR){
+ 1486              		.loc 1 391 0 is_stmt 1
+ 1487 0810 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 1488 0812 FF2B     		cmp	r3, #255
+ 1489 0814 00F0EA80 		beq	.L92
+ 392:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // no more timer expired
+ 393:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     } else {
+ 394:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         // call all timers expired having the same priority with timer idToCallCB
+ 395:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         for (j=0;j<MAX_NUM_TIMERS;j++){
+ 1490              		.loc 1 395 0
+ 1491 0818 0023     		movs	r3, #0
+ 1492 081a BB73     		strb	r3, [r7, #14]
+ 1493 081c E2E0     		b	.L93
+ 1494              	.L99:
+ 396:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (
+ 397:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 opentimers_vars.timersBuf[j].hasExpired == TRUE &&
+ 1495              		.loc 1 397 0
+ 1496 081e BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1497 0820 5E49     		ldr	r1, .L107
+ 1498 0822 1346     		mov	r3, r2
+ 1499 0824 DB00     		lsls	r3, r3, #3
+ 1500 0826 9B1A     		subs	r3, r3, r2
+ 1501 0828 9B00     		lsls	r3, r3, #2
+ 1502 082a 0B44     		add	r3, r3, r1
+ 1503 082c 1333     		adds	r3, r3, #19
+ 1504 082e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 396:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (
+ 1505              		.loc 1 396 0
+ 1506 0830 002B     		cmp	r3, #0
+ 1507 0832 00F0D480 		beq	.L94
+ 398:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 opentimers_vars.timersBuf[j].priority   == opentimers_vars.timersBuf[idToCallCB].pr
+ 1508              		.loc 1 398 0
+ 1509 0836 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1510 0838 5849     		ldr	r1, .L107
+ 1511 083a 1346     		mov	r3, r2
+ 1512 083c DB00     		lsls	r3, r3, #3
+ 1513 083e 9B1A     		subs	r3, r3, r2
+ 1514 0840 9B00     		lsls	r3, r3, #2
+ 1515 0842 0B44     		add	r3, r3, r1
+ 1516 0844 1433     		adds	r3, r3, #20
+ 1517 0846 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 1518 0848 7A7B     		ldrb	r2, [r7, #13]	@ zero_extendqisi2
+ 1519 084a 5448     		ldr	r0, .L107
+ 1520 084c 1346     		mov	r3, r2
+ 1521 084e DB00     		lsls	r3, r3, #3
+ 1522 0850 9B1A     		subs	r3, r3, r2
+ 1523 0852 9B00     		lsls	r3, r3, #2
+ 1524 0854 0344     		add	r3, r3, r0
+ 1525 0856 1433     		adds	r3, r3, #20
+ 1526 0858 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 397:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 opentimers_vars.timersBuf[j].priority   == opentimers_vars.timersBuf[idToCallCB].pr
+ 1527              		.loc 1 397 0
+ 1528 085a 9942     		cmp	r1, r3
+ 1529 085c 40F0BF80 		bne	.L94
+ 399:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             ){
+ 400:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 opentimers_vars.timersBuf[j].lastCompareValue    = opentimers_vars.timersBuf[j].cur
+ 1530              		.loc 1 400 0
+ 1531 0860 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1532 0862 B97B     		ldrb	r1, [r7, #14]	@ zero_extendqisi2
+ 1533 0864 4D48     		ldr	r0, .L107
+ 1534 0866 0B46     		mov	r3, r1
+ 1535 0868 DB00     		lsls	r3, r3, #3
+ 1536 086a 5B1A     		subs	r3, r3, r1
+ 1537 086c 9B00     		lsls	r3, r3, #2
+ 1538 086e 0344     		add	r3, r3, r0
+ 1539 0870 0433     		adds	r3, r3, #4
+ 1540 0872 1968     		ldr	r1, [r3]
+ 1541 0874 4948     		ldr	r0, .L107
+ 1542 0876 1346     		mov	r3, r2
+ 1543 0878 DB00     		lsls	r3, r3, #3
+ 1544 087a 9B1A     		subs	r3, r3, r2
+ 1545 087c 9B00     		lsls	r3, r3, #2
+ 1546 087e 0344     		add	r3, r3, r0
+ 1547 0880 0C33     		adds	r3, r3, #12
+ 1548 0882 1960     		str	r1, [r3]
+ 401:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (opentimers_vars.timersBuf[j].wraps_remaining==0){
+ 1549              		.loc 1 401 0
+ 1550 0884 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1551 0886 4549     		ldr	r1, .L107
+ 1552 0888 1346     		mov	r3, r2
+ 1553 088a DB00     		lsls	r3, r3, #3
+ 1554 088c 9B1A     		subs	r3, r3, r2
+ 1555 088e 9B00     		lsls	r3, r3, #2
+ 1556 0890 0B44     		add	r3, r3, r1
+ 1557 0892 0833     		adds	r3, r3, #8
+ 1558 0894 1B88     		ldrh	r3, [r3]
+ 1559 0896 002B     		cmp	r3, #0
+ 1560 0898 43D1     		bne	.L95
+ 402:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     opentimers_vars.timersBuf[j].isrunning           = FALSE;
+ 1561              		.loc 1 402 0
+ 1562 089a BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1563 089c 3F49     		ldr	r1, .L107
+ 1564 089e 1346     		mov	r3, r2
+ 1565 08a0 DB00     		lsls	r3, r3, #3
+ 1566 08a2 9B1A     		subs	r3, r3, r2
+ 1567 08a4 9B00     		lsls	r3, r3, #2
+ 1568 08a6 0B44     		add	r3, r3, r1
+ 1569 08a8 1033     		adds	r3, r3, #16
+ 1570 08aa 0022     		movs	r2, #0
+ 1571 08ac 1A70     		strb	r2, [r3]
+ 403:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     opentimers_vars.timersBuf[j].hasExpired          = FALSE;
+ 1572              		.loc 1 403 0
+ 1573 08ae BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1574 08b0 3A49     		ldr	r1, .L107
+ 1575 08b2 1346     		mov	r3, r2
+ 1576 08b4 DB00     		lsls	r3, r3, #3
+ 1577 08b6 9B1A     		subs	r3, r3, r2
+ 1578 08b8 9B00     		lsls	r3, r3, #2
+ 1579 08ba 0B44     		add	r3, r3, r1
+ 1580 08bc 1333     		adds	r3, r3, #19
+ 1581 08be 0022     		movs	r2, #0
+ 1582 08c0 1A70     		strb	r2, [r3]
+ 404:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     opentimers_vars.timersBuf[j].callback(j);
+ 1583              		.loc 1 404 0
+ 1584 08c2 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1585 08c4 3549     		ldr	r1, .L107
+ 1586 08c6 1346     		mov	r3, r2
+ 1587 08c8 DB00     		lsls	r3, r3, #3
+ 1588 08ca 9B1A     		subs	r3, r3, r2
+ 1589 08cc 9B00     		lsls	r3, r3, #2
+ 1590 08ce 0B44     		add	r3, r3, r1
+ 1591 08d0 1833     		adds	r3, r3, #24
+ 1592 08d2 1B68     		ldr	r3, [r3]
+ 1593 08d4 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1594 08d6 1046     		mov	r0, r2
+ 1595 08d8 9847     		blx	r3
+ 405:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[j].timerType==TIMER_PERIODIC){
+ 1596              		.loc 1 405 0
+ 1597 08da BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1598 08dc 2F49     		ldr	r1, .L107
+ 1599 08de 1346     		mov	r3, r2
+ 1600 08e0 DB00     		lsls	r3, r3, #3
+ 1601 08e2 9B1A     		subs	r3, r3, r2
+ 1602 08e4 9B00     		lsls	r3, r3, #2
+ 1603 08e6 0B44     		add	r3, r3, r1
+ 1604 08e8 1233     		adds	r3, r3, #18
+ 1605 08ea 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1606 08ec 002B     		cmp	r3, #0
+ 1607 08ee 76D1     		bne	.L94
+ 406:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         opentimers_scheduleIn(j,
+ 1608              		.loc 1 406 0
+ 1609 08f0 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1610 08f2 2A49     		ldr	r1, .L107
+ 1611 08f4 1346     		mov	r3, r2
+ 1612 08f6 DB00     		lsls	r3, r3, #3
+ 1613 08f8 9B1A     		subs	r3, r3, r2
+ 1614 08fa 9B00     		lsls	r3, r3, #2
+ 1615 08fc 0B44     		add	r3, r3, r1
+ 1616 08fe 1C68     		ldr	r4, [r3]
+ 1617 0900 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1618 0902 2649     		ldr	r1, .L107
+ 1619 0904 1346     		mov	r3, r2
+ 1620 0906 DB00     		lsls	r3, r3, #3
+ 1621 0908 9B1A     		subs	r3, r3, r2
+ 1622 090a 9B00     		lsls	r3, r3, #2
+ 1623 090c 0B44     		add	r3, r3, r1
+ 1624 090e 1833     		adds	r3, r3, #24
+ 1625 0910 1B68     		ldr	r3, [r3]
+ 1626 0912 B87B     		ldrb	r0, [r7, #14]	@ zero_extendqisi2
+ 1627 0914 0093     		str	r3, [sp]
+ 1628 0916 0023     		movs	r3, #0
+ 1629 0918 0122     		movs	r2, #1
+ 1630 091a 2146     		mov	r1, r4
+ 1631 091c FFF7FEFF 		bl	opentimers_scheduleIn
+ 1632 0920 5DE0     		b	.L94
+ 1633              	.L95:
+ 407:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                               opentimers_vars.timersBuf[j].totalTimerPeriod,
+ 408:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                               TIME_TICS,
+ 409:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                               TIMER_PERIODIC,
+ 410:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                                               opentimers_vars.timersBuf[j].callback
+ 411:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         );
+ 412:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 413:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 } else {
+ 414:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     opentimers_vars.timersBuf[j].wraps_remaining--;
+ 1634              		.loc 1 414 0
+ 1635 0922 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1636 0924 1D49     		ldr	r1, .L107
+ 1637 0926 1346     		mov	r3, r2
+ 1638 0928 DB00     		lsls	r3, r3, #3
+ 1639 092a 9B1A     		subs	r3, r3, r2
+ 1640 092c 9B00     		lsls	r3, r3, #2
+ 1641 092e 0B44     		add	r3, r3, r1
+ 1642 0930 0833     		adds	r3, r3, #8
+ 1643 0932 1B88     		ldrh	r3, [r3]
+ 1644 0934 013B     		subs	r3, r3, #1
+ 1645 0936 98B2     		uxth	r0, r3
+ 1646 0938 1849     		ldr	r1, .L107
+ 1647 093a 1346     		mov	r3, r2
+ 1648 093c DB00     		lsls	r3, r3, #3
+ 1649 093e 9B1A     		subs	r3, r3, r2
+ 1650 0940 9B00     		lsls	r3, r3, #2
+ 1651 0942 0B44     		add	r3, r3, r1
+ 1652 0944 0833     		adds	r3, r3, #8
+ 1653 0946 0246     		mov	r2, r0	@ movhi
+ 1654 0948 1A80     		strh	r2, [r3]	@ movhi
+ 415:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (opentimers_vars.timersBuf[j].wraps_remaining == 0){
+ 1655              		.loc 1 415 0
+ 1656 094a BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1657 094c 1349     		ldr	r1, .L107
+ 1658 094e 1346     		mov	r3, r2
+ 1659 0950 DB00     		lsls	r3, r3, #3
+ 1660 0952 9B1A     		subs	r3, r3, r2
+ 1661 0954 9B00     		lsls	r3, r3, #2
+ 1662 0956 0B44     		add	r3, r3, r1
+ 1663 0958 0833     		adds	r3, r3, #8
+ 1664 095a 1B88     		ldrh	r3, [r3]
+ 1665 095c 002B     		cmp	r3, #0
+ 1666 095e 1FD1     		bne	.L97
+ 416:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         opentimers_vars.timersBuf[j].currentCompareValue = (opentimers_vars.timersB
+ 1667              		.loc 1 416 0
+ 1668 0960 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1669 0962 B97B     		ldrb	r1, [r7, #14]	@ zero_extendqisi2
+ 1670 0964 0D48     		ldr	r0, .L107
+ 1671 0966 0B46     		mov	r3, r1
+ 1672 0968 DB00     		lsls	r3, r3, #3
+ 1673 096a 5B1A     		subs	r3, r3, r1
+ 1674 096c 9B00     		lsls	r3, r3, #2
+ 1675 096e 0344     		add	r3, r3, r0
+ 1676 0970 1868     		ldr	r0, [r3]
+ 1677 0972 B97B     		ldrb	r1, [r7, #14]	@ zero_extendqisi2
+ 1678 0974 094C     		ldr	r4, .L107
+ 1679 0976 0B46     		mov	r3, r1
+ 1680 0978 DB00     		lsls	r3, r3, #3
+ 1681 097a 5B1A     		subs	r3, r3, r1
+ 1682 097c 9B00     		lsls	r3, r3, #2
+ 1683 097e 2344     		add	r3, r3, r4
+ 1684 0980 0C33     		adds	r3, r3, #12
+ 1685 0982 1B68     		ldr	r3, [r3]
+ 1686 0984 0344     		add	r3, r3, r0
+ 1687 0986 23F00041 		bic	r1, r3, #-2147483648
+ 1688 098a 0448     		ldr	r0, .L107
+ 1689 098c 1346     		mov	r3, r2
+ 1690 098e DB00     		lsls	r3, r3, #3
+ 1691 0990 9B1A     		subs	r3, r3, r2
+ 1692 0992 9B00     		lsls	r3, r3, #2
+ 1693 0994 0344     		add	r3, r3, r0
+ 1694 0996 0433     		adds	r3, r3, #4
+ 1695 0998 1960     		str	r1, [r3]
+ 1696 099a 16E0     		b	.L98
+ 1697              	.L108:
+ 1698              		.align	2
+ 1699              	.L107:
+ 1700 099c 00000000 		.word	opentimers_vars
+ 1701              	.L97:
+ 417:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     } else {
+ 418:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         opentimers_vars.timersBuf[j].currentCompareValue = opentimers_vars.timersBu
+ 1702              		.loc 1 418 0
+ 1703 09a0 B97B     		ldrb	r1, [r7, #14]	@ zero_extendqisi2
+ 1704 09a2 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1705 09a4 6748     		ldr	r0, .L109
+ 1706 09a6 1346     		mov	r3, r2
+ 1707 09a8 DB00     		lsls	r3, r3, #3
+ 1708 09aa 9B1A     		subs	r3, r3, r2
+ 1709 09ac 9B00     		lsls	r3, r3, #2
+ 1710 09ae 0344     		add	r3, r3, r0
+ 1711 09b0 0C33     		adds	r3, r3, #12
+ 1712 09b2 1B68     		ldr	r3, [r3]
+ 1713 09b4 03F10042 		add	r2, r3, #-2147483648
+ 1714 09b8 013A     		subs	r2, r2, #1
+ 1715 09ba 6248     		ldr	r0, .L109
+ 1716 09bc 0B46     		mov	r3, r1
+ 1717 09be DB00     		lsls	r3, r3, #3
+ 1718 09c0 5B1A     		subs	r3, r3, r1
+ 1719 09c2 9B00     		lsls	r3, r3, #2
+ 1720 09c4 0344     		add	r3, r3, r0
+ 1721 09c6 0433     		adds	r3, r3, #4
+ 1722 09c8 1A60     		str	r2, [r3]
+ 1723              	.L98:
+ 419:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 420:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     opentimers_vars.timersBuf[j].hasExpired          = FALSE;
+ 1724              		.loc 1 420 0
+ 1725 09ca BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1726 09cc 5D49     		ldr	r1, .L109
+ 1727 09ce 1346     		mov	r3, r2
+ 1728 09d0 DB00     		lsls	r3, r3, #3
+ 1729 09d2 9B1A     		subs	r3, r3, r2
+ 1730 09d4 9B00     		lsls	r3, r3, #2
+ 1731 09d6 0B44     		add	r3, r3, r1
+ 1732 09d8 1333     		adds	r3, r3, #19
+ 1733 09da 0022     		movs	r2, #0
+ 1734 09dc 1A70     		strb	r2, [r3]
+ 1735              	.L94:
+ 395:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (
+ 1736              		.loc 1 395 0 discriminator 2
+ 1737 09de BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1738 09e0 0133     		adds	r3, r3, #1
+ 1739 09e2 BB73     		strb	r3, [r7, #14]
+ 1740              	.L93:
+ 395:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (
+ 1741              		.loc 1 395 0 is_stmt 0 discriminator 1
+ 1742 09e4 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1743 09e6 092B     		cmp	r3, #9
+ 1744 09e8 7FF619AF 		bls	.L99
+ 1745              	.L92:
+ 421:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 422:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 423:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 424:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 425:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.insideISR = FALSE;
+ 1746              		.loc 1 425 0 is_stmt 1
+ 1747 09ec 554B     		ldr	r3, .L109
+ 1748 09ee 0022     		movs	r2, #0
+ 1749 09f0 83F86521 		strb	r2, [r3, #357]
+ 426:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****       
+ 427:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 3. find the next timer to be fired
+ 428:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     timerGap     = opentimers_vars.timersBuf[0].currentCompareValue+opentimers_vars.timersBuf[0].wr
+ 1750              		.loc 1 428 0
+ 1751 09f4 534B     		ldr	r3, .L109
+ 1752 09f6 5A68     		ldr	r2, [r3, #4]
+ 1753 09f8 524B     		ldr	r3, .L109
+ 1754 09fa 1B89     		ldrh	r3, [r3, #8]
+ 1755 09fc 1946     		mov	r1, r3
+ 1756 09fe 0B46     		mov	r3, r1
+ 1757 0a00 DB07     		lsls	r3, r3, #31
+ 1758 0a02 5B1A     		subs	r3, r3, r1
+ 1759 0a04 1A44     		add	r2, r2, r3
+ 1760 0a06 4F4B     		ldr	r3, .L109
+ 1761 0a08 D3F82031 		ldr	r3, [r3, #288]
+ 1762 0a0c D31A     		subs	r3, r2, r3
+ 1763 0a0e BB60     		str	r3, [r7, #8]
+ 429:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     idToSchedule = 0;
+ 1764              		.loc 1 429 0
+ 1765 0a10 0023     		movs	r3, #0
+ 1766 0a12 3B73     		strb	r3, [r7, #12]
+ 430:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     for (i=1;i<MAX_NUM_TIMERS;i++){
+ 1767              		.loc 1 430 0
+ 1768 0a14 0123     		movs	r3, #1
+ 1769 0a16 FB73     		strb	r3, [r7, #15]
+ 1770 0a18 5FE0     		b	.L100
+ 1771              	.L106:
+ 431:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning){
+ 1772              		.loc 1 431 0
+ 1773 0a1a FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1774 0a1c 4949     		ldr	r1, .L109
+ 1775 0a1e 1346     		mov	r3, r2
+ 1776 0a20 DB00     		lsls	r3, r3, #3
+ 1777 0a22 9B1A     		subs	r3, r3, r2
+ 1778 0a24 9B00     		lsls	r3, r3, #2
+ 1779 0a26 0B44     		add	r3, r3, r1
+ 1780 0a28 1033     		adds	r3, r3, #16
+ 1781 0a2a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1782 0a2c 002B     		cmp	r3, #0
+ 1783 0a2e 51D0     		beq	.L101
+ 432:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             tempTimerGap = opentimers_vars.timersBuf[i].currentCompareValue-opentimers_vars.lastTim
+ 1784              		.loc 1 432 0
+ 1785 0a30 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1786 0a32 4449     		ldr	r1, .L109
+ 1787 0a34 1346     		mov	r3, r2
+ 1788 0a36 DB00     		lsls	r3, r3, #3
+ 1789 0a38 9B1A     		subs	r3, r3, r2
+ 1790 0a3a 9B00     		lsls	r3, r3, #2
+ 1791 0a3c 0B44     		add	r3, r3, r1
+ 1792 0a3e 0433     		adds	r3, r3, #4
+ 1793 0a40 1A68     		ldr	r2, [r3]
+ 1794 0a42 404B     		ldr	r3, .L109
+ 1795 0a44 D3F82031 		ldr	r3, [r3, #288]
+ 1796 0a48 D31A     		subs	r3, r2, r3
+ 1797 0a4a 3B60     		str	r3, [r7]
+ 433:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             if (tempTimerGap < timerGap){
+ 1798              		.loc 1 433 0
+ 1799 0a4c 3A68     		ldr	r2, [r7]
+ 1800 0a4e BB68     		ldr	r3, [r7, #8]
+ 1801 0a50 9A42     		cmp	r2, r3
+ 1802 0a52 22D2     		bcs	.L102
+ 434:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // if a timer "i" has low priority but has compare value less than 
+ 435:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // candidate timer "idToSchedule" more than TIMERTHRESHOLD ticks, 
+ 436:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // replace candidate timer by this timer "i".
+ 437:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (opentimers_vars.timersBuf[i].priority > opentimers_vars.timersBuf[idToSchedule]
+ 1803              		.loc 1 437 0
+ 1804 0a54 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1805 0a56 3B49     		ldr	r1, .L109
+ 1806 0a58 1346     		mov	r3, r2
+ 1807 0a5a DB00     		lsls	r3, r3, #3
+ 1808 0a5c 9B1A     		subs	r3, r3, r2
+ 1809 0a5e 9B00     		lsls	r3, r3, #2
+ 1810 0a60 0B44     		add	r3, r3, r1
+ 1811 0a62 1433     		adds	r3, r3, #20
+ 1812 0a64 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 1813 0a66 3A7B     		ldrb	r2, [r7, #12]	@ zero_extendqisi2
+ 1814 0a68 3648     		ldr	r0, .L109
+ 1815 0a6a 1346     		mov	r3, r2
+ 1816 0a6c DB00     		lsls	r3, r3, #3
+ 1817 0a6e 9B1A     		subs	r3, r3, r2
+ 1818 0a70 9B00     		lsls	r3, r3, #2
+ 1819 0a72 0344     		add	r3, r3, r0
+ 1820 0a74 1433     		adds	r3, r3, #20
+ 1821 0a76 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1822 0a78 9942     		cmp	r1, r3
+ 1823 0a7a 09D9     		bls	.L103
+ 438:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (timerGap-tempTimerGap > TIMERTHRESHOLD){
+ 1824              		.loc 1 438 0
+ 1825 0a7c BA68     		ldr	r2, [r7, #8]
+ 1826 0a7e 3B68     		ldr	r3, [r7]
+ 1827 0a80 D31A     		subs	r3, r2, r3
+ 1828 0a82 0A2B     		cmp	r3, #10
+ 1829 0a84 26D9     		bls	.L101
+ 439:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         timerGap     = tempTimerGap;
+ 1830              		.loc 1 439 0
+ 1831 0a86 3B68     		ldr	r3, [r7]
+ 1832 0a88 BB60     		str	r3, [r7, #8]
+ 440:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         idToSchedule = i;
+ 1833              		.loc 1 440 0
+ 1834 0a8a FB7B     		ldrb	r3, [r7, #15]
+ 1835 0a8c 3B73     		strb	r3, [r7, #12]
+ 1836 0a8e 21E0     		b	.L101
+ 1837              	.L103:
+ 441:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 442:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 } else {
+ 443:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 444:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // and compare value less than candidate timer replace candidate 
+ 445:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     // timer by timer "i".
+ 446:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     timerGap     = tempTimerGap;
+ 1838              		.loc 1 446 0
+ 1839 0a90 3B68     		ldr	r3, [r7]
+ 1840 0a92 BB60     		str	r3, [r7, #8]
+ 447:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     idToSchedule = i;
+ 1841              		.loc 1 447 0
+ 1842 0a94 FB7B     		ldrb	r3, [r7, #15]
+ 1843 0a96 3B73     		strb	r3, [r7, #12]
+ 1844 0a98 1CE0     		b	.L101
+ 1845              	.L102:
+ 448:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 449:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             } else {
+ 450:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // if a timer "i" has higher priority than candidate timer "idToSchedule" 
+ 451:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // and its compare value is larger than timer "i" no more than TIMERTHRESHOLD ticks
+ 452:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 // replace candidate timer by timer "i".
+ 453:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 if (opentimers_vars.timersBuf[i].priority < opentimers_vars.timersBuf[idToSchedule]
+ 1846              		.loc 1 453 0
+ 1847 0a9a FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1848 0a9c 2949     		ldr	r1, .L109
+ 1849 0a9e 1346     		mov	r3, r2
+ 1850 0aa0 DB00     		lsls	r3, r3, #3
+ 1851 0aa2 9B1A     		subs	r3, r3, r2
+ 1852 0aa4 9B00     		lsls	r3, r3, #2
+ 1853 0aa6 0B44     		add	r3, r3, r1
+ 1854 0aa8 1433     		adds	r3, r3, #20
+ 1855 0aaa 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 1856 0aac 3A7B     		ldrb	r2, [r7, #12]	@ zero_extendqisi2
+ 1857 0aae 2548     		ldr	r0, .L109
+ 1858 0ab0 1346     		mov	r3, r2
+ 1859 0ab2 DB00     		lsls	r3, r3, #3
+ 1860 0ab4 9B1A     		subs	r3, r3, r2
+ 1861 0ab6 9B00     		lsls	r3, r3, #2
+ 1862 0ab8 0344     		add	r3, r3, r0
+ 1863 0aba 1433     		adds	r3, r3, #20
+ 1864 0abc 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1865 0abe 9942     		cmp	r1, r3
+ 1866 0ac0 08D2     		bcs	.L101
+ 454:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     if (tempTimerGap - timerGap < TIMERTHRESHOLD){
+ 1867              		.loc 1 454 0
+ 1868 0ac2 3A68     		ldr	r2, [r7]
+ 1869 0ac4 BB68     		ldr	r3, [r7, #8]
+ 1870 0ac6 D31A     		subs	r3, r2, r3
+ 1871 0ac8 092B     		cmp	r3, #9
+ 1872 0aca 03D8     		bhi	.L101
+ 455:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         timerGap     = tempTimerGap;
+ 1873              		.loc 1 455 0
+ 1874 0acc 3B68     		ldr	r3, [r7]
+ 1875 0ace BB60     		str	r3, [r7, #8]
+ 456:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                         idToSchedule = i;
+ 1876              		.loc 1 456 0
+ 1877 0ad0 FB7B     		ldrb	r3, [r7, #15]
+ 1878 0ad2 3B73     		strb	r3, [r7, #12]
+ 1879              	.L101:
+ 430:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning){
+ 1880              		.loc 1 430 0 discriminator 2
+ 1881 0ad4 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 1882 0ad6 0133     		adds	r3, r3, #1
+ 1883 0ad8 FB73     		strb	r3, [r7, #15]
+ 1884              	.L100:
+ 430:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         if (opentimers_vars.timersBuf[i].isrunning){
+ 1885              		.loc 1 430 0 is_stmt 0 discriminator 1
+ 1886 0ada FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 1887 0adc 092B     		cmp	r3, #9
+ 1888 0ade 9CD9     		bls	.L106
+ 457:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                     }
+ 458:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****                 }
+ 459:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****             }
+ 460:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****         }
+ 461:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     }
+ 462:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     
+ 463:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     // 4. reschedule the timer
+ 464:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.currentTimeout = opentimers_vars.timersBuf[idToSchedule].currentCompareValue;
+ 1889              		.loc 1 464 0 is_stmt 1
+ 1890 0ae0 3A7B     		ldrb	r2, [r7, #12]	@ zero_extendqisi2
+ 1891 0ae2 1849     		ldr	r1, .L109
+ 1892 0ae4 1346     		mov	r3, r2
+ 1893 0ae6 DB00     		lsls	r3, r3, #3
+ 1894 0ae8 9B1A     		subs	r3, r3, r2
+ 1895 0aea 9B00     		lsls	r3, r3, #2
+ 1896 0aec 0B44     		add	r3, r3, r1
+ 1897 0aee 0433     		adds	r3, r3, #4
+ 1898 0af0 1B68     		ldr	r3, [r3]
+ 1899 0af2 144A     		ldr	r2, .L109
+ 1900 0af4 C2F81C31 		str	r3, [r2, #284]
+ 465:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.lastCompare[opentimers_vars.index] = opentimers_vars.currentTimeout;
+ 1901              		.loc 1 465 0
+ 1902 0af8 124B     		ldr	r3, .L109
+ 1903 0afa 93F86431 		ldrb	r3, [r3, #356]	@ zero_extendqisi2
+ 1904 0afe 1846     		mov	r0, r3
+ 1905 0b00 104B     		ldr	r3, .L109
+ 1906 0b02 D3F81C21 		ldr	r2, [r3, #284]
+ 1907 0b06 0F49     		ldr	r1, .L109
+ 1908 0b08 00F14803 		add	r3, r0, #72
+ 1909 0b0c 9B00     		lsls	r3, r3, #2
+ 1910 0b0e 0B44     		add	r3, r3, r1
+ 1911 0b10 5A60     		str	r2, [r3, #4]
+ 466:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.index = (opentimers_vars.index+1)&0x0F;
+ 1912              		.loc 1 466 0
+ 1913 0b12 0C4B     		ldr	r3, .L109
+ 1914 0b14 93F86431 		ldrb	r3, [r3, #356]	@ zero_extendqisi2
+ 1915 0b18 0133     		adds	r3, r3, #1
+ 1916 0b1a DBB2     		uxtb	r3, r3
+ 1917 0b1c 03F00F03 		and	r3, r3, #15
+ 1918 0b20 DAB2     		uxtb	r2, r3
+ 1919 0b22 084B     		ldr	r3, .L109
+ 1920 0b24 83F86421 		strb	r2, [r3, #356]
+ 467:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     sctimer_setCompare(opentimers_vars.currentTimeout);
+ 1921              		.loc 1 467 0
+ 1922 0b28 064B     		ldr	r3, .L109
+ 1923 0b2a D3F81C31 		ldr	r3, [r3, #284]
+ 1924 0b2e 1846     		mov	r0, r3
+ 1925 0b30 FFF7FEFF 		bl	sctimer_setCompare
+ 468:build/openmote-cc2538_armgcc/drivers/common/opentimers.c ****     opentimers_vars.running        = TRUE;
+ 1926              		.loc 1 468 0
+ 1927 0b34 034B     		ldr	r3, .L109
+ 1928 0b36 0122     		movs	r2, #1
+ 1929 0b38 83F81821 		strb	r2, [r3, #280]
+ 469:build/openmote-cc2538_armgcc/drivers/common/opentimers.c **** }...
+ 1930              		.loc 1 469 0
+ 1931 0b3c 00BF     		nop
+ 1932 0b3e 1437     		adds	r7, r7, #20
+ 1933              		.cfi_def_cfa_offset 12
+ 1934 0b40 BD46     		mov	sp, r7
+ 1935              		.cfi_def_cfa_register 13
+ 1936              		@ sp needed
+ 1937 0b42 90BD     		pop	{r4, r7, pc}
+ 1938              	.L110:
+ 1939              		.align	2
+ 1940              	.L109:
+ 1941 0b44 00000000 		.word	opentimers_vars
+ 1942              		.cfi_endproc
+ 1943              	.LFE10:
+ 1945              	.Letext0:
+ 1946              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1947              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1948              		.file 4 "build/openmote-cc2538_armgcc/drivers/common/opentimers.h"
+ 1949              		.file 5 "bsp/boards/openmote-cc2538/board_info.h"
+ 1950              		.file 6 "inc/opendefs.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 opentimers.c
+     /tmp/ccd5gpa0.s:20     .rodata:0000000000000000 $d
+     /tmp/ccd5gpa0.s:23     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccd5gpa0.s:28     .rodata:0000000000000008 infoBoardname
+     /tmp/ccd5gpa0.s:33     .rodata:0000000000000010 infouCName
+     /tmp/ccd5gpa0.s:38     .rodata:0000000000000018 infoRadioName
+     /tmp/ccd5gpa0.s:43     .rodata:0000000000000024 infoStackName
+                            *COM*:0000000000000168 opentimers_vars
+     /tmp/ccd5gpa0.s:47     .text:0000000000000000 $t
+     /tmp/ccd5gpa0.s:52     .text:0000000000000000 opentimers_init
+     /tmp/ccd5gpa0.s:111    .text:0000000000000048 $d
+     /tmp/ccd5gpa0.s:1319   .text:0000000000000708 opentimers_timer_callback
+     /tmp/ccd5gpa0.s:116    .text:0000000000000050 $t
+     /tmp/ccd5gpa0.s:121    .text:0000000000000050 opentimers_create
+     /tmp/ccd5gpa0.s:195    .text:00000000000000a8 $d
+     /tmp/ccd5gpa0.s:199    .text:00000000000000ac $t
+     /tmp/ccd5gpa0.s:204    .text:00000000000000ac opentimers_scheduleIn
+     /tmp/ccd5gpa0.s:607    .text:0000000000000350 $d
+     /tmp/ccd5gpa0.s:611    .text:0000000000000354 $t
+     /tmp/ccd5gpa0.s:616    .text:0000000000000354 opentimers_scheduleAbsolute
+     /tmp/ccd5gpa0.s:1013   .text:00000000000005ec $d
+     /tmp/ccd5gpa0.s:1017   .text:00000000000005f0 $t
+     /tmp/ccd5gpa0.s:1022   .text:00000000000005f0 opentimers_cancel
+     /tmp/ccd5gpa0.s:1074   .text:000000000000062c $d
+     /tmp/ccd5gpa0.s:1078   .text:0000000000000630 $t
+     /tmp/ccd5gpa0.s:1083   .text:0000000000000630 opentimers_destroy
+     /tmp/ccd5gpa0.s:1133   .text:0000000000000668 $d
+     /tmp/ccd5gpa0.s:1137   .text:000000000000066c $t
+     /tmp/ccd5gpa0.s:1142   .text:000000000000066c opentimers_getValue
+     /tmp/ccd5gpa0.s:1168   .text:000000000000067c opentimers_getCurrentTimeout
+     /tmp/ccd5gpa0.s:1195   .text:0000000000000690 $d
+     /tmp/ccd5gpa0.s:1199   .text:0000000000000694 $t
+     /tmp/ccd5gpa0.s:1204   .text:0000000000000694 opentimers_isRunning
+     /tmp/ccd5gpa0.s:1244   .text:00000000000006bc $d
+     /tmp/ccd5gpa0.s:1248   .text:00000000000006c0 $t
+     /tmp/ccd5gpa0.s:1253   .text:00000000000006c0 opentimers_setPriority
+     /tmp/ccd5gpa0.s:1310   .text:0000000000000704 $d
+     /tmp/ccd5gpa0.s:1314   .text:0000000000000708 $t
+     /tmp/ccd5gpa0.s:1700   .text:000000000000099c $d
+     /tmp/ccd5gpa0.s:1703   .text:00000000000009a0 $t
+     /tmp/ccd5gpa0.s:1941   .text:0000000000000b44 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.8e445c0106ab795ab4704214cba6f089
+                           .group:0000000000000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:0000000000000000 wm4.features.h.33.d97f2d646536517df901beeb5b9993f5
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.b82bf99f69d6a5c085fc866de0d3eb9b
+                           .group:0000000000000000 wm4._stdint.h.10.7a5f60e6741af4a5594a3867d347e1f9
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.36dd0417407b0a085bc04c49cc2ed13a
+                           .group:0000000000000000 wm4.config.h.219.65a553ab5bef5482f0d7880b0d33015e
+                           .group:0000000000000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:0000000000000000 wm4.stddef.h.39.a38874c8f8a57e66301090908ec2a69f
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.125.5cf8a495f1f7ef36777ad868a1e32068
+                           .group:0000000000000000 wm4.stddef.h.161.5349cb105733e8777bfb0cf53c4e3f34
+                           .group:0000000000000000 wm4._types.h.183.c226d164ceca1f2ecb9ae9360c54a098
+                           .group:0000000000000000 wm4.reent.h.17.850ac0a908956e5fb788be1b80de2f32
+                           .group:0000000000000000 wm4.cdefs.h.47.ba62642086d429b4f95c2381cae1c0aa
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.161.19e15733342b50ead2919490b095303e
+                           .group:0000000000000000 wm4.stdbool.h.29.07dce69c3b78884144b7f7bd19483461
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.1291259c351bc018e4d4402148b3c6db
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+
+UNDEFINED SYMBOLS
+memset
+sctimer_set_callback
+sctimer_readCounter
+sctimer_setCompare

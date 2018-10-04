@@ -1,0 +1,759 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"i2c.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.align	2
+  20              		.global	i2c_init
+  21              		.thumb
+  22              		.thumb_func
+  24              	i2c_init:
+  25              	.LFB0:
+  26              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** /**
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****  * Author: Xavier Vilajosana (xvilajosana@eecs.berkeley.edu)
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****  *         Pere Tuset (peretuset@openmote.com)
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****  * Date:   July 2013
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****  * Description:CC2538-specific definition of the "i2c" bsp module.
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****  */
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_gpio.h>
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_i2cm.h>
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_ioc.h>
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_memmap.h>
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_sys_ctrl.h>
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <headers/hw_types.h>
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <source/gpio.h>
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <source/i2c_lib.h>
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <source/ioc.h>
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #include <source/sys_ctrl.h>
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** //=========================== define ==========================================
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_PERIPHERAL          ( SYS_CTRL_PERIPH_I2C )
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_BASE                ( GPIO_B_BASE )
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_SCL                 ( GPIO_PIN_3 )
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_SDA                 ( GPIO_PIN_4 )
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_BAUDRATE            ( 100000 )
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** #define I2C_MAX_DELAY_US        ( 100000 )
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** //=========================== variables =======================================
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** //=========================== prototypes ======================================
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** extern uint32_t board_timer_get(void);
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** extern bool board_timer_expired(uint32_t future);
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** //=========================== public ==========================================
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** void i2c_init(void) {
+  27              		.loc 1 39 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 8
+  30              		@ frame_needed = 1, uses_anonymous_args = 0
+  31 0000 80B5     		push	{r7, lr}
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 7, -8
+  34              		.cfi_offset 14, -4
+  35 0002 82B0     		sub	sp, sp, #8
+  36              		.cfi_def_cfa_offset 16
+  37 0004 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     bool status;
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Enable peripheral except in deep sleep modes (e.g. LPM1, LPM2, LPM3)
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     SysCtrlPeripheralEnable(I2C_PERIPHERAL);
+  39              		.loc 1 43 0
+  40 0006 4FF44070 		mov	r0, #768
+  41 000a FFF7FEFF 		bl	SysCtrlPeripheralEnable
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     SysCtrlPeripheralSleepEnable(I2C_PERIPHERAL);
+  42              		.loc 1 44 0
+  43 000e 4FF44070 		mov	r0, #768
+  44 0012 FFF7FEFF 		bl	SysCtrlPeripheralSleepEnable
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     SysCtrlPeripheralDeepSleepDisable(I2C_PERIPHERAL);
+  45              		.loc 1 45 0
+  46 0016 4FF44070 		mov	r0, #768
+  47 001a FFF7FEFF 		bl	SysCtrlPeripheralDeepSleepDisable
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Reset peripheral previous to configuring it
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     SysCtrlPeripheralReset(I2C_PERIPHERAL);
+  48              		.loc 1 48 0
+  49 001e 4FF44070 		mov	r0, #768
+  50 0022 FFF7FEFF 		bl	SysCtrlPeripheralReset
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Configure the SCL pin
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     GPIOPinTypeI2C(I2C_BASE, I2C_SCL);
+  51              		.loc 1 51 0
+  52 0026 0821     		movs	r1, #8
+  53 0028 1548     		ldr	r0, .L2
+  54 002a FFF7FEFF 		bl	GPIOPinTypeI2C
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     IOCPinConfigPeriphInput(I2C_BASE, I2C_SCL, IOC_I2CMSSCL);
+  55              		.loc 1 52 0
+  56 002e 154A     		ldr	r2, .L2+4
+  57 0030 0821     		movs	r1, #8
+  58 0032 1348     		ldr	r0, .L2
+  59 0034 FFF7FEFF 		bl	IOCPinConfigPeriphInput
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     IOCPinConfigPeriphOutput(I2C_BASE, I2C_SCL, IOC_MUX_OUT_SEL_I2C_CMSSCL);
+  60              		.loc 1 53 0
+  61 0038 0C22     		movs	r2, #12
+  62 003a 0821     		movs	r1, #8
+  63 003c 1048     		ldr	r0, .L2
+  64 003e FFF7FEFF 		bl	IOCPinConfigPeriphOutput
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Configure the SDA pin
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     GPIOPinTypeI2C(I2C_BASE, I2C_SDA);
+  65              		.loc 1 56 0
+  66 0042 1021     		movs	r1, #16
+  67 0044 0E48     		ldr	r0, .L2
+  68 0046 FFF7FEFF 		bl	GPIOPinTypeI2C
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     IOCPinConfigPeriphInput(I2C_BASE, I2C_SDA, IOC_I2CMSSDA);
+  69              		.loc 1 57 0
+  70 004a 0F4A     		ldr	r2, .L2+8
+  71 004c 1021     		movs	r1, #16
+  72 004e 0C48     		ldr	r0, .L2
+  73 0050 FFF7FEFF 		bl	IOCPinConfigPeriphInput
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     IOCPinConfigPeriphOutput(I2C_BASE, I2C_SDA, IOC_MUX_OUT_SEL_I2C_CMSSDA);
+  74              		.loc 1 58 0
+  75 0054 0B22     		movs	r2, #11
+  76 0056 1021     		movs	r1, #16
+  77 0058 0948     		ldr	r0, .L2
+  78 005a FFF7FEFF 		bl	IOCPinConfigPeriphOutput
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Configure the I2C clock
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     status = (I2C_BAUDRATE == 400000 ? true : false);
+  79              		.loc 1 61 0
+  80 005e 0023     		movs	r3, #0
+  81 0060 FB71     		strb	r3, [r7, #7]
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterInitExpClk(SysCtrlClockGet(), status);
+  82              		.loc 1 62 0
+  83 0062 FFF7FEFF 		bl	SysCtrlClockGet
+  84 0066 0246     		mov	r2, r0
+  85 0068 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  86 006a 1946     		mov	r1, r3
+  87 006c 1046     		mov	r0, r2
+  88 006e FFF7FEFF 		bl	I2CMasterInitExpClk
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Enable the I2C module as master
+  65:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterEnable();
+  89              		.loc 1 65 0
+  90 0072 FFF7FEFF 		bl	I2CMasterEnable
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** }
+  91              		.loc 1 66 0
+  92 0076 00BF     		nop
+  93 0078 0837     		adds	r7, r7, #8
+  94              		.cfi_def_cfa_offset 8
+  95 007a BD46     		mov	sp, r7
+  96              		.cfi_def_cfa_register 13
+  97              		@ sp needed
+  98 007c 80BD     		pop	{r7, pc}
+  99              	.L3:
+ 100 007e 00BF     		.align	2
+ 101              	.L2:
+ 102 0080 00A00D40 		.word	1074634752
+ 103 0084 30410D40 		.word	1074610480
+ 104 0088 2C410D40 		.word	1074610476
+ 105              		.cfi_endproc
+ 106              	.LFE0:
+ 108              		.align	2
+ 109              		.global	i2c_read_byte
+ 110              		.thumb
+ 111              		.thumb_func
+ 113              	i2c_read_byte:
+ 114              	.LFB1:
+  67:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  68:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** bool i2c_read_byte(uint8_t address, uint8_t* byte) {
+ 115              		.loc 1 68 0
+ 116              		.cfi_startproc
+ 117              		@ args = 0, pretend = 0, frame = 16
+ 118              		@ frame_needed = 1, uses_anonymous_args = 0
+ 119 008c 80B5     		push	{r7, lr}
+ 120              		.cfi_def_cfa_offset 8
+ 121              		.cfi_offset 7, -8
+ 122              		.cfi_offset 14, -4
+ 123 008e 84B0     		sub	sp, sp, #16
+ 124              		.cfi_def_cfa_offset 24
+ 125 0090 00AF     		add	r7, sp, #0
+ 126              		.cfi_def_cfa_register 7
+ 127 0092 0346     		mov	r3, r0
+ 128 0094 3960     		str	r1, [r7]
+ 129 0096 FB71     		strb	r3, [r7, #7]
+  69:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     uint32_t future = I2C_MAX_DELAY_US;
+ 130              		.loc 1 69 0
+ 131 0098 144B     		ldr	r3, .L8
+ 132 009a FB60     		str	r3, [r7, #12]
+  70:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+  71:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Receive operation
+  72:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterSlaveAddrSet(address, true);
+ 133              		.loc 1 72 0
+ 134 009c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 135 009e 0121     		movs	r1, #1
+ 136 00a0 1846     		mov	r0, r3
+ 137 00a2 FFF7FEFF 		bl	I2CMasterSlaveAddrSet
+  73:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  74:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Single receive operation
+  75:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterControl(I2C_MASTER_CMD_SINGLE_RECEIVE);
+ 138              		.loc 1 75 0
+ 139 00a6 0720     		movs	r0, #7
+ 140 00a8 FFF7FEFF 		bl	I2CMasterControl
+  76:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  77:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Calculate timeout
+  78:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     future += board_timer_get();
+ 141              		.loc 1 78 0
+ 142 00ac FFF7FEFF 		bl	board_timer_get
+ 143 00b0 0246     		mov	r2, r0
+ 144 00b2 FB68     		ldr	r3, [r7, #12]
+ 145 00b4 1344     		add	r3, r3, r2
+ 146 00b6 FB60     		str	r3, [r7, #12]
+  79:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  80:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Wait until complete or timeout
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     while (I2CMasterBusy()) {
+ 147              		.loc 1 81 0
+ 148 00b8 07E0     		b	.L5
+ 149              	.L7:
+  82:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Update timeout status and return if expired
+  83:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         if (board_timer_expired(future)) return false;
+ 150              		.loc 1 83 0
+ 151 00ba F868     		ldr	r0, [r7, #12]
+ 152 00bc FFF7FEFF 		bl	board_timer_expired
+ 153 00c0 0346     		mov	r3, r0
+ 154 00c2 002B     		cmp	r3, #0
+ 155 00c4 01D0     		beq	.L5
+ 156              		.loc 1 83 0 is_stmt 0 discriminator 1
+ 157 00c6 0023     		movs	r3, #0
+ 158 00c8 0BE0     		b	.L6
+ 159              	.L5:
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Update timeout status and return if expired
+ 160              		.loc 1 81 0 is_stmt 1
+ 161 00ca FFF7FEFF 		bl	I2CMasterBusy
+ 162 00ce 0346     		mov	r3, r0
+ 163 00d0 002B     		cmp	r3, #0
+ 164 00d2 F2D1     		bne	.L7
+  84:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     }
+  85:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  86:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Read data from I2C
+  87:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     *byte = I2CMasterDataGet();
+ 165              		.loc 1 87 0
+ 166 00d4 FFF7FEFF 		bl	I2CMasterDataGet
+ 167 00d8 0346     		mov	r3, r0
+ 168 00da DAB2     		uxtb	r2, r3
+ 169 00dc 3B68     		ldr	r3, [r7]
+ 170 00de 1A70     		strb	r2, [r3]
+  88:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+  89:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Return status
+  90:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     return true;
+ 171              		.loc 1 90 0
+ 172 00e0 0123     		movs	r3, #1
+ 173              	.L6:
+  91:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** }
+ 174              		.loc 1 91 0
+ 175 00e2 1846     		mov	r0, r3
+ 176 00e4 1037     		adds	r7, r7, #16
+ 177              		.cfi_def_cfa_offset 8
+ 178 00e6 BD46     		mov	sp, r7
+ 179              		.cfi_def_cfa_register 13
+ 180              		@ sp needed
+ 181 00e8 80BD     		pop	{r7, pc}
+ 182              	.L9:
+ 183 00ea 00BF     		.align	2
+ 184              	.L8:
+ 185 00ec A0860100 		.word	100000
+ 186              		.cfi_endproc
+ 187              	.LFE1:
+ 189              		.align	2
+ 190              		.global	i2c_read_bytes
+ 191              		.thumb
+ 192              		.thumb_func
+ 194              	i2c_read_bytes:
+ 195              	.LFB2:
+  92:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  93:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** uint32_t i2c_read_bytes(uint8_t address, uint8_t* buffer, uint32_t length) {
+ 196              		.loc 1 93 0
+ 197              		.cfi_startproc
+ 198              		@ args = 0, pretend = 0, frame = 24
+ 199              		@ frame_needed = 1, uses_anonymous_args = 0
+ 200 00f0 90B5     		push	{r4, r7, lr}
+ 201              		.cfi_def_cfa_offset 12
+ 202              		.cfi_offset 4, -12
+ 203              		.cfi_offset 7, -8
+ 204              		.cfi_offset 14, -4
+ 205 00f2 87B0     		sub	sp, sp, #28
+ 206              		.cfi_def_cfa_offset 40
+ 207 00f4 00AF     		add	r7, sp, #0
+ 208              		.cfi_def_cfa_register 7
+ 209 00f6 0346     		mov	r3, r0
+ 210 00f8 B960     		str	r1, [r7, #8]
+ 211 00fa 7A60     		str	r2, [r7, #4]
+ 212 00fc FB73     		strb	r3, [r7, #15]
+  94:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     uint32_t future = I2C_MAX_DELAY_US;
+ 213              		.loc 1 94 0
+ 214 00fe 1D4B     		ldr	r3, .L17
+ 215 0100 7B61     		str	r3, [r7, #20]
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+  96:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Receive operation
+  97:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterSlaveAddrSet(address, true);
+ 216              		.loc 1 97 0
+ 217 0102 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 218 0104 0121     		movs	r1, #1
+ 219 0106 1846     		mov	r0, r3
+ 220 0108 FFF7FEFF 		bl	I2CMasterSlaveAddrSet
+  98:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+  99:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Multiple receive operation
+ 100:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterControl(I2C_MASTER_CMD_BURST_RECEIVE_START);
+ 221              		.loc 1 100 0
+ 222 010c 0B20     		movs	r0, #11
+ 223 010e FFF7FEFF 		bl	I2CMasterControl
+ 101:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 102:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Calculate timeout
+ 103:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     future += board_timer_get();
+ 224              		.loc 1 103 0
+ 225 0112 FFF7FEFF 		bl	board_timer_get
+ 226 0116 0246     		mov	r2, r0
+ 227 0118 7B69     		ldr	r3, [r7, #20]
+ 228 011a 1344     		add	r3, r3, r2
+ 229 011c 7B61     		str	r3, [r7, #20]
+ 104:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 105:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Iterate overall all bytes
+ 106:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     while (length) {
+ 230              		.loc 1 106 0
+ 231 011e 21E0     		b	.L11
+ 232              	.L14:
+ 107:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Wait until complete or timeout
+ 108:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         while (I2CMasterBusy()) {
+ 109:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             // Update timeout status and return if expired
+ 110:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             if (board_timer_expired(future)) return length;
+ 233              		.loc 1 110 0
+ 234 0120 7869     		ldr	r0, [r7, #20]
+ 235 0122 FFF7FEFF 		bl	board_timer_expired
+ 236 0126 0346     		mov	r3, r0
+ 237 0128 002B     		cmp	r3, #0
+ 238 012a 01D0     		beq	.L12
+ 239              		.loc 1 110 0 is_stmt 0 discriminator 1
+ 240 012c 7B68     		ldr	r3, [r7, #4]
+ 241 012e 1DE0     		b	.L13
+ 242              	.L12:
+ 108:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             // Update timeout status and return if expired
+ 243              		.loc 1 108 0 is_stmt 1
+ 244 0130 FFF7FEFF 		bl	I2CMasterBusy
+ 245 0134 0346     		mov	r3, r0
+ 246 0136 002B     		cmp	r3, #0
+ 247 0138 F2D1     		bne	.L14
+ 111:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         }
+ 112:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         
+ 113:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Read data from I2C
+ 114:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         *buffer++ = I2CMasterDataGet();
+ 248              		.loc 1 114 0
+ 249 013a BC68     		ldr	r4, [r7, #8]
+ 250 013c 631C     		adds	r3, r4, #1
+ 251 013e BB60     		str	r3, [r7, #8]
+ 252 0140 FFF7FEFF 		bl	I2CMasterDataGet
+ 253 0144 0346     		mov	r3, r0
+ 254 0146 DBB2     		uxtb	r3, r3
+ 255 0148 2370     		strb	r3, [r4]
+ 115:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         length--;
+ 256              		.loc 1 115 0
+ 257 014a 7B68     		ldr	r3, [r7, #4]
+ 258 014c 013B     		subs	r3, r3, #1
+ 259 014e 7B60     		str	r3, [r7, #4]
+ 116:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 117:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check if it's the last byte
+ 118:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         if (length == 1) I2CMasterControl(I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
+ 260              		.loc 1 118 0
+ 261 0150 7B68     		ldr	r3, [r7, #4]
+ 262 0152 012B     		cmp	r3, #1
+ 263 0154 03D1     		bne	.L15
+ 264              		.loc 1 118 0 is_stmt 0 discriminator 1
+ 265 0156 0520     		movs	r0, #5
+ 266 0158 FFF7FEFF 		bl	I2CMasterControl
+ 267 015c 02E0     		b	.L11
+ 268              	.L15:
+ 119:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         else             I2CMasterControl(I2C_MASTER_CMD_BURST_RECEIVE_CONT);
+ 269              		.loc 1 119 0 is_stmt 1
+ 270 015e 0920     		movs	r0, #9
+ 271 0160 FFF7FEFF 		bl	I2CMasterControl
+ 272              	.L11:
+ 106:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Wait until complete or timeout
+ 273              		.loc 1 106 0
+ 274 0164 7B68     		ldr	r3, [r7, #4]
+ 275 0166 002B     		cmp	r3, #0
+ 276 0168 E2D1     		bne	.L12
+ 120:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     }
+ 121:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 122:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Return bytes read
+ 123:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     return length;
+ 277              		.loc 1 123 0
+ 278 016a 7B68     		ldr	r3, [r7, #4]
+ 279              	.L13:
+ 124:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** }
+ 280              		.loc 1 124 0
+ 281 016c 1846     		mov	r0, r3
+ 282 016e 1C37     		adds	r7, r7, #28
+ 283              		.cfi_def_cfa_offset 12
+ 284 0170 BD46     		mov	sp, r7
+ 285              		.cfi_def_cfa_register 13
+ 286              		@ sp needed
+ 287 0172 90BD     		pop	{r4, r7, pc}
+ 288              	.L18:
+ 289              		.align	2
+ 290              	.L17:
+ 291 0174 A0860100 		.word	100000
+ 292              		.cfi_endproc
+ 293              	.LFE2:
+ 295              		.align	2
+ 296              		.global	i2c_write_byte
+ 297              		.thumb
+ 298              		.thumb_func
+ 300              	i2c_write_byte:
+ 301              	.LFB3:
+ 125:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** bool i2c_write_byte(uint8_t address, uint8_t byte) {   
+ 302              		.loc 1 126 0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 16
+ 305              		@ frame_needed = 1, uses_anonymous_args = 0
+ 306 0178 80B5     		push	{r7, lr}
+ 307              		.cfi_def_cfa_offset 8
+ 308              		.cfi_offset 7, -8
+ 309              		.cfi_offset 14, -4
+ 310 017a 84B0     		sub	sp, sp, #16
+ 311              		.cfi_def_cfa_offset 24
+ 312 017c 00AF     		add	r7, sp, #0
+ 313              		.cfi_def_cfa_register 7
+ 314 017e 0346     		mov	r3, r0
+ 315 0180 0A46     		mov	r2, r1
+ 316 0182 FB71     		strb	r3, [r7, #7]
+ 317 0184 1346     		mov	r3, r2
+ 318 0186 BB71     		strb	r3, [r7, #6]
+ 127:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     uint32_t future = I2C_MAX_DELAY_US;
+ 319              		.loc 1 127 0
+ 320 0188 134B     		ldr	r3, .L23
+ 321 018a FB60     		str	r3, [r7, #12]
+ 128:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 129:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Transmit operation
+ 130:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterSlaveAddrSet(address, false);
+ 322              		.loc 1 130 0
+ 323 018c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 324 018e 0021     		movs	r1, #0
+ 325 0190 1846     		mov	r0, r3
+ 326 0192 FFF7FEFF 		bl	I2CMasterSlaveAddrSet
+ 131:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 132:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Write byte to I2C buffer
+ 133:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterDataPut(byte);
+ 327              		.loc 1 133 0
+ 328 0196 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 329 0198 1846     		mov	r0, r3
+ 330 019a FFF7FEFF 		bl	I2CMasterDataPut
+ 134:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 135:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Single transmit operation
+ 136:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterControl(I2C_MASTER_CMD_SINGLE_SEND);
+ 331              		.loc 1 136 0
+ 332 019e 0720     		movs	r0, #7
+ 333 01a0 FFF7FEFF 		bl	I2CMasterControl
+ 137:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 138:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Calculate timeout
+ 139:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     future += board_timer_get();
+ 334              		.loc 1 139 0
+ 335 01a4 FFF7FEFF 		bl	board_timer_get
+ 336 01a8 0246     		mov	r2, r0
+ 337 01aa FB68     		ldr	r3, [r7, #12]
+ 338 01ac 1344     		add	r3, r3, r2
+ 339 01ae FB60     		str	r3, [r7, #12]
+ 140:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Wait until complete or timeout
+ 142:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     while (I2CMasterBusy()) {
+ 340              		.loc 1 142 0
+ 341 01b0 07E0     		b	.L20
+ 342              	.L22:
+ 143:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check timeout status and return if expired
+ 144:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         if (board_timer_expired(future)) return false;
+ 343              		.loc 1 144 0
+ 344 01b2 F868     		ldr	r0, [r7, #12]
+ 345 01b4 FFF7FEFF 		bl	board_timer_expired
+ 346 01b8 0346     		mov	r3, r0
+ 347 01ba 002B     		cmp	r3, #0
+ 348 01bc 01D0     		beq	.L20
+ 349              		.loc 1 144 0 is_stmt 0 discriminator 1
+ 350 01be 0023     		movs	r3, #0
+ 351 01c0 05E0     		b	.L21
+ 352              	.L20:
+ 142:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check timeout status and return if expired
+ 353              		.loc 1 142 0 is_stmt 1
+ 354 01c2 FFF7FEFF 		bl	I2CMasterBusy
+ 355 01c6 0346     		mov	r3, r0
+ 356 01c8 002B     		cmp	r3, #0
+ 357 01ca F2D1     		bne	.L22
+ 145:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     }
+ 146:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 147:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     return true;
+ 358              		.loc 1 147 0
+ 359 01cc 0123     		movs	r3, #1
+ 360              	.L21:
+ 148:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** }
+ 361              		.loc 1 148 0
+ 362 01ce 1846     		mov	r0, r3
+ 363 01d0 1037     		adds	r7, r7, #16
+ 364              		.cfi_def_cfa_offset 8
+ 365 01d2 BD46     		mov	sp, r7
+ 366              		.cfi_def_cfa_register 13
+ 367              		@ sp needed
+ 368 01d4 80BD     		pop	{r7, pc}
+ 369              	.L24:
+ 370 01d6 00BF     		.align	2
+ 371              	.L23:
+ 372 01d8 A0860100 		.word	100000
+ 373              		.cfi_endproc
+ 374              	.LFE3:
+ 376              		.align	2
+ 377              		.global	i2c_write_bytes
+ 378              		.thumb
+ 379              		.thumb_func
+ 381              	i2c_write_bytes:
+ 382              	.LFB4:
+ 149:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 150:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** uint32_t i2c_write_bytes(uint8_t address, uint8_t* buffer, uint32_t length) {
+ 383              		.loc 1 150 0
+ 384              		.cfi_startproc
+ 385              		@ args = 0, pretend = 0, frame = 24
+ 386              		@ frame_needed = 1, uses_anonymous_args = 0
+ 387 01dc 80B5     		push	{r7, lr}
+ 388              		.cfi_def_cfa_offset 8
+ 389              		.cfi_offset 7, -8
+ 390              		.cfi_offset 14, -4
+ 391 01de 86B0     		sub	sp, sp, #24
+ 392              		.cfi_def_cfa_offset 32
+ 393 01e0 00AF     		add	r7, sp, #0
+ 394              		.cfi_def_cfa_register 7
+ 395 01e2 0346     		mov	r3, r0
+ 396 01e4 B960     		str	r1, [r7, #8]
+ 397 01e6 7A60     		str	r2, [r7, #4]
+ 398 01e8 FB73     		strb	r3, [r7, #15]
+ 151:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     uint32_t future = I2C_MAX_DELAY_US;
+ 399              		.loc 1 151 0
+ 400 01ea 294B     		ldr	r3, .L35
+ 401 01ec 7B61     		str	r3, [r7, #20]
+ 152:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 153:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Transmit operation
+ 154:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterSlaveAddrSet(address, false);
+ 402              		.loc 1 154 0
+ 403 01ee FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 404 01f0 0021     		movs	r1, #0
+ 405 01f2 1846     		mov	r0, r3
+ 406 01f4 FFF7FEFF 		bl	I2CMasterSlaveAddrSet
+ 155:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 156:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Write byte to I2C buffer
+ 157:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterDataPut(*buffer++);
+ 407              		.loc 1 157 0
+ 408 01f8 BB68     		ldr	r3, [r7, #8]
+ 409 01fa 5A1C     		adds	r2, r3, #1
+ 410 01fc BA60     		str	r2, [r7, #8]
+ 411 01fe 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 412 0200 1846     		mov	r0, r3
+ 413 0202 FFF7FEFF 		bl	I2CMasterDataPut
+ 158:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     length--;
+ 414              		.loc 1 158 0
+ 415 0206 7B68     		ldr	r3, [r7, #4]
+ 416 0208 013B     		subs	r3, r3, #1
+ 417 020a 7B60     		str	r3, [r7, #4]
+ 159:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 160:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Multiple transmit operation
+ 161:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     I2CMasterControl(I2C_MASTER_CMD_BURST_SEND_START);
+ 418              		.loc 1 161 0
+ 419 020c 0320     		movs	r0, #3
+ 420 020e FFF7FEFF 		bl	I2CMasterControl
+ 162:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 163:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Calculate timeout
+ 164:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     future += board_timer_get();
+ 421              		.loc 1 164 0
+ 422 0212 FFF7FEFF 		bl	board_timer_get
+ 423 0216 0246     		mov	r2, r0
+ 424 0218 7B69     		ldr	r3, [r7, #20]
+ 425 021a 1344     		add	r3, r3, r2
+ 426 021c 7B61     		str	r3, [r7, #20]
+ 165:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 166:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Wait until complete or timeout
+ 167:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     while (I2CMasterBusy()) {
+ 427              		.loc 1 167 0
+ 428 021e 07E0     		b	.L26
+ 429              	.L28:
+ 168:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check timeout status and return if expired
+ 169:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         if (board_timer_expired(future)) return length;
+ 430              		.loc 1 169 0
+ 431 0220 7869     		ldr	r0, [r7, #20]
+ 432 0222 FFF7FEFF 		bl	board_timer_expired
+ 433 0226 0346     		mov	r3, r0
+ 434 0228 002B     		cmp	r3, #0
+ 435 022a 01D0     		beq	.L26
+ 436              		.loc 1 169 0 is_stmt 0 discriminator 1
+ 437 022c 7B68     		ldr	r3, [r7, #4]
+ 438 022e 2BE0     		b	.L27
+ 439              	.L26:
+ 167:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check timeout status and return if expired
+ 440              		.loc 1 167 0 is_stmt 1
+ 441 0230 FFF7FEFF 		bl	I2CMasterBusy
+ 442 0234 0346     		mov	r3, r0
+ 443 0236 002B     		cmp	r3, #0
+ 444 0238 F2D1     		bne	.L28
+ 170:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     }
+ 171:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 172:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Iterate overall all bytes
+ 173:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     while (length) {
+ 445              		.loc 1 173 0
+ 446 023a 21E0     		b	.L29
+ 447              	.L34:
+ 174:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Write byte to I2C buffer
+ 175:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         I2CMasterDataPut(*buffer++);
+ 448              		.loc 1 175 0
+ 449 023c BB68     		ldr	r3, [r7, #8]
+ 450 023e 5A1C     		adds	r2, r3, #1
+ 451 0240 BA60     		str	r2, [r7, #8]
+ 452 0242 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 453 0244 1846     		mov	r0, r3
+ 454 0246 FFF7FEFF 		bl	I2CMasterDataPut
+ 176:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 177:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Check if it's the last byte
+ 178:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         if (length == 1) I2CMasterControl(I2C_MASTER_CMD_BURST_SEND_FINISH);
+ 455              		.loc 1 178 0
+ 456 024a 7B68     		ldr	r3, [r7, #4]
+ 457 024c 012B     		cmp	r3, #1
+ 458 024e 03D1     		bne	.L30
+ 459              		.loc 1 178 0 is_stmt 0 discriminator 1
+ 460 0250 0520     		movs	r0, #5
+ 461 0252 FFF7FEFF 		bl	I2CMasterControl
+ 462 0256 0BE0     		b	.L32
+ 463              	.L30:
+ 179:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         else             I2CMasterControl(I2C_MASTER_CMD_BURST_SEND_CONT);
+ 464              		.loc 1 179 0 is_stmt 1
+ 465 0258 0120     		movs	r0, #1
+ 466 025a FFF7FEFF 		bl	I2CMasterControl
+ 180:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 181:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Wait until complete or timeout
+ 182:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         while (I2CMasterBusy()) {
+ 467              		.loc 1 182 0
+ 468 025e 07E0     		b	.L32
+ 469              	.L33:
+ 183:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             // Check timeout status and return if expired
+ 184:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             if (board_timer_expired(future)) return length;
+ 470              		.loc 1 184 0
+ 471 0260 7869     		ldr	r0, [r7, #20]
+ 472 0262 FFF7FEFF 		bl	board_timer_expired
+ 473 0266 0346     		mov	r3, r0
+ 474 0268 002B     		cmp	r3, #0
+ 475 026a 01D0     		beq	.L32
+ 476              		.loc 1 184 0 is_stmt 0 discriminator 1
+ 477 026c 7B68     		ldr	r3, [r7, #4]
+ 478 026e 0BE0     		b	.L27
+ 479              	.L32:
+ 182:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****             // Check timeout status and return if expired
+ 480              		.loc 1 182 0 is_stmt 1
+ 481 0270 FFF7FEFF 		bl	I2CMasterBusy
+ 482 0274 0346     		mov	r3, r0
+ 483 0276 002B     		cmp	r3, #0
+ 484 0278 F2D1     		bne	.L33
+ 185:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         }
+ 186:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** 
+ 187:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Update the length
+ 188:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         length--;
+ 485              		.loc 1 188 0
+ 486 027a 7B68     		ldr	r3, [r7, #4]
+ 487 027c 013B     		subs	r3, r3, #1
+ 488 027e 7B60     		str	r3, [r7, #4]
+ 489              	.L29:
+ 173:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****         // Write byte to I2C buffer
+ 490              		.loc 1 173 0
+ 491 0280 7B68     		ldr	r3, [r7, #4]
+ 492 0282 002B     		cmp	r3, #0
+ 493 0284 DAD1     		bne	.L34
+ 189:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     }
+ 190:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     
+ 191:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     // Return bytes written
+ 192:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c ****     return length;
+ 494              		.loc 1 192 0
+ 495 0286 7B68     		ldr	r3, [r7, #4]
+ 496              	.L27:
+ 193:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/i2c.c **** }
+ 497              		.loc 1 193 0
+ 498 0288 1846     		mov	r0, r3
+ 499 028a 1837     		adds	r7, r7, #24
+ 500              		.cfi_def_cfa_offset 8
+ 501 028c BD46     		mov	sp, r7
+ 502              		.cfi_def_cfa_register 13
+ 503              		@ sp needed
+ 504 028e 80BD     		pop	{r7, pc}
+ 505              	.L36:
+ 506              		.align	2
+ 507              	.L35:
+ 508 0290 A0860100 		.word	100000
+ 509              		.cfi_endproc
+ 510              	.LFE4:
+ 512              	.Letext0:
+ 513              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 514              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 i2c.c
+     /tmp/ccmhniIp.s:19     .text:0000000000000000 $t
+     /tmp/ccmhniIp.s:24     .text:0000000000000000 i2c_init
+     /tmp/ccmhniIp.s:102    .text:0000000000000080 $d
+     /tmp/ccmhniIp.s:108    .text:000000000000008c $t
+     /tmp/ccmhniIp.s:113    .text:000000000000008c i2c_read_byte
+     /tmp/ccmhniIp.s:185    .text:00000000000000ec $d
+     /tmp/ccmhniIp.s:189    .text:00000000000000f0 $t
+     /tmp/ccmhniIp.s:194    .text:00000000000000f0 i2c_read_bytes
+     /tmp/ccmhniIp.s:291    .text:0000000000000174 $d
+     /tmp/ccmhniIp.s:295    .text:0000000000000178 $t
+     /tmp/ccmhniIp.s:300    .text:0000000000000178 i2c_write_byte
+     /tmp/ccmhniIp.s:372    .text:00000000000001d8 $d
+     /tmp/ccmhniIp.s:376    .text:00000000000001dc $t
+     /tmp/ccmhniIp.s:381    .text:00000000000001dc i2c_write_bytes
+     /tmp/ccmhniIp.s:508    .text:0000000000000290 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.8e445c0106ab795ab4704214cba6f089
+                           .group:0000000000000000 wm4.hw_gpio.h.39.abbe53cff9a4c1fb5f1c34960fe1e7aa
+                           .group:0000000000000000 wm4.hw_i2cm.h.39.4b5af155c75f23d9eeb001d8feb957ac
+                           .group:0000000000000000 wm4.hw_ioc.h.39.7722cce4a3cc0e3380c3cd135aee3b21
+                           .group:0000000000000000 wm4.hw_memmap.h.39.19283c377d449c9bca5fdd8ccb62628c
+                           .group:0000000000000000 wm4.hw_sys_ctrl.h.39.50b4d7775c38e82076d0eb3bdc2daf82
+                           .group:0000000000000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:0000000000000000 wm4.features.h.33.d97f2d646536517df901beeb5b9993f5
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.b82bf99f69d6a5c085fc866de0d3eb9b
+                           .group:0000000000000000 wm4._stdint.h.10.7a5f60e6741af4a5594a3867d347e1f9
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.stdbool.h.29.07dce69c3b78884144b7f7bd19483461
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.gpio.h.41.604fa3d9f70fb140a75ada50bffeaeff
+                           .group:0000000000000000 wm4.i2c_lib.h.42.5fd828f6712e1f3a1c5cb3c7bbae1df4
+                           .group:0000000000000000 wm4.ioc.h.41.7444fe7016a1d045dd9fea497d615b28
+                           .group:0000000000000000 wm4.sys_ctrl.h.41.c6bbd4dace326d685c1afa45bc1ba1e2
+
+UNDEFINED SYMBOLS
+SysCtrlPeripheralEnable
+SysCtrlPeripheralSleepEnable
+SysCtrlPeripheralDeepSleepDisable
+SysCtrlPeripheralReset
+GPIOPinTypeI2C
+IOCPinConfigPeriphInput
+IOCPinConfigPeriphOutput
+SysCtrlClockGet
+I2CMasterInitExpClk
+I2CMasterEnable
+I2CMasterSlaveAddrSet
+I2CMasterControl
+board_timer_get
+board_timer_expired
+I2CMasterBusy
+I2CMasterDataGet
+I2CMasterDataPut
