@@ -1,0 +1,127 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"debug.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.align	2
+  20              		.global	__error__
+  21              		.thumb
+  22              		.thumb_func
+  24              	__error__:
+  25              	.LFB0:
+  26              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** /******************************************************************************
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Filename:       debug.c
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Revised:        $Date: 2013-01-11 14:28:46 +0100 (fr, 11 jan 2013) $
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Revision:       $Revision: 9099 $
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Description:    Debug stub.
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  Redistribution and use in source and binary forms, with or without
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  modification, are permitted provided that the following conditions
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  are met:
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    Redistributions of source code must retain the above copyright
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    notice, this list of conditions and the following disclaimer.
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    Redistributions in binary form must reproduce the above copyright
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    notice, this list of conditions and the following disclaimer in the
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    documentation and/or other materials provided with the distribution.
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    Neither the name of Texas Instruments Incorporated nor the names of
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    its contributors may be used to endorse or promote products derived
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *    from this software without specific prior written permission.
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** *
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** ******************************************************************************/
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** 
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //*****************************************************************************
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //! \addtogroup debug_api
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //! @{
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //*****************************************************************************
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** 
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** #include "debug.h"
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** 
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //*****************************************************************************
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //!
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //! Function stub for allowing compile with ENABLE_ASSERT flag asserted.
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //!
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** //*****************************************************************************
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** void
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** __error__(char *pcFilename, uint32_t ui32Line)
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c **** {
+  27              		.loc 1 58 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 8
+  30              		@ frame_needed = 1, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32 0000 80B4     		push	{r7}
+  33              		.cfi_def_cfa_offset 4
+  34              		.cfi_offset 7, -4
+  35 0002 83B0     		sub	sp, sp, #12
+  36              		.cfi_def_cfa_offset 16
+  37 0004 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+  39 0006 7860     		str	r0, [r7, #4]
+  40 0008 3960     		str	r1, [r7]
+  41              	.L2:
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     //
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     // Enter an infinite loop.
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     //
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     while(1)
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     {
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/debug.c ****     }
+  42              		.loc 1 64 0 discriminator 1
+  43 000a FEE7     		b	.L2
+  44              		.cfi_endproc
+  45              	.LFE0:
+  47              	.Letext0:
+  48              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+  49              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 debug.c
+     /tmp/ccjwQDwW.s:19     .text:0000000000000000 $t
+     /tmp/ccjwQDwW.s:24     .text:0000000000000000 __error__
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.8e445c0106ab795ab4704214cba6f089
+                           .group:0000000000000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:0000000000000000 wm4.features.h.33.d97f2d646536517df901beeb5b9993f5
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.b82bf99f69d6a5c085fc866de0d3eb9b
+                           .group:0000000000000000 wm4._stdint.h.10.7a5f60e6741af4a5594a3867d347e1f9
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.stdbool.h.29.07dce69c3b78884144b7f7bd19483461
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+
+NO UNDEFINED SYMBOLS

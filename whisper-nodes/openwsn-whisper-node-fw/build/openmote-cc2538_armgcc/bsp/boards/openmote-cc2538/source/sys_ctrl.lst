@@ -1,0 +1,2491 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"sys_ctrl.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.rodata
+  20              		.align	2
+  23              	g_pui32RCGCRegs:
+  24 0000 08200D40 		.word	1074601992
+  25 0004 18200D40 		.word	1074602008
+  26 0008 28200D40 		.word	1074602024
+  27 000c 38200D40 		.word	1074602040
+  28 0010 48200D40 		.word	1074602056
+  29 0014 A8200D40 		.word	1074602152
+  30              		.align	2
+  33              	g_pui32SCGCRegs:
+  34 0018 0C200D40 		.word	1074601996
+  35 001c 1C200D40 		.word	1074602012
+  36 0020 2C200D40 		.word	1074602028
+  37 0024 3C200D40 		.word	1074602044
+  38 0028 4C200D40 		.word	1074602060
+  39 002c AC200D40 		.word	1074602156
+  40              		.align	2
+  43              	g_pui32DCGCRegs:
+  44 0030 10200D40 		.word	1074602000
+  45 0034 20200D40 		.word	1074602016
+  46 0038 30200D40 		.word	1074602032
+  47 003c 40200D40 		.word	1074602048
+  48 0040 50200D40 		.word	1074602064
+  49 0044 B0200D40 		.word	1074602160
+  50              		.align	2
+  53              	g_pui32SRRegs:
+  54 0048 14200D40 		.word	1074602004
+  55 004c 24200D40 		.word	1074602020
+  56 0050 34200D40 		.word	1074602036
+  57 0054 44200D40 		.word	1074602052
+  58 0058 54200D40 		.word	1074602068
+  59              		.align	2
+  62              	g_pui32DieCfgMask:
+  63 005c 01000000 		.word	1
+  64 0060 00010000 		.word	256
+  65 0064 00000100 		.word	65536
+  66 0068 00000001 		.word	16777216
+  67 006c 01000000 		.word	1
+  68 0070 04000000 		.word	4
+  69              		.text
+  70              		.align	2
+  71              		.global	SysCtrlClockSet
+  72              		.thumb
+  73              		.thumb_func
+  75              	SysCtrlClockSet:
+  76              	.LFB0:
+  77              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** /******************************************************************************
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Filename:       sys_ctrl.c
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Revised:        $Date: 2013-04-29 09:29:18 +0200 (Mon, 29 Apr 2013) $
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Revision:       $Revision: 9921 $
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Description:    Driver for the system controller.
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  Redistribution and use in source and binary forms, with or without
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  modification, are permitted provided that the following conditions
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  are met:
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    Redistributions of source code must retain the above copyright
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    notice, this list of conditions and the following disclaimer.
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    Redistributions in binary form must reproduce the above copyright
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    notice, this list of conditions and the following disclaimer in the
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    documentation and/or other materials provided with the distribution.
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    Neither the name of Texas Instruments Incorporated nor the names of
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    its contributors may be used to endorse or promote products derived
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *    from this software without specific prior written permission.
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** *
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** ******************************************************************************/
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \addtogroup sysctl_api
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! @{
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include <headers/hw_flash_ctrl.h>
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include <headers/hw_ints.h>
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include <headers/hw_nvic.h>
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include <headers/hw_sys_ctrl.h>
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include "cpu.h"
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include "debug.h"
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include "interrupt.h"
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #include "sys_ctrl.h"
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Arrays that maps the "peripheral set" number (which is stored in the
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // third nibble of the SYS_CTRL_PERIPH_* defines) to the SYSCTL register that
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // contains the relevant bit for that peripheral.
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  65:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Run mode registers
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static const uint32_t g_pui32RCGCRegs[] =
+  67:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+  68:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCGPT,
+  69:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCSSI,
+  70:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCUART,
+  71:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCI2C,
+  72:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCSEC,
+  73:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_RCGCRFC
+  74:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** };
+  75:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  76:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Sleep mode registers
+  77:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static const uint32_t g_pui32SCGCRegs[] =
+  78:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+  79:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCGPT,
+  80:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCSSI,
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCUART,
+  82:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCI2C,
+  83:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCSEC,
+  84:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SCGCRFC
+  85:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** };
+  86:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  87:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Deep sleep mode registers
+  88:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static const uint32_t g_pui32DCGCRegs[] =
+  89:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+  90:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCGPT,
+  91:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCSSI,
+  92:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCUART,
+  93:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCI2C,
+  94:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCSEC,
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_DCGCRFC
+  96:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** };
+  97:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+  98:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Reset registers
+  99:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static const uint32_t g_pui32SRRegs[] =
+ 100:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 101:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SRGPT,
+ 102:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SRSSI,
+ 103:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SRUART,
+ 104:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SRI2C,
+ 105:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     SYS_CTRL_SRSEC,
+ 106:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** };
+ 107:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 108:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // Masks for determining if a peripheral is enabled
+ 109:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static const uint32_t g_pui32DieCfgMask[] =
+ 110:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 111:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG1_GPTM0_EN,
+ 112:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG1_SSI0_EN,
+ 113:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG1_UART0_EN,
+ 114:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG1_I2C_EN,
+ 115:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG2_PKA_EN,
+ 116:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     FLASH_CTRL_DIECFG2_RF_CORE_EN
+ 117:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** };
+ 118:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 119:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 120:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 121:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // This macro extracts the array index out of the peripheral number.
+ 122:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 123:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 124:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #define SYS_CTRL_PERIPH_INDEX(a)  (((a) >> 8) & 0xf)
+ 125:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 127:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 128:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 129:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // This macro extracts the peripheral instance number and generates bit mask
+ 130:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 131:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 132:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #define SYS_CTRL_PERIPH_MASKBIT(a) (0x00000001 << ((a) & 0xf))
+ 133:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 134:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 135:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 136:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // This macro extracts the instance number out of the peripheral number.
+ 137:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 138:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 139:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #define SYS_CTRL_PERIPH_INSTANCE(a)  ((a) & 0xf)
+ 140:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 142:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 143:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \internal
+ 144:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Checks a peripheral identifier
+ 145:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 146:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral identifier.
+ 147:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 148:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function determines if a peripheral identifier is valid.
+ 149:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 150:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return Returns \b true if the peripheral identifier is valid and \b false
+ 151:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! otherwise.
+ 152:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 153:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 154:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #ifdef ENABLE_ASSERT
+ 155:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** static bool
+ 156:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralValid(uint32_t ui32Peripheral)
+ 157:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 158:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     return((ui32Peripheral == SYS_CTRL_PERIPH_GPT0)  ||
+ 159:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_GPT1)  ||
+ 160:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_GPT2)  ||
+ 161:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_GPT3)  ||
+ 162:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_SSI0)  ||
+ 163:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_SSI1)  ||
+ 164:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_UART0) ||
+ 165:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_UART1) ||
+ 166:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_I2C)   ||
+ 167:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_PKA)   ||
+ 168:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_AES)   ||
+ 169:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            (ui32Peripheral == SYS_CTRL_PERIPH_RFC));
+ 170:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 171:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 172:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 173:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 174:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 175:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 176:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Sets the general clocking of the device
+ 177:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 178:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param bExternalOsc32k is set to true for applications with
+ 179:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!        external 32kHz crystal.
+ 180:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param bInternalOsc selects internal 1-16MHz RC oscillator. If set to
+ 181:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!        false, the external 0-32MHz crystal is used.
+ 182:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32SysDiv System Clock Setting.
+ 183:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 184:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function configures the clocking of the device.
+ 185:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The oscillator used and the system clock divider settings are
+ 186:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! configured with this function.
+ 187:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 188:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32SysDiv argument must be only one of the following values:
+ 189:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_32MHZ, \b SYS_CTRL_SYSDIV_16MHZ,
+ 190:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_8MHZ,  \b SYS_CTRL_SYSDIV_4MHZ,
+ 191:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_2MHZ,  \b SYS_CTRL_SYSDIV_1MHZ,
+ 192:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_500KHZ,\b SYS_CTRL_SYSDIV_250KHZ.
+ 193:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Note \b SYS_CTRL_SYSDIV_32MHZ can not be selected when Internal Oscillator
+ 194:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! is selected.
+ 195:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 196:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 197:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 198:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 199:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 200:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlClockSet(bool bExternalOsc32k, bool bInternalOsc,
+ 201:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****                 uint32_t ui32SysDiv)
+ 202:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+  78              		.loc 1 202 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 24
+  81              		@ frame_needed = 1, uses_anonymous_args = 0
+  82 0000 80B5     		push	{r7, lr}
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 7, -8
+  85              		.cfi_offset 14, -4
+  86 0002 86B0     		sub	sp, sp, #24
+  87              		.cfi_def_cfa_offset 32
+  88 0004 00AF     		add	r7, sp, #0
+  89              		.cfi_def_cfa_register 7
+  90 0006 0346     		mov	r3, r0
+  91 0008 3A60     		str	r2, [r7]
+  92 000a FB71     		strb	r3, [r7, #7]
+  93 000c 0B46     		mov	r3, r1
+  94 000e BB71     		strb	r3, [r7, #6]
+ 203:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32STA;
+ 204:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Reg;
+ 205:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32TimeoutVal;
+ 206:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Osc;
+ 207:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 208:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // check input parameters
+ 209:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT((ui32SysDiv == SYS_CTRL_SYSDIV_32MHZ  ||
+ 210:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_16MHZ  ||
+ 211:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_8MHZ   ||
+ 212:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_4MHZ   ||
+ 213:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_2MHZ   ||
+ 214:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_1MHZ   ||
+ 215:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_500KHZ ||
+ 216:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             ui32SysDiv == SYS_CTRL_SYSDIV_250KHZ) &&
+ 217:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            !((ui32SysDiv == SYS_CTRL_SYSDIV_32MHZ) && bInternalOsc));
+ 218:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 219:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 220:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Enable AMP detect to make sure XOSC starts correctly
+ 221:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 222:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(!bInternalOsc)
+  95              		.loc 1 222 0
+  96 0010 BB79     		ldrb	r3, [r7, #6]
+  97 0012 83F00103 		eor	r3, r3, #1
+  98 0016 DBB2     		uxtb	r3, r3
+  99 0018 002B     		cmp	r3, #0
+ 100 001a 07D0     		beq	.L2
+ 223:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 224:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg = HWREG(SYS_CTRL_CLOCK_CTRL) | SYS_CTRL_CLOCK_CTRL_AMP_DET;
+ 101              		.loc 1 224 0
+ 102 001c 244B     		ldr	r3, .L10
+ 103 001e 1B68     		ldr	r3, [r3]
+ 104 0020 43F40013 		orr	r3, r3, #2097152
+ 105 0024 3B61     		str	r3, [r7, #16]
+ 225:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         HWREG(SYS_CTRL_CLOCK_CTRL) = ui32Reg;
+ 106              		.loc 1 225 0
+ 107 0026 224A     		ldr	r2, .L10
+ 108 0028 3B69     		ldr	r3, [r7, #16]
+ 109 002a 1360     		str	r3, [r2]
+ 110              	.L2:
+ 226:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 227:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 228:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 229:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Set 32kHz clock, Osc and SysDiv
+ 230:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 231:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Reg = HWREG(SYS_CTRL_CLOCK_CTRL);
+ 111              		.loc 1 231 0
+ 112 002c 204B     		ldr	r3, .L10
+ 113 002e 1B68     		ldr	r3, [r3]
+ 114 0030 3B61     		str	r3, [r7, #16]
+ 232:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Reg &= ~(SYS_CTRL_CLOCK_CTRL_OSC32K | SYS_CTRL_CLOCK_CTRL_OSC |
+ 115              		.loc 1 232 0
+ 116 0032 3A69     		ldr	r2, [r7, #16]
+ 117 0034 1F4B     		ldr	r3, .L10+4
+ 118 0036 1340     		ands	r3, r3, r2
+ 119 0038 3B61     		str	r3, [r7, #16]
+ 233:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****                  SYS_CTRL_CLOCK_CTRL_SYS_DIV_M);
+ 234:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(!bExternalOsc32k)
+ 120              		.loc 1 234 0
+ 121 003a FB79     		ldrb	r3, [r7, #7]
+ 122 003c 83F00103 		eor	r3, r3, #1
+ 123 0040 DBB2     		uxtb	r3, r3
+ 124 0042 002B     		cmp	r3, #0
+ 125 0044 03D0     		beq	.L3
+ 235:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 236:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg |= SYS_CTRL_CLOCK_CTRL_OSC32K;
+ 126              		.loc 1 236 0
+ 127 0046 3B69     		ldr	r3, [r7, #16]
+ 128 0048 43F08073 		orr	r3, r3, #16777216
+ 129 004c 3B61     		str	r3, [r7, #16]
+ 130              	.L3:
+ 237:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 238:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Osc = bInternalOsc ? SYS_CTRL_CLOCK_CTRL_OSC : 0;
+ 131              		.loc 1 238 0
+ 132 004e BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 133 0050 002B     		cmp	r3, #0
+ 134 0052 02D0     		beq	.L4
+ 135              		.loc 1 238 0 is_stmt 0 discriminator 1
+ 136 0054 4FF48033 		mov	r3, #65536
+ 137 0058 00E0     		b	.L5
+ 138              	.L4:
+ 139              		.loc 1 238 0 discriminator 2
+ 140 005a 0023     		movs	r3, #0
+ 141              	.L5:
+ 142              		.loc 1 238 0 discriminator 4
+ 143 005c BB60     		str	r3, [r7, #8]
+ 239:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Reg |= ui32Osc;
+ 144              		.loc 1 239 0 is_stmt 1 discriminator 4
+ 145 005e 3A69     		ldr	r2, [r7, #16]
+ 146 0060 BB68     		ldr	r3, [r7, #8]
+ 147 0062 1343     		orrs	r3, r3, r2
+ 148 0064 3B61     		str	r3, [r7, #16]
+ 240:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Reg |= ui32SysDiv;
+ 149              		.loc 1 240 0 discriminator 4
+ 150 0066 3A69     		ldr	r2, [r7, #16]
+ 151 0068 3B68     		ldr	r3, [r7]
+ 152 006a 1343     		orrs	r3, r3, r2
+ 153 006c 3B61     		str	r3, [r7, #16]
+ 241:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(SYS_CTRL_CLOCK_CTRL) = ui32Reg;
+ 154              		.loc 1 241 0 discriminator 4
+ 155 006e 104A     		ldr	r2, .L10
+ 156 0070 3B69     		ldr	r3, [r7, #16]
+ 157 0072 1360     		str	r3, [r2]
+ 242:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 243:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 244:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Note: This wait loop could potentially be removed, if caution
+ 245:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // is taken in code running after this call.
+ 246:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 247:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // If we have changed Osc settings, wait until change happens
+ 248:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 249:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32STA = HWREG(SYS_CTRL_CLOCK_STA);
+ 158              		.loc 1 249 0 discriminator 4
+ 159 0074 104B     		ldr	r3, .L10+8
+ 160 0076 1B68     		ldr	r3, [r3]
+ 161 0078 7B61     		str	r3, [r7, #20]
+ 250:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32TimeoutVal = 0;
+ 162              		.loc 1 250 0 discriminator 4
+ 163 007a 0023     		movs	r3, #0
+ 164 007c FB60     		str	r3, [r7, #12]
+ 251:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     while((ui32Osc != (ui32STA & SYS_CTRL_CLOCK_CTRL_OSC)) &&
+ 165              		.loc 1 251 0 discriminator 4
+ 166 007e 08E0     		b	.L6
+ 167              	.L8:
+ 252:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             (ui32TimeoutVal < SYS_CTRL_TIMEOUT))
+ 253:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 254:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SysCtrlDelay(16);
+ 168              		.loc 1 254 0
+ 169 0080 1020     		movs	r0, #16
+ 170 0082 FFF7FEFF 		bl	SysCtrlDelay
+ 255:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32STA = HWREG(SYS_CTRL_CLOCK_STA);
+ 171              		.loc 1 255 0
+ 172 0086 0C4B     		ldr	r3, .L10+8
+ 173 0088 1B68     		ldr	r3, [r3]
+ 174 008a 7B61     		str	r3, [r7, #20]
+ 256:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32TimeoutVal++;
+ 175              		.loc 1 256 0
+ 176 008c FB68     		ldr	r3, [r7, #12]
+ 177 008e 0133     		adds	r3, r3, #1
+ 178 0090 FB60     		str	r3, [r7, #12]
+ 179              	.L6:
+ 251:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             (ui32TimeoutVal < SYS_CTRL_TIMEOUT))
+ 180              		.loc 1 251 0
+ 181 0092 7B69     		ldr	r3, [r7, #20]
+ 182 0094 03F48032 		and	r2, r3, #65536
+ 183 0098 BB68     		ldr	r3, [r7, #8]
+ 184 009a 9A42     		cmp	r2, r3
+ 185 009c 04D0     		beq	.L9
+ 251:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             (ui32TimeoutVal < SYS_CTRL_TIMEOUT))
+ 186              		.loc 1 251 0 is_stmt 0 discriminator 1
+ 187 009e FB68     		ldr	r3, [r7, #12]
+ 188 00a0 4FF6FE72 		movw	r2, #65534
+ 189 00a4 9342     		cmp	r3, r2
+ 190 00a6 EBD9     		bls	.L8
+ 191              	.L9:
+ 257:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 258:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(ui32TimeoutVal < SYS_CTRL_TIMEOUT);
+ 259:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 260:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** } // SysCtrlClockSet
+ 192              		.loc 1 260 0 is_stmt 1
+ 193 00a8 00BF     		nop
+ 194 00aa 1837     		adds	r7, r7, #24
+ 195              		.cfi_def_cfa_offset 8
+ 196 00ac BD46     		mov	sp, r7
+ 197              		.cfi_def_cfa_register 13
+ 198              		@ sp needed
+ 199 00ae 80BD     		pop	{r7, pc}
+ 200              	.L11:
+ 201              		.align	2
+ 202              	.L10:
+ 203 00b0 00200D40 		.word	1074601984
+ 204 00b4 F8FFFEFE 		.word	-16842760
+ 205 00b8 04200D40 		.word	1074601988
+ 206              		.cfi_endproc
+ 207              	.LFE0:
+ 209              		.align	2
+ 210              		.global	SysCtrlClockGet
+ 211              		.thumb
+ 212              		.thumb_func
+ 214              	SysCtrlClockGet:
+ 215              	.LFB1:
+ 261:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 262:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 263:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 264:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 265:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Gets the processor clock rate
+ 266:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 267:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function determines the clock rate of the processor clock.
+ 268:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 269:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return The processor clock rate
+ 270:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 271:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 272:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** uint32_t
+ 273:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlClockGet(void)
+ 274:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 216              		.loc 1 274 0
+ 217              		.cfi_startproc
+ 218              		@ args = 0, pretend = 0, frame = 16
+ 219              		@ frame_needed = 1, uses_anonymous_args = 0
+ 220              		@ link register save eliminated.
+ 221 00bc 80B4     		push	{r7}
+ 222              		.cfi_def_cfa_offset 4
+ 223              		.cfi_offset 7, -4
+ 224 00be 85B0     		sub	sp, sp, #20
+ 225              		.cfi_def_cfa_offset 24
+ 226 00c0 00AF     		add	r7, sp, #0
+ 227              		.cfi_def_cfa_register 7
+ 275:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Clk;
+ 276:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32STA;
+ 277:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32SysDiv;
+ 278:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 279:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32STA = HWREG(SYS_CTRL_CLOCK_STA);
+ 228              		.loc 1 279 0
+ 229 00c2 1E4B     		ldr	r3, .L24
+ 230 00c4 1B68     		ldr	r3, [r3]
+ 231 00c6 BB60     		str	r3, [r7, #8]
+ 280:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32SysDiv =
+ 232              		.loc 1 280 0
+ 233 00c8 BB68     		ldr	r3, [r7, #8]
+ 234 00ca 03F00703 		and	r3, r3, #7
+ 235 00ce 7B60     		str	r3, [r7, #4]
+ 281:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         (ui32STA & SYS_CTRL_CLOCK_STA_SYS_DIV_M) >> SYS_CTRL_CLOCK_STA_SYS_DIV_S;
+ 282:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Clk = 0;
+ 236              		.loc 1 282 0
+ 237 00d0 0023     		movs	r3, #0
+ 238 00d2 FB60     		str	r3, [r7, #12]
+ 283:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 284:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     switch(ui32SysDiv)
+ 239              		.loc 1 284 0
+ 240 00d4 7B68     		ldr	r3, [r7, #4]
+ 241 00d6 072B     		cmp	r3, #7
+ 242 00d8 2AD8     		bhi	.L13
+ 243 00da 01A2     		adr	r2, .L15
+ 244 00dc 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 245              		.p2align 2
+ 246              	.L15:
+ 247 00e0 01010000 		.word	.L14+1
+ 248 00e4 07010000 		.word	.L16+1
+ 249 00e8 0D010000 		.word	.L17+1
+ 250 00ec 13010000 		.word	.L18+1
+ 251 00f0 19010000 		.word	.L19+1
+ 252 00f4 1F010000 		.word	.L20+1
+ 253 00f8 25010000 		.word	.L21+1
+ 254 00fc 2B010000 		.word	.L22+1
+ 255              		.p2align 1
+ 256              	.L14:
+ 285:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 286:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_32MHZ:
+ 287:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_32MHZ;
+ 257              		.loc 1 287 0
+ 258 0100 0F4B     		ldr	r3, .L24+4
+ 259 0102 FB60     		str	r3, [r7, #12]
+ 288:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 260              		.loc 1 288 0
+ 261 0104 14E0     		b	.L13
+ 262              	.L16:
+ 289:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_16MHZ:
+ 290:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_16MHZ;
+ 263              		.loc 1 290 0
+ 264 0106 0F4B     		ldr	r3, .L24+8
+ 265 0108 FB60     		str	r3, [r7, #12]
+ 291:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 266              		.loc 1 291 0
+ 267 010a 11E0     		b	.L13
+ 268              	.L17:
+ 292:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_8MHZ:
+ 293:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_8MHZ;
+ 269              		.loc 1 293 0
+ 270 010c 0E4B     		ldr	r3, .L24+12
+ 271 010e FB60     		str	r3, [r7, #12]
+ 294:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 272              		.loc 1 294 0
+ 273 0110 0EE0     		b	.L13
+ 274              	.L18:
+ 295:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_4MHZ:
+ 296:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_4MHZ;
+ 275              		.loc 1 296 0
+ 276 0112 0E4B     		ldr	r3, .L24+16
+ 277 0114 FB60     		str	r3, [r7, #12]
+ 297:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 278              		.loc 1 297 0
+ 279 0116 0BE0     		b	.L13
+ 280              	.L19:
+ 298:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_2MHZ:
+ 299:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_2MHZ;
+ 281              		.loc 1 299 0
+ 282 0118 0D4B     		ldr	r3, .L24+20
+ 283 011a FB60     		str	r3, [r7, #12]
+ 300:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 284              		.loc 1 300 0
+ 285 011c 08E0     		b	.L13
+ 286              	.L20:
+ 301:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_1MHZ:
+ 302:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_1MHZ;
+ 287              		.loc 1 302 0
+ 288 011e 0D4B     		ldr	r3, .L24+24
+ 289 0120 FB60     		str	r3, [r7, #12]
+ 303:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 290              		.loc 1 303 0
+ 291 0122 05E0     		b	.L13
+ 292              	.L21:
+ 304:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_500KHZ:
+ 305:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_500KHZ;
+ 293              		.loc 1 305 0
+ 294 0124 0C4B     		ldr	r3, .L24+28
+ 295 0126 FB60     		str	r3, [r7, #12]
+ 306:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 296              		.loc 1 306 0
+ 297 0128 02E0     		b	.L13
+ 298              	.L22:
+ 307:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_250KHZ:
+ 308:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_250KHZ;
+ 299              		.loc 1 308 0
+ 300 012a 0C4B     		ldr	r3, .L24+32
+ 301 012c FB60     		str	r3, [r7, #12]
+ 309:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 302              		.loc 1 309 0
+ 303 012e 00BF     		nop
+ 304              	.L13:
+ 310:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 311:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 312:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 313:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Return the computed clock rate.
+ 314:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 315:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     return(ui32Clk);
+ 305              		.loc 1 315 0
+ 306 0130 FB68     		ldr	r3, [r7, #12]
+ 316:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** } // SysCtrlClockGet
+ 307              		.loc 1 316 0
+ 308 0132 1846     		mov	r0, r3
+ 309 0134 1437     		adds	r7, r7, #20
+ 310              		.cfi_def_cfa_offset 4
+ 311 0136 BD46     		mov	sp, r7
+ 312              		.cfi_def_cfa_register 13
+ 313              		@ sp needed
+ 314 0138 80BC     		pop	{r7}
+ 315              		.cfi_restore 7
+ 316              		.cfi_def_cfa_offset 0
+ 317 013a 7047     		bx	lr
+ 318              	.L25:
+ 319              		.align	2
+ 320              	.L24:
+ 321 013c 04200D40 		.word	1074601988
+ 322 0140 0048E801 		.word	32000000
+ 323 0144 0024F400 		.word	16000000
+ 324 0148 00127A00 		.word	8000000
+ 325 014c 00093D00 		.word	4000000
+ 326 0150 80841E00 		.word	2000000
+ 327 0154 40420F00 		.word	1000000
+ 328 0158 20A10700 		.word	500000
+ 329 015c 90D00300 		.word	250000
+ 330              		.cfi_endproc
+ 331              	.LFE1:
+ 333              		.align	2
+ 334              		.global	SysCtrlIOClockSet
+ 335              		.thumb
+ 336              		.thumb_func
+ 338              	SysCtrlIOClockSet:
+ 339              	.LFB2:
+ 317:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 318:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 319:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 320:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Sets the IO clocking of the device
+ 321:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 322:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32IODiv System Clock Setting.
+ 323:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 324:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function configures the IO clocking of the device (that is, the
+ 325:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Baud rate clock for SSI and UART).
+ 326:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 327:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32IODiv argument must be only one of the following values:
+ 328:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_32MHZ, \b SYS_CTRL_SYSDIV_16MHZ,
+ 329:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_8MHZ,  \b SYS_CTRL_SYSDIV_4MHZ,
+ 330:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_2MHZ,  \b SYS_CTRL_SYSDIV_1MHZ,
+ 331:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_SYSDIV_500KHZ,\b SYS_CTRL_SYSDIV_250KHZ.
+ 332:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 333:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Note \b SYS_CTRL_SYSDIV_32MHZ cannot be selected when Internal Oscillator
+ 334:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! is selected.
+ 335:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 336:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 337:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 338:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 339:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 340:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlIOClockSet(uint32_t ui32IODiv)
+ 341:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 340              		.loc 1 341 0
+ 341              		.cfi_startproc
+ 342              		@ args = 0, pretend = 0, frame = 16
+ 343              		@ frame_needed = 1, uses_anonymous_args = 0
+ 344              		@ link register save eliminated.
+ 345 0160 80B4     		push	{r7}
+ 346              		.cfi_def_cfa_offset 4
+ 347              		.cfi_offset 7, -4
+ 348 0162 85B0     		sub	sp, sp, #20
+ 349              		.cfi_def_cfa_offset 24
+ 350 0164 00AF     		add	r7, sp, #0
+ 351              		.cfi_def_cfa_register 7
+ 352 0166 7860     		str	r0, [r7, #4]
+ 342:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32RegVal;
+ 343:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 344:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // check input parameters
+ 345:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(ui32IODiv == SYS_CTRL_SYSDIV_32MHZ  ||
+ 346:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_16MHZ  ||
+ 347:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_8MHZ   ||
+ 348:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_4MHZ   ||
+ 349:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_2MHZ   ||
+ 350:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_1MHZ   ||
+ 351:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_500KHZ ||
+ 352:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32IODiv == SYS_CTRL_SYSDIV_250KHZ);
+ 353:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 354:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32RegVal = HWREG(SYS_CTRL_CLOCK_CTRL);
+ 353              		.loc 1 354 0
+ 354 0168 094B     		ldr	r3, .L27
+ 355 016a 1B68     		ldr	r3, [r3]
+ 356 016c FB60     		str	r3, [r7, #12]
+ 355:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32RegVal &= ~SYS_CTRL_CLOCK_CTRL_IO_DIV_M;
+ 357              		.loc 1 355 0
+ 358 016e FB68     		ldr	r3, [r7, #12]
+ 359 0170 23F4E063 		bic	r3, r3, #1792
+ 360 0174 FB60     		str	r3, [r7, #12]
+ 356:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32RegVal |= (ui32IODiv << SYS_CTRL_CLOCK_CTRL_IO_DIV_S);
+ 361              		.loc 1 356 0
+ 362 0176 7B68     		ldr	r3, [r7, #4]
+ 363 0178 1B02     		lsls	r3, r3, #8
+ 364 017a FA68     		ldr	r2, [r7, #12]
+ 365 017c 1343     		orrs	r3, r3, r2
+ 366 017e FB60     		str	r3, [r7, #12]
+ 357:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(SYS_CTRL_CLOCK_CTRL) = ui32RegVal;
+ 367              		.loc 1 357 0
+ 368 0180 034A     		ldr	r2, .L27
+ 369 0182 FB68     		ldr	r3, [r7, #12]
+ 370 0184 1360     		str	r3, [r2]
+ 358:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** } // SysCtrlIOClockSet
+ 371              		.loc 1 358 0
+ 372 0186 00BF     		nop
+ 373 0188 1437     		adds	r7, r7, #20
+ 374              		.cfi_def_cfa_offset 4
+ 375 018a BD46     		mov	sp, r7
+ 376              		.cfi_def_cfa_register 13
+ 377              		@ sp needed
+ 378 018c 80BC     		pop	{r7}
+ 379              		.cfi_restore 7
+ 380              		.cfi_def_cfa_offset 0
+ 381 018e 7047     		bx	lr
+ 382              	.L28:
+ 383              		.align	2
+ 384              	.L27:
+ 385 0190 00200D40 		.word	1074601984
+ 386              		.cfi_endproc
+ 387              	.LFE2:
+ 389              		.align	2
+ 390              		.global	SysCtrlIOClockGet
+ 391              		.thumb
+ 392              		.thumb_func
+ 394              	SysCtrlIOClockGet:
+ 395              	.LFB3:
+ 359:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 360:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 361:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 362:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 363:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Gets the IO clock rate
+ 364:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 365:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function returns the IO clocking of the device, i.e. the Baud
+ 366:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! rate clock for SSI and UART.
+ 367:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 368:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return The IO clock rate
+ 369:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 370:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 371:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** uint32_t
+ 372:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlIOClockGet(void)
+ 373:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 396              		.loc 1 373 0
+ 397              		.cfi_startproc
+ 398              		@ args = 0, pretend = 0, frame = 16
+ 399              		@ frame_needed = 1, uses_anonymous_args = 0
+ 400              		@ link register save eliminated.
+ 401 0194 80B4     		push	{r7}
+ 402              		.cfi_def_cfa_offset 4
+ 403              		.cfi_offset 7, -4
+ 404 0196 85B0     		sub	sp, sp, #20
+ 405              		.cfi_def_cfa_offset 24
+ 406 0198 00AF     		add	r7, sp, #0
+ 407              		.cfi_def_cfa_register 7
+ 374:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Clk;
+ 375:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32STA;
+ 376:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32IODiv;
+ 377:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 378:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32STA = HWREG(SYS_CTRL_CLOCK_STA);
+ 408              		.loc 1 378 0
+ 409 019a 1F4B     		ldr	r3, .L41
+ 410 019c 1B68     		ldr	r3, [r3]
+ 411 019e BB60     		str	r3, [r7, #8]
+ 379:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32IODiv =
+ 380:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         (ui32STA & SYS_CTRL_CLOCK_STA_IO_DIV_M) >> SYS_CTRL_CLOCK_STA_IO_DIV_S;
+ 412              		.loc 1 380 0
+ 413 01a0 BB68     		ldr	r3, [r7, #8]
+ 414 01a2 1B0A     		lsrs	r3, r3, #8
+ 379:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32IODiv =
+ 415              		.loc 1 379 0
+ 416 01a4 03F00703 		and	r3, r3, #7
+ 417 01a8 7B60     		str	r3, [r7, #4]
+ 381:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 382:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Clk = 0;
+ 418              		.loc 1 382 0
+ 419 01aa 0023     		movs	r3, #0
+ 420 01ac FB60     		str	r3, [r7, #12]
+ 383:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 384:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     switch(ui32IODiv)
+ 421              		.loc 1 384 0
+ 422 01ae 7B68     		ldr	r3, [r7, #4]
+ 423 01b0 072B     		cmp	r3, #7
+ 424 01b2 2BD8     		bhi	.L30
+ 425 01b4 01A2     		adr	r2, .L32
+ 426 01b6 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 427 01ba 00BF     		.p2align 2
+ 428              	.L32:
+ 429 01bc DD010000 		.word	.L31+1
+ 430 01c0 E3010000 		.word	.L33+1
+ 431 01c4 E9010000 		.word	.L34+1
+ 432 01c8 EF010000 		.word	.L35+1
+ 433 01cc F5010000 		.word	.L36+1
+ 434 01d0 FB010000 		.word	.L37+1
+ 435 01d4 01020000 		.word	.L38+1
+ 436 01d8 07020000 		.word	.L39+1
+ 437              		.p2align 1
+ 438              	.L31:
+ 385:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 386:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_32MHZ:
+ 387:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_32MHZ;
+ 439              		.loc 1 387 0
+ 440 01dc 0F4B     		ldr	r3, .L41+4
+ 441 01de FB60     		str	r3, [r7, #12]
+ 388:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 442              		.loc 1 388 0
+ 443 01e0 14E0     		b	.L30
+ 444              	.L33:
+ 389:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_16MHZ:
+ 390:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_16MHZ;
+ 445              		.loc 1 390 0
+ 446 01e2 0F4B     		ldr	r3, .L41+8
+ 447 01e4 FB60     		str	r3, [r7, #12]
+ 391:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 448              		.loc 1 391 0
+ 449 01e6 11E0     		b	.L30
+ 450              	.L34:
+ 392:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_8MHZ:
+ 393:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_8MHZ;
+ 451              		.loc 1 393 0
+ 452 01e8 0E4B     		ldr	r3, .L41+12
+ 453 01ea FB60     		str	r3, [r7, #12]
+ 394:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 454              		.loc 1 394 0
+ 455 01ec 0EE0     		b	.L30
+ 456              	.L35:
+ 395:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_4MHZ:
+ 396:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_4MHZ;
+ 457              		.loc 1 396 0
+ 458 01ee 0E4B     		ldr	r3, .L41+16
+ 459 01f0 FB60     		str	r3, [r7, #12]
+ 397:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 460              		.loc 1 397 0
+ 461 01f2 0BE0     		b	.L30
+ 462              	.L36:
+ 398:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_2MHZ:
+ 399:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_2MHZ;
+ 463              		.loc 1 399 0
+ 464 01f4 0D4B     		ldr	r3, .L41+20
+ 465 01f6 FB60     		str	r3, [r7, #12]
+ 400:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 466              		.loc 1 400 0
+ 467 01f8 08E0     		b	.L30
+ 468              	.L37:
+ 401:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_1MHZ:
+ 402:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_1MHZ;
+ 469              		.loc 1 402 0
+ 470 01fa 0D4B     		ldr	r3, .L41+24
+ 471 01fc FB60     		str	r3, [r7, #12]
+ 403:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 472              		.loc 1 403 0
+ 473 01fe 05E0     		b	.L30
+ 474              	.L38:
+ 404:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_500KHZ:
+ 405:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_500KHZ;
+ 475              		.loc 1 405 0
+ 476 0200 0C4B     		ldr	r3, .L41+28
+ 477 0202 FB60     		str	r3, [r7, #12]
+ 406:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 478              		.loc 1 406 0
+ 479 0204 02E0     		b	.L30
+ 480              	.L39:
+ 407:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     case SYS_CTRL_SYSDIV_250KHZ:
+ 408:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Clk = SYS_CTRL_250KHZ;
+ 481              		.loc 1 408 0
+ 482 0206 0C4B     		ldr	r3, .L41+32
+ 483 0208 FB60     		str	r3, [r7, #12]
+ 409:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         break;
+ 484              		.loc 1 409 0
+ 485 020a 00BF     		nop
+ 486              	.L30:
+ 410:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 411:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 412:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 413:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Return the computed clock rate.
+ 414:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 415:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     return(ui32Clk);
+ 487              		.loc 1 415 0
+ 488 020c FB68     		ldr	r3, [r7, #12]
+ 416:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** } // SysCtrlIOClockGet
+ 489              		.loc 1 416 0
+ 490 020e 1846     		mov	r0, r3
+ 491 0210 1437     		adds	r7, r7, #20
+ 492              		.cfi_def_cfa_offset 4
+ 493 0212 BD46     		mov	sp, r7
+ 494              		.cfi_def_cfa_register 13
+ 495              		@ sp needed
+ 496 0214 80BC     		pop	{r7}
+ 497              		.cfi_restore 7
+ 498              		.cfi_def_cfa_offset 0
+ 499 0216 7047     		bx	lr
+ 500              	.L42:
+ 501              		.align	2
+ 502              	.L41:
+ 503 0218 04200D40 		.word	1074601988
+ 504 021c 0048E801 		.word	32000000
+ 505 0220 0024F400 		.word	16000000
+ 506 0224 00127A00 		.word	8000000
+ 507 0228 00093D00 		.word	4000000
+ 508 022c 80841E00 		.word	2000000
+ 509 0230 40420F00 		.word	1000000
+ 510 0234 20A10700 		.word	500000
+ 511 0238 90D00300 		.word	250000
+ 512              		.cfi_endproc
+ 513              	.LFE3:
+ 515              		.align	2
+ 516              		.global	SysCtrlDelay
+ 517              		.thumb
+ 518              		.thumb_func
+ 520              	SysCtrlDelay:
+ 521              	.LFB4:
+ 417:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 418:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 419:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 420:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 421:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Provides a small delay
+ 422:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 423:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Count is the number of delay loop iterations to perform.
+ 424:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 425:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function provides a means of generating a constant length delay and
+ 426:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! is written in assembly to keep the delay consistent across tool chains,
+ 427:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! avoiding the need to tune the delay based on the tool chain in use.
+ 428:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 429:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The loop takes 3 cycles/loop.
+ 430:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 431:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 432:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 433:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 434:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #if defined(__ICCARM__) || defined(DOXYGEN)
+ 435:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 436:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlDelay(uint32_t ui32Count)
+ 437:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 438:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     __asm("    subs    r0, #1\n"
+ 439:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****           "    bne.n   SysCtrlDelay\n"
+ 440:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****           "    bx      lr");
+ 441:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 442:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 443:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #if defined(__GNUC__)
+ 444:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void __attribute__((naked))
+ 445:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlDelay(uint32_t ui32Count)
+ 446:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 522              		.loc 1 446 0
+ 523              		.cfi_startproc
+ 524              		@ Naked Function: prologue and epilogue provided by programmer.
+ 525              		@ args = 0, pretend = 0, frame = 0
+ 526              		@ frame_needed = 1, uses_anonymous_args = 0
+ 447:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     __asm("    subs    r0, #1\n"
+ 527              		.loc 1 447 0
+ 528              		.syntax unified
+ 529              	@ 447 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c" 1
+ 530 023c 0138     		    subs    r0, #1
+ 531 023e 7FF4FEAF 	    bne     SysCtrlDelay
+ 532 0242 7047     	    bx      lr
+ 533              	@ 0 "" 2
+ 448:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****           "    bne     SysCtrlDelay\n"
+ 449:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****           "    bx      lr");
+ 450:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 534              		.loc 1 450 0
+ 535              		.thumb
+ 536              		.syntax unified
+ 537 0244 00BF     		nop
+ 538              		.cfi_endproc
+ 539              	.LFE4:
+ 541 0246 00BF     		.align	2
+ 542              		.global	SysCtrlReset
+ 543              		.thumb
+ 544              		.thumb_func
+ 546              	SysCtrlReset:
+ 547              	.LFB5:
+ 451:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 452:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #if defined(__KEIL__) || defined(__ARMCC_VERSION)
+ 453:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** __asm void
+ 454:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlDelay(uint32_t ui32Count)
+ 455:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 456:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     subs    r0, #1;
+ 457:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bne     SysCtrlDelay;
+ 458:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bx      lr;
+ 459:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 460:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 461:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 462:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // For CCS implement this function in pure assembly.  This prevents the TI
+ 463:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** // compiler from doing funny things with the optimizer.
+ 464:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 465:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #if defined(__TI_COMPILER_VERSION__)
+ 466:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** __asm("    .sect \".text:SysCtrlDelay\"\n"
+ 467:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    .clink\n"
+ 468:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    .thumbfunc SysCtrlDelay\n"
+ 469:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    .thumb\n"
+ 470:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    .global SysCtrlDelay\n"
+ 471:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "SysCtrlDelay:\n"
+ 472:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    subs r0, #1\n"
+ 473:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    bne.n SysCtrlDelay\n"
+ 474:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****       "    bx lr\n");
+ 475:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 476:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 477:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 478:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 479:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 480:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Resets the device
+ 481:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 482:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function performs a software reset of the entire device.  The
+ 483:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! processor and all peripherals are reset and all device registers are
+ 484:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! returned to their default values.
+ 485:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 486:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return This function does not return.
+ 487:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 488:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 489:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 490:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlReset(void)
+ 491:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 548              		.loc 1 491 0
+ 549              		.cfi_startproc
+ 550              		@ args = 0, pretend = 0, frame = 0
+ 551              		@ frame_needed = 1, uses_anonymous_args = 0
+ 552              		@ link register save eliminated.
+ 553 0248 80B4     		push	{r7}
+ 554              		.cfi_def_cfa_offset 4
+ 555              		.cfi_offset 7, -4
+ 556 024a 00AF     		add	r7, sp, #0
+ 557              		.cfi_def_cfa_register 7
+ 492:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 493:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Perform a software reset request.  This request causes the device to
+ 494:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // reset, no further code is executed.
+ 495:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 496:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(SYS_CTRL_PWRDBG) = SYS_CTRL_PWRDBG_FORCE_WARM_RESET;
+ 558              		.loc 1 496 0
+ 559 024c 014B     		ldr	r3, .L46
+ 560 024e 0822     		movs	r2, #8
+ 561 0250 1A60     		str	r2, [r3]
+ 562              	.L45:
+ 497:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 498:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 499:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // The device should have reset, so this should never be reached.  Just in
+ 500:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // case, loop forever.
+ 501:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 502:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     while(1)
+ 503:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 504:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 563              		.loc 1 504 0 discriminator 1
+ 564 0252 FEE7     		b	.L45
+ 565              	.L47:
+ 566              		.align	2
+ 567              	.L46:
+ 568 0254 74200D40 		.word	1074602100
+ 569              		.cfi_endproc
+ 570              	.LFE5:
+ 572              		.align	2
+ 573              		.global	SysCtrlSleep
+ 574              		.thumb
+ 575              		.thumb_func
+ 577              	SysCtrlSleep:
+ 578              	.LFB6:
+ 505:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 506:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 507:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 508:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 509:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 510:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Puts the processor into sleep mode
+ 511:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 512:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function places the processor into sleep mode and does not return
+ 513:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! until the processor returns to run mode.  The peripherals that are enabled
+ 514:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! by SysCtrlPeripheralSleepEnable() continue to operate and can wake up the
+ 515:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! processor.
+ 516:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 517:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \sa SysCtrlPeripheralSleepEnable()
+ 518:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 519:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 520:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 521:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 522:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 523:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlSleep(void)
+ 524:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 579              		.loc 1 524 0
+ 580              		.cfi_startproc
+ 581              		@ args = 0, pretend = 0, frame = 0
+ 582              		@ frame_needed = 1, uses_anonymous_args = 0
+ 583 0258 80B5     		push	{r7, lr}
+ 584              		.cfi_def_cfa_offset 8
+ 585              		.cfi_offset 7, -8
+ 586              		.cfi_offset 14, -4
+ 587 025a 00AF     		add	r7, sp, #0
+ 588              		.cfi_def_cfa_register 7
+ 525:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 526:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Wait for an interrupt.
+ 527:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 528:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     CPUwfi();
+ 589              		.loc 1 528 0
+ 590 025c FFF7FEFF 		bl	CPUwfi
+ 529:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 591              		.loc 1 529 0
+ 592 0260 00BF     		nop
+ 593 0262 80BD     		pop	{r7, pc}
+ 594              		.cfi_endproc
+ 595              	.LFE6:
+ 597              		.align	2
+ 598              		.global	SysCtrlDeepSleep
+ 599              		.thumb
+ 600              		.thumb_func
+ 602              	SysCtrlDeepSleep:
+ 603              	.LFB7:
+ 530:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 531:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 532:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 533:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 534:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Puts the processor into deep-sleep mode
+ 535:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 536:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function places the processor into deep-sleep mode and does not return
+ 537:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! until the processor returns to run mode.  The peripherals that are enabled
+ 538:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! by SysCtrlPeripheralDeepSleepEnable() continue to operate and can wake up
+ 539:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! the processor (if not in power mode 1, 2, or 3).
+ 540:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Note the power mode should be set before going into deep sleep.
+ 541:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 542:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \sa SysCtrlPowerModeSet(), SysCtrlPeripheralDeepSleepEnable()
+ 543:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 544:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 545:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 546:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 547:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 548:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlDeepSleep(void)
+ 549:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 604              		.loc 1 549 0
+ 605              		.cfi_startproc
+ 606              		@ args = 0, pretend = 0, frame = 8
+ 607              		@ frame_needed = 1, uses_anonymous_args = 0
+ 608 0264 80B5     		push	{r7, lr}
+ 609              		.cfi_def_cfa_offset 8
+ 610              		.cfi_offset 7, -8
+ 611              		.cfi_offset 14, -4
+ 612 0266 82B0     		sub	sp, sp, #8
+ 613              		.cfi_def_cfa_offset 16
+ 614 0268 00AF     		add	r7, sp, #0
+ 615              		.cfi_def_cfa_register 7
+ 550:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #ifndef NO_CLOCK_DIVIDER_RESTORE
+ 551:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bool  bRestoreSys;
+ 552:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bool  bRestoreIO;
+ 553:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Reg;
+ 554:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 555:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Reg = HWREG(SYS_CTRL_CLOCK_STA);
+ 616              		.loc 1 555 0
+ 617 026a 334B     		ldr	r3, .L63
+ 618 026c 1B68     		ldr	r3, [r3]
+ 619 026e 7B60     		str	r3, [r7, #4]
+ 556:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bRestoreSys = (ui32Reg & SYS_CTRL_CLOCK_STA_SYS_DIV_M)==0;
+ 620              		.loc 1 556 0
+ 621 0270 7B68     		ldr	r3, [r7, #4]
+ 622 0272 03F00703 		and	r3, r3, #7
+ 623 0276 002B     		cmp	r3, #0
+ 624 0278 0CBF     		ite	eq
+ 625 027a 0123     		moveq	r3, #1
+ 626 027c 0023     		movne	r3, #0
+ 627 027e FB70     		strb	r3, [r7, #3]
+ 557:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     bRestoreIO  = (ui32Reg & SYS_CTRL_CLOCK_STA_IO_DIV_M)==0;
+ 628              		.loc 1 557 0
+ 629 0280 7B68     		ldr	r3, [r7, #4]
+ 630 0282 03F4E063 		and	r3, r3, #1792
+ 631 0286 002B     		cmp	r3, #0
+ 632 0288 0CBF     		ite	eq
+ 633 028a 0123     		moveq	r3, #1
+ 634 028c 0023     		movne	r3, #0
+ 635 028e BB70     		strb	r3, [r7, #2]
+ 558:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(bRestoreSys || bRestoreIO)
+ 636              		.loc 1 558 0
+ 637 0290 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 638 0292 002B     		cmp	r3, #0
+ 639 0294 02D1     		bne	.L50
+ 640              		.loc 1 558 0 is_stmt 0 discriminator 1
+ 641 0296 BB78     		ldrb	r3, [r7, #2]	@ zero_extendqisi2
+ 642 0298 002B     		cmp	r3, #0
+ 643 029a 18D0     		beq	.L51
+ 644              	.L50:
+ 559:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 560:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg = HWREG(SYS_CTRL_CLOCK_CTRL);
+ 645              		.loc 1 560 0 is_stmt 1
+ 646 029c 274B     		ldr	r3, .L63+4
+ 647 029e 1B68     		ldr	r3, [r3]
+ 648 02a0 7B60     		str	r3, [r7, #4]
+ 561:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg |= bRestoreSys? 0x1:0x0;
+ 649              		.loc 1 561 0
+ 650 02a2 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 651 02a4 002B     		cmp	r3, #0
+ 652 02a6 01D0     		beq	.L52
+ 653              		.loc 1 561 0 is_stmt 0 discriminator 1
+ 654 02a8 0123     		movs	r3, #1
+ 655 02aa 00E0     		b	.L53
+ 656              	.L52:
+ 657              		.loc 1 561 0 discriminator 2
+ 658 02ac 0023     		movs	r3, #0
+ 659              	.L53:
+ 660              		.loc 1 561 0 discriminator 4
+ 661 02ae 7A68     		ldr	r2, [r7, #4]
+ 662 02b0 1343     		orrs	r3, r3, r2
+ 663 02b2 7B60     		str	r3, [r7, #4]
+ 562:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg |= bRestoreIO? 0x100:0x0;
+ 664              		.loc 1 562 0 is_stmt 1 discriminator 4
+ 665 02b4 BB78     		ldrb	r3, [r7, #2]	@ zero_extendqisi2
+ 666 02b6 002B     		cmp	r3, #0
+ 667 02b8 02D0     		beq	.L54
+ 668              		.loc 1 562 0 is_stmt 0 discriminator 1
+ 669 02ba 4FF48073 		mov	r3, #256
+ 670 02be 00E0     		b	.L55
+ 671              	.L54:
+ 672              		.loc 1 562 0 discriminator 2
+ 673 02c0 0023     		movs	r3, #0
+ 674              	.L55:
+ 675              		.loc 1 562 0 discriminator 4
+ 676 02c2 7A68     		ldr	r2, [r7, #4]
+ 677 02c4 1343     		orrs	r3, r3, r2
+ 678 02c6 7B60     		str	r3, [r7, #4]
+ 563:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         HWREG(SYS_CTRL_CLOCK_CTRL) = ui32Reg;
+ 679              		.loc 1 563 0 is_stmt 1 discriminator 4
+ 680 02c8 1C4A     		ldr	r2, .L63+4
+ 681 02ca 7B68     		ldr	r3, [r7, #4]
+ 682 02cc 1360     		str	r3, [r2]
+ 683              	.L51:
+ 564:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 565:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 566:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     
+ 567:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 568:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Enable deep-sleep.
+ 569:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 570:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(NVIC_SYS_CTRL) |= NVIC_SYS_CTRL_SLEEPDEEP;
+ 684              		.loc 1 570 0
+ 685 02ce 1C4A     		ldr	r2, .L63+8
+ 686 02d0 1B4B     		ldr	r3, .L63+8
+ 687 02d2 1B68     		ldr	r3, [r3]
+ 688 02d4 43F00403 		orr	r3, r3, #4
+ 689 02d8 1360     		str	r3, [r2]
+ 571:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 572:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 573:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Wait for an interrupt.
+ 574:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 575:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     CPUwfi();
+ 690              		.loc 1 575 0
+ 691 02da FFF7FEFF 		bl	CPUwfi
+ 576:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 577:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 578:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Disable deep-sleep so that a future sleep will work correctly.
+ 579:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     //
+ 580:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(NVIC_SYS_CTRL) &= ~(NVIC_SYS_CTRL_SLEEPDEEP);
+ 692              		.loc 1 580 0
+ 693 02de 184A     		ldr	r2, .L63+8
+ 694 02e0 174B     		ldr	r3, .L63+8
+ 695 02e2 1B68     		ldr	r3, [r3]
+ 696 02e4 23F00403 		bic	r3, r3, #4
+ 697 02e8 1360     		str	r3, [r2]
+ 581:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 582:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #ifndef NO_CLOCK_DIVIDER_RESTORE
+ 583:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(bRestoreSys || bRestoreIO)
+ 698              		.loc 1 583 0
+ 699 02ea FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 700 02ec 002B     		cmp	r3, #0
+ 701 02ee 02D1     		bne	.L56
+ 702              		.loc 1 583 0 is_stmt 0 discriminator 1
+ 703 02f0 BB78     		ldrb	r3, [r7, #2]	@ zero_extendqisi2
+ 704 02f2 002B     		cmp	r3, #0
+ 705 02f4 1BD0     		beq	.L62
+ 706              	.L56:
+ 584:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 585:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg = HWREG(SYS_CTRL_CLOCK_CTRL);
+ 707              		.loc 1 585 0 is_stmt 1
+ 708 02f6 114B     		ldr	r3, .L63+4
+ 709 02f8 1B68     		ldr	r3, [r3]
+ 710 02fa 7B60     		str	r3, [r7, #4]
+ 586:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg &= bRestoreSys ? ~SYS_CTRL_CLOCK_CTRL_SYS_DIV_M : 0xffffffff;
+ 711              		.loc 1 586 0
+ 712 02fc FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 713 02fe 002B     		cmp	r3, #0
+ 714 0300 02D0     		beq	.L58
+ 715              		.loc 1 586 0 is_stmt 0 discriminator 1
+ 716 0302 6FF00703 		mvn	r3, #7
+ 717 0306 01E0     		b	.L59
+ 718              	.L58:
+ 719              		.loc 1 586 0 discriminator 2
+ 720 0308 4FF0FF33 		mov	r3, #-1
+ 721              	.L59:
+ 722              		.loc 1 586 0 discriminator 4
+ 723 030c 7A68     		ldr	r2, [r7, #4]
+ 724 030e 1340     		ands	r3, r3, r2
+ 725 0310 7B60     		str	r3, [r7, #4]
+ 587:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32Reg &= bRestoreIO ?  ~SYS_CTRL_CLOCK_CTRL_IO_DIV_M : 0xffffffff;
+ 726              		.loc 1 587 0 is_stmt 1 discriminator 4
+ 727 0312 BB78     		ldrb	r3, [r7, #2]	@ zero_extendqisi2
+ 728 0314 002B     		cmp	r3, #0
+ 729 0316 02D0     		beq	.L60
+ 730              		.loc 1 587 0 is_stmt 0 discriminator 1
+ 731 0318 6FF4E063 		mvn	r3, #1792
+ 732 031c 01E0     		b	.L61
+ 733              	.L60:
+ 734              		.loc 1 587 0 discriminator 2
+ 735 031e 4FF0FF33 		mov	r3, #-1
+ 736              	.L61:
+ 737              		.loc 1 587 0 discriminator 4
+ 738 0322 7A68     		ldr	r2, [r7, #4]
+ 739 0324 1340     		ands	r3, r3, r2
+ 740 0326 7B60     		str	r3, [r7, #4]
+ 588:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         HWREG(SYS_CTRL_CLOCK_CTRL) = ui32Reg;
+ 741              		.loc 1 588 0 is_stmt 1 discriminator 4
+ 742 0328 044A     		ldr	r2, .L63+4
+ 743 032a 7B68     		ldr	r3, [r7, #4]
+ 744 032c 1360     		str	r3, [r2]
+ 745              	.L62:
+ 589:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 590:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** #endif
+ 591:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 746              		.loc 1 591 0
+ 747 032e 00BF     		nop
+ 748 0330 0837     		adds	r7, r7, #8
+ 749              		.cfi_def_cfa_offset 8
+ 750 0332 BD46     		mov	sp, r7
+ 751              		.cfi_def_cfa_register 13
+ 752              		@ sp needed
+ 753 0334 80BD     		pop	{r7, pc}
+ 754              	.L64:
+ 755 0336 00BF     		.align	2
+ 756              	.L63:
+ 757 0338 04200D40 		.word	1074601988
+ 758 033c 00200D40 		.word	1074601984
+ 759 0340 10ED00E0 		.word	-536810224
+ 760              		.cfi_endproc
+ 761              	.LFE7:
+ 763              		.align	2
+ 764              		.global	SysCtrlPeripheralPresent
+ 765              		.thumb
+ 766              		.thumb_func
+ 768              	SysCtrlPeripheralPresent:
+ 769              	.LFB8:
+ 592:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 593:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 594:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 595:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 596:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 597:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Determines if a peripheral is present
+ 598:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 599:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral in question.
+ 600:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 601:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Determines if a particular peripheral is present in the device (that is,
+ 602:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! is not permanently disabled).
+ 603:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 604:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 605:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 606:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 607:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 608:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 609:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 610:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 611:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 612:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return Returns \b true if the specified peripheral is present and \b false
+ 613:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! if it is permanently disabled.
+ 614:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 615:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 616:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** bool
+ 617:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralPresent(uint32_t ui32Peripheral)
+ 618:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 770              		.loc 1 618 0
+ 771              		.cfi_startproc
+ 772              		@ args = 0, pretend = 0, frame = 16
+ 773              		@ frame_needed = 1, uses_anonymous_args = 0
+ 774              		@ link register save eliminated.
+ 775 0344 80B4     		push	{r7}
+ 776              		.cfi_def_cfa_offset 4
+ 777              		.cfi_offset 7, -4
+ 778 0346 85B0     		sub	sp, sp, #20
+ 779              		.cfi_def_cfa_offset 24
+ 780 0348 00AF     		add	r7, sp, #0
+ 781              		.cfi_def_cfa_register 7
+ 782 034a 7860     		str	r0, [r7, #4]
+ 619:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32DieCfg;
+ 620:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32Mask;
+ 621:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 622:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 623:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 624:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 625:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(SYS_CTRL_PERIPH_INDEX(ui32Peripheral) ==
+ 783              		.loc 1 625 0
+ 784 034c 7B68     		ldr	r3, [r7, #4]
+ 785 034e 1B0A     		lsrs	r3, r3, #8
+ 786 0350 03F00F03 		and	r3, r3, #15
+ 787 0354 042B     		cmp	r3, #4
+ 788 0356 0BD0     		beq	.L66
+ 626:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(SYS_CTRL_PERIPH_PKA) ||
+ 627:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(ui32Peripheral) ==
+ 789              		.loc 1 627 0
+ 790 0358 7B68     		ldr	r3, [r7, #4]
+ 791 035a 1B0A     		lsrs	r3, r3, #8
+ 792 035c 03F00F03 		and	r3, r3, #15
+ 626:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(SYS_CTRL_PERIPH_PKA) ||
+ 793              		.loc 1 626 0
+ 794 0360 042B     		cmp	r3, #4
+ 795 0362 05D0     		beq	.L66
+ 628:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(SYS_CTRL_PERIPH_AES) ||
+ 629:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(ui32Peripheral) ==
+ 796              		.loc 1 629 0
+ 797 0364 7B68     		ldr	r3, [r7, #4]
+ 798 0366 1B0A     		lsrs	r3, r3, #8
+ 799 0368 03F00F03 		and	r3, r3, #15
+ 628:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(SYS_CTRL_PERIPH_AES) ||
+ 800              		.loc 1 628 0
+ 801 036c 052B     		cmp	r3, #5
+ 802 036e 03D1     		bne	.L67
+ 803              	.L66:
+ 630:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****             SYS_CTRL_PERIPH_INDEX(SYS_CTRL_PERIPH_RFC))
+ 631:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 632:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32DieCfg = HWREG(FLASH_CTRL_DIECFG2);
+ 804              		.loc 1 632 0
+ 805 0370 104B     		ldr	r3, .L71
+ 806 0372 1B68     		ldr	r3, [r3]
+ 807 0374 FB60     		str	r3, [r7, #12]
+ 808 0376 02E0     		b	.L68
+ 809              	.L67:
+ 633:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 634:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     else
+ 635:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 636:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ui32DieCfg = HWREG(FLASH_CTRL_DIECFG1);
+ 810              		.loc 1 636 0
+ 811 0378 0F4B     		ldr	r3, .L71+4
+ 812 037a 1B68     		ldr	r3, [r3]
+ 813 037c FB60     		str	r3, [r7, #12]
+ 814              	.L68:
+ 637:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 638:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 639:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32Mask = (g_pui32DieCfgMask[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)] <<
+ 815              		.loc 1 639 0
+ 816 037e 7B68     		ldr	r3, [r7, #4]
+ 817 0380 1B0A     		lsrs	r3, r3, #8
+ 818 0382 03F00F03 		and	r3, r3, #15
+ 819 0386 0D4A     		ldr	r2, .L71+8
+ 820 0388 52F82320 		ldr	r2, [r2, r3, lsl #2]
+ 640:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****                 SYS_CTRL_PERIPH_INSTANCE(ui32Peripheral));
+ 821              		.loc 1 640 0
+ 822 038c 7B68     		ldr	r3, [r7, #4]
+ 823 038e 03F00F03 		and	r3, r3, #15
+ 639:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****                 SYS_CTRL_PERIPH_INSTANCE(ui32Peripheral));
+ 824              		.loc 1 639 0
+ 825 0392 02FA03F3 		lsl	r3, r2, r3
+ 826 0396 BB60     		str	r3, [r7, #8]
+ 641:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 642:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Mask with correct  mask and determine if this peripheral is
+ 643:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // permanently disabled.
+ 644:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     if(ui32DieCfg & ui32Mask)
+ 827              		.loc 1 644 0
+ 828 0398 FA68     		ldr	r2, [r7, #12]
+ 829 039a BB68     		ldr	r3, [r7, #8]
+ 830 039c 1340     		ands	r3, r3, r2
+ 831 039e 002B     		cmp	r3, #0
+ 832 03a0 01D0     		beq	.L69
+ 645:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 646:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         return(true);
+ 833              		.loc 1 646 0
+ 834 03a2 0123     		movs	r3, #1
+ 835 03a4 00E0     		b	.L70
+ 836              	.L69:
+ 647:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 648:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     else
+ 649:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     {
+ 650:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         return(false);
+ 837              		.loc 1 650 0
+ 838 03a6 0023     		movs	r3, #0
+ 839              	.L70:
+ 651:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     }
+ 652:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 840              		.loc 1 652 0
+ 841 03a8 1846     		mov	r0, r3
+ 842 03aa 1437     		adds	r7, r7, #20
+ 843              		.cfi_def_cfa_offset 4
+ 844 03ac BD46     		mov	sp, r7
+ 845              		.cfi_def_cfa_register 13
+ 846              		@ sp needed
+ 847 03ae 80BC     		pop	{r7}
+ 848              		.cfi_restore 7
+ 849              		.cfi_def_cfa_offset 0
+ 850 03b0 7047     		bx	lr
+ 851              	.L72:
+ 852 03b2 00BF     		.align	2
+ 853              	.L71:
+ 854 03b4 1C300D40 		.word	1074606108
+ 855 03b8 18300D40 		.word	1074606104
+ 856 03bc 5C000000 		.word	g_pui32DieCfgMask
+ 857              		.cfi_endproc
+ 858              	.LFE8:
+ 860              		.align	2
+ 861              		.global	SysCtrlPeripheralReset
+ 862              		.thumb
+ 863              		.thumb_func
+ 865              	SysCtrlPeripheralReset:
+ 866              	.LFB9:
+ 653:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 654:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 655:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 656:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Performs a software reset of a peripheral
+ 657:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 658:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to reset.
+ 659:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 660:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function performs a software reset of the specified peripheral.  An
+ 661:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! individual peripheral reset signal is asserted for a brief period and then
+ 662:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! deasserted, leaving the peripheral in a operating state but in its reset
+ 663:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! condition.
+ 664:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 665:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 666:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 667:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 668:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 669:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 670:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 671:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES.
+ 672:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 673:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 674:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 675:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 676:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 677:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralReset(uint32_t ui32Peripheral)
+ 678:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 867              		.loc 1 678 0
+ 868              		.cfi_startproc
+ 869              		@ args = 0, pretend = 0, frame = 16
+ 870              		@ frame_needed = 1, uses_anonymous_args = 0
+ 871              		@ link register save eliminated.
+ 872 03c0 80B4     		push	{r7}
+ 873              		.cfi_def_cfa_offset 4
+ 874              		.cfi_offset 7, -4
+ 875 03c2 85B0     		sub	sp, sp, #20
+ 876              		.cfi_def_cfa_offset 24
+ 877 03c4 00AF     		add	r7, sp, #0
+ 878              		.cfi_def_cfa_register 7
+ 879 03c6 7860     		str	r0, [r7, #4]
+ 679:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     volatile uint32_t ui32Delay;
+ 680:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 681:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 682:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 683:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(!(ui32Peripheral == SYS_CTRL_PERIPH_RFC));
+ 684:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 685:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Put the peripheral into the reset state.
+ 686:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32SRRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) |=
+ 880              		.loc 1 686 0
+ 881 03c8 7B68     		ldr	r3, [r7, #4]
+ 882 03ca 1B0A     		lsrs	r3, r3, #8
+ 883 03cc 03F00F03 		and	r3, r3, #15
+ 884 03d0 1D4A     		ldr	r2, .L76
+ 885 03d2 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 886 03d6 1846     		mov	r0, r3
+ 887 03d8 7B68     		ldr	r3, [r7, #4]
+ 888 03da 1B0A     		lsrs	r3, r3, #8
+ 889 03dc 03F00F03 		and	r3, r3, #15
+ 890 03e0 194A     		ldr	r2, .L76
+ 891 03e2 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 892 03e6 1B68     		ldr	r3, [r3]
+ 687:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 893              		.loc 1 687 0
+ 894 03e8 7A68     		ldr	r2, [r7, #4]
+ 895 03ea 02F00F02 		and	r2, r2, #15
+ 896 03ee 0121     		movs	r1, #1
+ 897 03f0 01FA02F2 		lsl	r2, r1, r2
+ 686:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 898              		.loc 1 686 0
+ 899 03f4 1343     		orrs	r3, r3, r2
+ 900 03f6 0360     		str	r3, [r0]
+ 688:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 689:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Delay for a little bit.
+ 690:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     for(ui32Delay = 0; ui32Delay < 16; ui32Delay++) { }
+ 901              		.loc 1 690 0
+ 902 03f8 0023     		movs	r3, #0
+ 903 03fa FB60     		str	r3, [r7, #12]
+ 904 03fc 02E0     		b	.L74
+ 905              	.L75:
+ 906              		.loc 1 690 0 is_stmt 0 discriminator 3
+ 907 03fe FB68     		ldr	r3, [r7, #12]
+ 908 0400 0133     		adds	r3, r3, #1
+ 909 0402 FB60     		str	r3, [r7, #12]
+ 910              	.L74:
+ 911              		.loc 1 690 0 discriminator 1
+ 912 0404 FB68     		ldr	r3, [r7, #12]
+ 913 0406 0F2B     		cmp	r3, #15
+ 914 0408 F9D9     		bls	.L75
+ 691:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 692:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Take the peripheral out of the reset state.
+ 693:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32SRRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) &=
+ 915              		.loc 1 693 0 is_stmt 1
+ 916 040a 7B68     		ldr	r3, [r7, #4]
+ 917 040c 1B0A     		lsrs	r3, r3, #8
+ 918 040e 03F00F03 		and	r3, r3, #15
+ 919 0412 0D4A     		ldr	r2, .L76
+ 920 0414 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 921 0418 1846     		mov	r0, r3
+ 922 041a 7B68     		ldr	r3, [r7, #4]
+ 923 041c 1B0A     		lsrs	r3, r3, #8
+ 924 041e 03F00F03 		and	r3, r3, #15
+ 925 0422 094A     		ldr	r2, .L76
+ 926 0424 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 927 0428 1B68     		ldr	r3, [r3]
+ 694:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 928              		.loc 1 694 0
+ 929 042a 7A68     		ldr	r2, [r7, #4]
+ 930 042c 02F00F02 		and	r2, r2, #15
+ 931 0430 0121     		movs	r1, #1
+ 932 0432 01FA02F2 		lsl	r2, r1, r2
+ 933 0436 D243     		mvns	r2, r2
+ 693:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 934              		.loc 1 693 0
+ 935 0438 1340     		ands	r3, r3, r2
+ 936 043a 0360     		str	r3, [r0]
+ 695:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 937              		.loc 1 695 0
+ 938 043c 00BF     		nop
+ 939 043e 1437     		adds	r7, r7, #20
+ 940              		.cfi_def_cfa_offset 4
+ 941 0440 BD46     		mov	sp, r7
+ 942              		.cfi_def_cfa_register 13
+ 943              		@ sp needed
+ 944 0442 80BC     		pop	{r7}
+ 945              		.cfi_restore 7
+ 946              		.cfi_def_cfa_offset 0
+ 947 0444 7047     		bx	lr
+ 948              	.L77:
+ 949 0446 00BF     		.align	2
+ 950              	.L76:
+ 951 0448 48000000 		.word	g_pui32SRRegs
+ 952              		.cfi_endproc
+ 953              	.LFE9:
+ 955              		.align	2
+ 956              		.global	SysCtrlPeripheralEnable
+ 957              		.thumb
+ 958              		.thumb_func
+ 960              	SysCtrlPeripheralEnable:
+ 961              	.LFB10:
+ 696:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 697:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 698:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 699:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 700:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Enables a peripheral (in Run mode)
+ 701:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 702:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to enable.
+ 703:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 704:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Peripherals are enabled with this function.  At power-up, some peripherals
+ 705:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! are disabled and must be enabled to operate or respond to
+ 706:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! register reads/writes.
+ 707:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 708:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 709:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 710:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 711:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 712:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 713:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 714:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 715:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 716:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \note The actual enabling of the peripheral might be delayed until some
+ 717:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! time after this function returns. Ensure that the peripheral is not
+ 718:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! accessed until enabled.
+ 719:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 720:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 721:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 722:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 723:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 724:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralEnable(uint32_t ui32Peripheral)
+ 725:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 962              		.loc 1 725 0
+ 963              		.cfi_startproc
+ 964              		@ args = 0, pretend = 0, frame = 8
+ 965              		@ frame_needed = 1, uses_anonymous_args = 0
+ 966              		@ link register save eliminated.
+ 967 044c 80B4     		push	{r7}
+ 968              		.cfi_def_cfa_offset 4
+ 969              		.cfi_offset 7, -4
+ 970 044e 83B0     		sub	sp, sp, #12
+ 971              		.cfi_def_cfa_offset 16
+ 972 0450 00AF     		add	r7, sp, #0
+ 973              		.cfi_def_cfa_register 7
+ 974 0452 7860     		str	r0, [r7, #4]
+ 726:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 727:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 728:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 729:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Enable module in Run Mode
+ 730:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32RCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) |=
+ 975              		.loc 1 730 0
+ 976 0454 7B68     		ldr	r3, [r7, #4]
+ 977 0456 1B0A     		lsrs	r3, r3, #8
+ 978 0458 03F00F03 		and	r3, r3, #15
+ 979 045c 0C4A     		ldr	r2, .L79
+ 980 045e 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 981 0462 1846     		mov	r0, r3
+ 982 0464 7B68     		ldr	r3, [r7, #4]
+ 983 0466 1B0A     		lsrs	r3, r3, #8
+ 984 0468 03F00F03 		and	r3, r3, #15
+ 985 046c 084A     		ldr	r2, .L79
+ 986 046e 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 987 0472 1B68     		ldr	r3, [r3]
+ 731:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 988              		.loc 1 731 0
+ 989 0474 7A68     		ldr	r2, [r7, #4]
+ 990 0476 02F00F02 		and	r2, r2, #15
+ 991 047a 0121     		movs	r1, #1
+ 992 047c 01FA02F2 		lsl	r2, r1, r2
+ 730:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 993              		.loc 1 730 0
+ 994 0480 1343     		orrs	r3, r3, r2
+ 995 0482 0360     		str	r3, [r0]
+ 732:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 996              		.loc 1 732 0
+ 997 0484 00BF     		nop
+ 998 0486 0C37     		adds	r7, r7, #12
+ 999              		.cfi_def_cfa_offset 4
+ 1000 0488 BD46     		mov	sp, r7
+ 1001              		.cfi_def_cfa_register 13
+ 1002              		@ sp needed
+ 1003 048a 80BC     		pop	{r7}
+ 1004              		.cfi_restore 7
+ 1005              		.cfi_def_cfa_offset 0
+ 1006 048c 7047     		bx	lr
+ 1007              	.L80:
+ 1008 048e 00BF     		.align	2
+ 1009              	.L79:
+ 1010 0490 00000000 		.word	g_pui32RCGCRegs
+ 1011              		.cfi_endproc
+ 1012              	.LFE10:
+ 1014              		.align	2
+ 1015              		.global	SysCtrlPeripheralDisable
+ 1016              		.thumb
+ 1017              		.thumb_func
+ 1019              	SysCtrlPeripheralDisable:
+ 1020              	.LFB11:
+ 733:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 734:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 735:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 736:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 737:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Disables a peripheral (in Run mode)
+ 738:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 739:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to disable.
+ 740:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 741:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Peripherals are disabled with this function. Once disabled, peripherals do
+ 742:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! not operate or respond to register reads/writes.
+ 743:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 744:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 745:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 746:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 747:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 748:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 749:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 750:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 751:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 752:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 753:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 754:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 755:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 756:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralDisable(uint32_t ui32Peripheral)
+ 757:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1021              		.loc 1 757 0
+ 1022              		.cfi_startproc
+ 1023              		@ args = 0, pretend = 0, frame = 8
+ 1024              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1025              		@ link register save eliminated.
+ 1026 0494 80B4     		push	{r7}
+ 1027              		.cfi_def_cfa_offset 4
+ 1028              		.cfi_offset 7, -4
+ 1029 0496 83B0     		sub	sp, sp, #12
+ 1030              		.cfi_def_cfa_offset 16
+ 1031 0498 00AF     		add	r7, sp, #0
+ 1032              		.cfi_def_cfa_register 7
+ 1033 049a 7860     		str	r0, [r7, #4]
+ 758:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 759:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 760:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 761:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Disable module in Run Mode
+ 762:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32RCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) &=
+ 1034              		.loc 1 762 0
+ 1035 049c 7B68     		ldr	r3, [r7, #4]
+ 1036 049e 1B0A     		lsrs	r3, r3, #8
+ 1037 04a0 03F00F03 		and	r3, r3, #15
+ 1038 04a4 0C4A     		ldr	r2, .L82
+ 1039 04a6 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1040 04aa 1846     		mov	r0, r3
+ 1041 04ac 7B68     		ldr	r3, [r7, #4]
+ 1042 04ae 1B0A     		lsrs	r3, r3, #8
+ 1043 04b0 03F00F03 		and	r3, r3, #15
+ 1044 04b4 084A     		ldr	r2, .L82
+ 1045 04b6 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1046 04ba 1B68     		ldr	r3, [r3]
+ 763:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1047              		.loc 1 763 0
+ 1048 04bc 7A68     		ldr	r2, [r7, #4]
+ 1049 04be 02F00F02 		and	r2, r2, #15
+ 1050 04c2 0121     		movs	r1, #1
+ 1051 04c4 01FA02F2 		lsl	r2, r1, r2
+ 1052 04c8 D243     		mvns	r2, r2
+ 762:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1053              		.loc 1 762 0
+ 1054 04ca 1340     		ands	r3, r3, r2
+ 1055 04cc 0360     		str	r3, [r0]
+ 764:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1056              		.loc 1 764 0
+ 1057 04ce 00BF     		nop
+ 1058 04d0 0C37     		adds	r7, r7, #12
+ 1059              		.cfi_def_cfa_offset 4
+ 1060 04d2 BD46     		mov	sp, r7
+ 1061              		.cfi_def_cfa_register 13
+ 1062              		@ sp needed
+ 1063 04d4 80BC     		pop	{r7}
+ 1064              		.cfi_restore 7
+ 1065              		.cfi_def_cfa_offset 0
+ 1066 04d6 7047     		bx	lr
+ 1067              	.L83:
+ 1068              		.align	2
+ 1069              	.L82:
+ 1070 04d8 00000000 		.word	g_pui32RCGCRegs
+ 1071              		.cfi_endproc
+ 1072              	.LFE11:
+ 1074              		.align	2
+ 1075              		.global	SysCtrlPeripheralSleepEnable
+ 1076              		.thumb
+ 1077              		.thumb_func
+ 1079              	SysCtrlPeripheralSleepEnable:
+ 1080              	.LFB12:
+ 765:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 766:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 767:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 768:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 769:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Enables a peripheral in sleep mode
+ 770:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 771:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to enable in sleep mode.
+ 772:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 773:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function allows a peripheral to continue operating when the processor
+ 774:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! goes into sleep mode.  Because the clocking configuration of the device does
+ 775:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! not change, any peripheral can safely continue operating while the
+ 776:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! processor is in sleep mode, and can therefore wake the processor from sleep
+ 777:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! mode.
+ 778:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 779:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 780:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 781:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 782:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 783:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 784:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 785:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 786:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 787:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 788:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 789:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 790:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 791:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralSleepEnable(uint32_t ui32Peripheral)
+ 792:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1081              		.loc 1 792 0
+ 1082              		.cfi_startproc
+ 1083              		@ args = 0, pretend = 0, frame = 8
+ 1084              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1085              		@ link register save eliminated.
+ 1086 04dc 80B4     		push	{r7}
+ 1087              		.cfi_def_cfa_offset 4
+ 1088              		.cfi_offset 7, -4
+ 1089 04de 83B0     		sub	sp, sp, #12
+ 1090              		.cfi_def_cfa_offset 16
+ 1091 04e0 00AF     		add	r7, sp, #0
+ 1092              		.cfi_def_cfa_register 7
+ 1093 04e2 7860     		str	r0, [r7, #4]
+ 793:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 794:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 795:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 796:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Enable this peripheral in sleep mode.
+ 797:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32SCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) |=
+ 1094              		.loc 1 797 0
+ 1095 04e4 7B68     		ldr	r3, [r7, #4]
+ 1096 04e6 1B0A     		lsrs	r3, r3, #8
+ 1097 04e8 03F00F03 		and	r3, r3, #15
+ 1098 04ec 0C4A     		ldr	r2, .L85
+ 1099 04ee 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1100 04f2 1846     		mov	r0, r3
+ 1101 04f4 7B68     		ldr	r3, [r7, #4]
+ 1102 04f6 1B0A     		lsrs	r3, r3, #8
+ 1103 04f8 03F00F03 		and	r3, r3, #15
+ 1104 04fc 084A     		ldr	r2, .L85
+ 1105 04fe 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1106 0502 1B68     		ldr	r3, [r3]
+ 798:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1107              		.loc 1 798 0
+ 1108 0504 7A68     		ldr	r2, [r7, #4]
+ 1109 0506 02F00F02 		and	r2, r2, #15
+ 1110 050a 0121     		movs	r1, #1
+ 1111 050c 01FA02F2 		lsl	r2, r1, r2
+ 797:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1112              		.loc 1 797 0
+ 1113 0510 1343     		orrs	r3, r3, r2
+ 1114 0512 0360     		str	r3, [r0]
+ 799:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1115              		.loc 1 799 0
+ 1116 0514 00BF     		nop
+ 1117 0516 0C37     		adds	r7, r7, #12
+ 1118              		.cfi_def_cfa_offset 4
+ 1119 0518 BD46     		mov	sp, r7
+ 1120              		.cfi_def_cfa_register 13
+ 1121              		@ sp needed
+ 1122 051a 80BC     		pop	{r7}
+ 1123              		.cfi_restore 7
+ 1124              		.cfi_def_cfa_offset 0
+ 1125 051c 7047     		bx	lr
+ 1126              	.L86:
+ 1127 051e 00BF     		.align	2
+ 1128              	.L85:
+ 1129 0520 18000000 		.word	g_pui32SCGCRegs
+ 1130              		.cfi_endproc
+ 1131              	.LFE12:
+ 1133              		.align	2
+ 1134              		.global	SysCtrlPeripheralSleepDisable
+ 1135              		.thumb
+ 1136              		.thumb_func
+ 1138              	SysCtrlPeripheralSleepDisable:
+ 1139              	.LFB13:
+ 800:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 801:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 802:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 803:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 804:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Disables a peripheral in sleep mode
+ 805:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 806:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to disable in sleep mode.
+ 807:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 808:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function causes a peripheral to stop operating when the processor goes
+ 809:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! into sleep mode.  Disabling peripherals while in sleep mode helps lower
+ 810:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! the current draw of the device. If enabled (by SysCtrlPeripheralEnable()),
+ 811:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! the peripheral automatically resume operation when the processor
+ 812:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! leaves sleep mode, maintaining the entire state before entry into sleep
+ 813:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! mode.
+ 814:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 815:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 816:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 817:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 818:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 819:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 820:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 821:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 822:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 823:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 824:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 825:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 826:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 827:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralSleepDisable(uint32_t ui32Peripheral)
+ 828:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1140              		.loc 1 828 0
+ 1141              		.cfi_startproc
+ 1142              		@ args = 0, pretend = 0, frame = 8
+ 1143              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1144              		@ link register save eliminated.
+ 1145 0524 80B4     		push	{r7}
+ 1146              		.cfi_def_cfa_offset 4
+ 1147              		.cfi_offset 7, -4
+ 1148 0526 83B0     		sub	sp, sp, #12
+ 1149              		.cfi_def_cfa_offset 16
+ 1150 0528 00AF     		add	r7, sp, #0
+ 1151              		.cfi_def_cfa_register 7
+ 1152 052a 7860     		str	r0, [r7, #4]
+ 829:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 830:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 831:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 832:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Disable this peripheral in sleep mode.
+ 833:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32SCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) &=
+ 1153              		.loc 1 833 0
+ 1154 052c 7B68     		ldr	r3, [r7, #4]
+ 1155 052e 1B0A     		lsrs	r3, r3, #8
+ 1156 0530 03F00F03 		and	r3, r3, #15
+ 1157 0534 0C4A     		ldr	r2, .L88
+ 1158 0536 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1159 053a 1846     		mov	r0, r3
+ 1160 053c 7B68     		ldr	r3, [r7, #4]
+ 1161 053e 1B0A     		lsrs	r3, r3, #8
+ 1162 0540 03F00F03 		and	r3, r3, #15
+ 1163 0544 084A     		ldr	r2, .L88
+ 1164 0546 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1165 054a 1B68     		ldr	r3, [r3]
+ 834:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1166              		.loc 1 834 0
+ 1167 054c 7A68     		ldr	r2, [r7, #4]
+ 1168 054e 02F00F02 		and	r2, r2, #15
+ 1169 0552 0121     		movs	r1, #1
+ 1170 0554 01FA02F2 		lsl	r2, r1, r2
+ 1171 0558 D243     		mvns	r2, r2
+ 833:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1172              		.loc 1 833 0
+ 1173 055a 1340     		ands	r3, r3, r2
+ 1174 055c 0360     		str	r3, [r0]
+ 835:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1175              		.loc 1 835 0
+ 1176 055e 00BF     		nop
+ 1177 0560 0C37     		adds	r7, r7, #12
+ 1178              		.cfi_def_cfa_offset 4
+ 1179 0562 BD46     		mov	sp, r7
+ 1180              		.cfi_def_cfa_register 13
+ 1181              		@ sp needed
+ 1182 0564 80BC     		pop	{r7}
+ 1183              		.cfi_restore 7
+ 1184              		.cfi_def_cfa_offset 0
+ 1185 0566 7047     		bx	lr
+ 1186              	.L89:
+ 1187              		.align	2
+ 1188              	.L88:
+ 1189 0568 18000000 		.word	g_pui32SCGCRegs
+ 1190              		.cfi_endproc
+ 1191              	.LFE13:
+ 1193              		.align	2
+ 1194              		.global	SysCtrlPeripheralDeepSleepEnable
+ 1195              		.thumb
+ 1196              		.thumb_func
+ 1198              	SysCtrlPeripheralDeepSleepEnable:
+ 1199              	.LFB14:
+ 836:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 837:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 838:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 839:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 840:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Enables a peripheral in deep-sleep mode
+ 841:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 842:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to enable in deep-sleep mode.
+ 843:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 844:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function allows a peripheral to continue operating when the processor
+ 845:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! goes into deep-sleep mode. Because the clocking configuration of the device
+ 846:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! can change, not all peripherals can safely continue operating while the
+ 847:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! processor is in sleep mode. Safe operation depends on the chosen power mode.
+ 848:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The caller must make sensible choices.
+ 849:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 850:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 851:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 852:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 853:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 854:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 855:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 856:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 857:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 858:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 859:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 860:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 861:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 862:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralDeepSleepEnable(uint32_t ui32Peripheral)
+ 863:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1200              		.loc 1 863 0
+ 1201              		.cfi_startproc
+ 1202              		@ args = 0, pretend = 0, frame = 8
+ 1203              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1204              		@ link register save eliminated.
+ 1205 056c 80B4     		push	{r7}
+ 1206              		.cfi_def_cfa_offset 4
+ 1207              		.cfi_offset 7, -4
+ 1208 056e 83B0     		sub	sp, sp, #12
+ 1209              		.cfi_def_cfa_offset 16
+ 1210 0570 00AF     		add	r7, sp, #0
+ 1211              		.cfi_def_cfa_register 7
+ 1212 0572 7860     		str	r0, [r7, #4]
+ 864:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 865:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 866:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 867:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Enable this peripheral in deep-sleep mode.
+ 868:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32DCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) |=
+ 1213              		.loc 1 868 0
+ 1214 0574 7B68     		ldr	r3, [r7, #4]
+ 1215 0576 1B0A     		lsrs	r3, r3, #8
+ 1216 0578 03F00F03 		and	r3, r3, #15
+ 1217 057c 0C4A     		ldr	r2, .L91
+ 1218 057e 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1219 0582 1846     		mov	r0, r3
+ 1220 0584 7B68     		ldr	r3, [r7, #4]
+ 1221 0586 1B0A     		lsrs	r3, r3, #8
+ 1222 0588 03F00F03 		and	r3, r3, #15
+ 1223 058c 084A     		ldr	r2, .L91
+ 1224 058e 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1225 0592 1B68     		ldr	r3, [r3]
+ 869:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1226              		.loc 1 869 0
+ 1227 0594 7A68     		ldr	r2, [r7, #4]
+ 1228 0596 02F00F02 		and	r2, r2, #15
+ 1229 059a 0121     		movs	r1, #1
+ 1230 059c 01FA02F2 		lsl	r2, r1, r2
+ 868:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1231              		.loc 1 868 0
+ 1232 05a0 1343     		orrs	r3, r3, r2
+ 1233 05a2 0360     		str	r3, [r0]
+ 870:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1234              		.loc 1 870 0
+ 1235 05a4 00BF     		nop
+ 1236 05a6 0C37     		adds	r7, r7, #12
+ 1237              		.cfi_def_cfa_offset 4
+ 1238 05a8 BD46     		mov	sp, r7
+ 1239              		.cfi_def_cfa_register 13
+ 1240              		@ sp needed
+ 1241 05aa 80BC     		pop	{r7}
+ 1242              		.cfi_restore 7
+ 1243              		.cfi_def_cfa_offset 0
+ 1244 05ac 7047     		bx	lr
+ 1245              	.L92:
+ 1246 05ae 00BF     		.align	2
+ 1247              	.L91:
+ 1248 05b0 30000000 		.word	g_pui32DCGCRegs
+ 1249              		.cfi_endproc
+ 1250              	.LFE14:
+ 1252              		.align	2
+ 1253              		.global	SysCtrlPeripheralDeepSleepDisable
+ 1254              		.thumb
+ 1255              		.thumb_func
+ 1257              	SysCtrlPeripheralDeepSleepDisable:
+ 1258              	.LFB15:
+ 871:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 872:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 873:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 874:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 875:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Disables a peripheral in deep-sleep mode
+ 876:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 877:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32Peripheral is the peripheral to disable in deep-sleep mode.
+ 878:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 879:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function causes a peripheral to stop operating when the processor goes
+ 880:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! into deep-sleep mode.  Disabling peripherals while in deep-sleep mode helps
+ 881:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! to lower the current draw of the device, and can keep peripherals that
+ 882:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! require a particular clock frequency from operating when the clock changes
+ 883:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! as a result of entering deep-sleep mode.  If enabled (by
+ 884:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! SysCtrlPeripheralEnable()), the peripheral automatically resumes operation
+ 885:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! when the processor leaves deep-sleep mode, maintaining its entire
+ 886:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! state from before entry into deep-sleep mode.
+ 887:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 888:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32Peripheral parameter must be one of the values:
+ 889:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT0 , \b SYS_CTRL_PERIPH_GPT1,
+ 890:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_GPT2,  \b SYS_CTRL_PERIPH_GPT3,
+ 891:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_SSI0,  \b SYS_CTRL_PERIPH_SSI1,
+ 892:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_UART0, \b SYS_CTRL_PERIPH_UART1,
+ 893:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_I2C,   \b SYS_CTRL_PERIPH_PKA,
+ 894:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PERIPH_AES,   \b SYS_CTRL_PERIPH_RFC.
+ 895:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 896:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 897:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 898:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 899:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 900:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPeripheralDeepSleepDisable(uint32_t ui32Peripheral)
+ 901:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1259              		.loc 1 901 0
+ 1260              		.cfi_startproc
+ 1261              		@ args = 0, pretend = 0, frame = 8
+ 1262              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1263              		@ link register save eliminated.
+ 1264 05b4 80B4     		push	{r7}
+ 1265              		.cfi_def_cfa_offset 4
+ 1266              		.cfi_offset 7, -4
+ 1267 05b6 83B0     		sub	sp, sp, #12
+ 1268              		.cfi_def_cfa_offset 16
+ 1269 05b8 00AF     		add	r7, sp, #0
+ 1270              		.cfi_def_cfa_register 7
+ 1271 05ba 7860     		str	r0, [r7, #4]
+ 902:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 903:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(SysCtrlPeripheralValid(ui32Peripheral));
+ 904:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 905:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Disable this peripheral in deep-sleep mode.
+ 906:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(g_pui32DCGCRegs[SYS_CTRL_PERIPH_INDEX(ui32Peripheral)]) &=
+ 1272              		.loc 1 906 0
+ 1273 05bc 7B68     		ldr	r3, [r7, #4]
+ 1274 05be 1B0A     		lsrs	r3, r3, #8
+ 1275 05c0 03F00F03 		and	r3, r3, #15
+ 1276 05c4 0C4A     		ldr	r2, .L94
+ 1277 05c6 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1278 05ca 1846     		mov	r0, r3
+ 1279 05cc 7B68     		ldr	r3, [r7, #4]
+ 1280 05ce 1B0A     		lsrs	r3, r3, #8
+ 1281 05d0 03F00F03 		and	r3, r3, #15
+ 1282 05d4 084A     		ldr	r2, .L94
+ 1283 05d6 52F82330 		ldr	r3, [r2, r3, lsl #2]
+ 1284 05da 1B68     		ldr	r3, [r3]
+ 907:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1285              		.loc 1 907 0
+ 1286 05dc 7A68     		ldr	r2, [r7, #4]
+ 1287 05de 02F00F02 		and	r2, r2, #15
+ 1288 05e2 0121     		movs	r1, #1
+ 1289 05e4 01FA02F2 		lsl	r2, r1, r2
+ 1290 05e8 D243     		mvns	r2, r2
+ 906:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****         ~SYS_CTRL_PERIPH_MASKBIT(ui32Peripheral);
+ 1291              		.loc 1 906 0
+ 1292 05ea 1340     		ands	r3, r3, r2
+ 1293 05ec 0360     		str	r3, [r0]
+ 908:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1294              		.loc 1 908 0
+ 1295 05ee 00BF     		nop
+ 1296 05f0 0C37     		adds	r7, r7, #12
+ 1297              		.cfi_def_cfa_offset 4
+ 1298 05f2 BD46     		mov	sp, r7
+ 1299              		.cfi_def_cfa_register 13
+ 1300              		@ sp needed
+ 1301 05f4 80BC     		pop	{r7}
+ 1302              		.cfi_restore 7
+ 1303              		.cfi_def_cfa_offset 0
+ 1304 05f6 7047     		bx	lr
+ 1305              	.L95:
+ 1306              		.align	2
+ 1307              	.L94:
+ 1308 05f8 30000000 		.word	g_pui32DCGCRegs
+ 1309              		.cfi_endproc
+ 1310              	.LFE15:
+ 1312              		.align	2
+ 1313              		.global	SysCtrlPowerModeSet
+ 1314              		.thumb
+ 1315              		.thumb_func
+ 1317              	SysCtrlPowerModeSet:
+ 1318              	.LFB16:
+ 909:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 910:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 911:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 912:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 913:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Set Power Mode
+ 914:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 915:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \param ui32PowerMode is the power mode to be entered.
+ 916:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 917:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function selects the power mode to enter when CM3 enters Deep Sleep
+ 918:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! mode.
+ 919:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Power mode PM0 (\b SYS_CTRL_PM_NOACTION) is entered when the CPU
+ 920:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! wakes up due to an interrupt.
+ 921:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Note only transitions to and from PM0 are legal  (that is, PM1 to PM2
+ 922:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! cannot happen).
+ 923:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 924:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! The \e ui32PowerMode argument must be only one of the following values:
+ 925:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PM_NOACTION, \b SYS_CTRL_PM_1, \b SYS_CTRL_PM_2 or
+ 926:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PM_3.
+ 927:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 928:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \sa SysCtrlDeepSleep().
+ 929:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 930:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 931:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 932:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 933:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 934:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPowerModeSet(uint32_t ui32PowerMode)
+ 935:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1319              		.loc 1 935 0
+ 1320              		.cfi_startproc
+ 1321              		@ args = 0, pretend = 0, frame = 8
+ 1322              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1323              		@ link register save eliminated.
+ 1324 05fc 80B4     		push	{r7}
+ 1325              		.cfi_def_cfa_offset 4
+ 1326              		.cfi_offset 7, -4
+ 1327 05fe 83B0     		sub	sp, sp, #12
+ 1328              		.cfi_def_cfa_offset 16
+ 1329 0600 00AF     		add	r7, sp, #0
+ 1330              		.cfi_def_cfa_register 7
+ 1331 0602 7860     		str	r0, [r7, #4]
+ 936:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Check the arguments.
+ 937:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ASSERT(ui32PowerMode == SYS_CTRL_PM_NOACTION ||
+ 938:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32PowerMode == SYS_CTRL_PM_1        ||
+ 939:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32PowerMode == SYS_CTRL_PM_2        ||
+ 940:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****            ui32PowerMode == SYS_CTRL_PM_3);
+ 941:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 942:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     // Set power mode
+ 943:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(SYS_CTRL_PMCTL) = ui32PowerMode;
+ 1332              		.loc 1 943 0
+ 1333 0604 034A     		ldr	r2, .L97
+ 1334 0606 7B68     		ldr	r3, [r7, #4]
+ 1335 0608 1360     		str	r3, [r2]
+ 944:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1336              		.loc 1 944 0
+ 1337 060a 00BF     		nop
+ 1338 060c 0C37     		adds	r7, r7, #12
+ 1339              		.cfi_def_cfa_offset 4
+ 1340 060e BD46     		mov	sp, r7
+ 1341              		.cfi_def_cfa_register 13
+ 1342              		@ sp needed
+ 1343 0610 80BC     		pop	{r7}
+ 1344              		.cfi_restore 7
+ 1345              		.cfi_def_cfa_offset 0
+ 1346 0612 7047     		bx	lr
+ 1347              	.L98:
+ 1348              		.align	2
+ 1349              	.L97:
+ 1350 0614 58200D40 		.word	1074602072
+ 1351              		.cfi_endproc
+ 1352              	.LFE16:
+ 1354              		.align	2
+ 1355              		.global	SysCtrlPowerModeGet
+ 1356              		.thumb
+ 1357              		.thumb_func
+ 1359              	SysCtrlPowerModeGet:
+ 1360              	.LFB17:
+ 945:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 946:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 947:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 948:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 949:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Get Power Mode
+ 950:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 951:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function returns the current Power Mode setting.
+ 952:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 953:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return Power mode, i.e. one of the following values:
+ 954:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PM_NOACTION, \b SYS_CTRL_PM_1, \b SYS_CTRL_PM_2 or
+ 955:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \b SYS_CTRL_PM_3.
+ 956:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 957:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 958:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** uint32_t
+ 959:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlPowerModeGet(void)
+ 960:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1361              		.loc 1 960 0
+ 1362              		.cfi_startproc
+ 1363              		@ args = 0, pretend = 0, frame = 8
+ 1364              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1365              		@ link register save eliminated.
+ 1366 0618 80B4     		push	{r7}
+ 1367              		.cfi_def_cfa_offset 4
+ 1368              		.cfi_offset 7, -4
+ 1369 061a 83B0     		sub	sp, sp, #12
+ 1370              		.cfi_def_cfa_offset 16
+ 1371 061c 00AF     		add	r7, sp, #0
+ 1372              		.cfi_def_cfa_register 7
+ 961:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32PowerMode;
+ 962:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 963:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32PowerMode = HWREG(SYS_CTRL_PMCTL);
+ 1373              		.loc 1 963 0
+ 1374 061e 064B     		ldr	r3, .L101
+ 1375 0620 1B68     		ldr	r3, [r3]
+ 1376 0622 7B60     		str	r3, [r7, #4]
+ 964:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32PowerMode &= SYS_CTRL_PMCTL_PM_M;
+ 1377              		.loc 1 964 0
+ 1378 0624 7B68     		ldr	r3, [r7, #4]
+ 1379 0626 03F00303 		and	r3, r3, #3
+ 1380 062a 7B60     		str	r3, [r7, #4]
+ 965:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 966:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     return(ui32PowerMode);
+ 1381              		.loc 1 966 0
+ 1382 062c 7B68     		ldr	r3, [r7, #4]
+ 967:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1383              		.loc 1 967 0
+ 1384 062e 1846     		mov	r0, r3
+ 1385 0630 0C37     		adds	r7, r7, #12
+ 1386              		.cfi_def_cfa_offset 4
+ 1387 0632 BD46     		mov	sp, r7
+ 1388              		.cfi_def_cfa_register 13
+ 1389              		@ sp needed
+ 1390 0634 80BC     		pop	{r7}
+ 1391              		.cfi_restore 7
+ 1392              		.cfi_def_cfa_offset 0
+ 1393 0636 7047     		bx	lr
+ 1394              	.L102:
+ 1395              		.align	2
+ 1396              	.L101:
+ 1397 0638 58200D40 		.word	1074602072
+ 1398              		.cfi_endproc
+ 1399              	.LFE17:
+ 1401              		.align	2
+ 1402              		.global	SysCtrlClockLossDetectEnable
+ 1403              		.thumb
+ 1404              		.thumb_func
+ 1406              	SysCtrlClockLossDetectEnable:
+ 1407              	.LFB18:
+ 968:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 969:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 970:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 971:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 972:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 973:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! Enable Clock Loss Detection
+ 974:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 975:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! This function enables clock loss detection.
+ 976:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //!
+ 977:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //! \return None
+ 978:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //
+ 979:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** //*****************************************************************************
+ 980:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** void
+ 981:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** SysCtrlClockLossDetectEnable(void)
+ 982:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** {
+ 1408              		.loc 1 982 0
+ 1409              		.cfi_startproc
+ 1410              		@ args = 0, pretend = 0, frame = 8
+ 1411              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1412              		@ link register save eliminated.
+ 1413 063c 80B4     		push	{r7}
+ 1414              		.cfi_def_cfa_offset 4
+ 1415              		.cfi_offset 7, -4
+ 1416 063e 83B0     		sub	sp, sp, #12
+ 1417              		.cfi_def_cfa_offset 16
+ 1418 0640 00AF     		add	r7, sp, #0
+ 1419              		.cfi_def_cfa_register 7
+ 983:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     uint32_t ui32CLD;
+ 984:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** 
+ 985:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32CLD = HWREG(SYS_CTRL_CLD);
+ 1420              		.loc 1 985 0
+ 1421 0642 074B     		ldr	r3, .L104
+ 1422 0644 1B68     		ldr	r3, [r3]
+ 1423 0646 7B60     		str	r3, [r7, #4]
+ 986:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     ui32CLD |= SYS_CTRL_CLD_EN;
+ 1424              		.loc 1 986 0
+ 1425 0648 7B68     		ldr	r3, [r7, #4]
+ 1426 064a 43F00103 		orr	r3, r3, #1
+ 1427 064e 7B60     		str	r3, [r7, #4]
+ 987:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c ****     HWREG(SYS_CTRL_CLD) = ui32CLD;
+ 1428              		.loc 1 987 0
+ 1429 0650 034A     		ldr	r2, .L104
+ 1430 0652 7B68     		ldr	r3, [r7, #4]
+ 1431 0654 1360     		str	r3, [r2]
+ 988:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/source/sys_ctrl.c **** }
+ 1432              		.loc 1 988 0
+ 1433 0656 00BF     		nop
+ 1434 0658 0C37     		adds	r7, r7, #12
+ 1435              		.cfi_def_cfa_offset 4
+ 1436 065a BD46     		mov	sp, r7
+ 1437              		.cfi_def_cfa_register 13
+ 1438              		@ sp needed
+ 1439 065c 80BC     		pop	{r7}
+ 1440              		.cfi_restore 7
+ 1441              		.cfi_def_cfa_offset 0
+ 1442 065e 7047     		bx	lr
+ 1443              	.L105:
+ 1444              		.align	2
+ 1445              	.L104:
+ 1446 0660 80200D40 		.word	1074602112
+ 1447              		.cfi_endproc
+ 1448              	.LFE18:
+ 1450              	.Letext0:
+ 1451              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1452              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sys_ctrl.c
+     /tmp/cci13Rzt.s:20     .rodata:0000000000000000 $d
+     /tmp/cci13Rzt.s:23     .rodata:0000000000000000 g_pui32RCGCRegs
+     /tmp/cci13Rzt.s:33     .rodata:0000000000000018 g_pui32SCGCRegs
+     /tmp/cci13Rzt.s:43     .rodata:0000000000000030 g_pui32DCGCRegs
+     /tmp/cci13Rzt.s:53     .rodata:0000000000000048 g_pui32SRRegs
+     /tmp/cci13Rzt.s:62     .rodata:000000000000005c g_pui32DieCfgMask
+     /tmp/cci13Rzt.s:70     .text:0000000000000000 $t
+     /tmp/cci13Rzt.s:75     .text:0000000000000000 SysCtrlClockSet
+     /tmp/cci13Rzt.s:520    .text:000000000000023c SysCtrlDelay
+     /tmp/cci13Rzt.s:203    .text:00000000000000b0 $d
+     /tmp/cci13Rzt.s:209    .text:00000000000000bc $t
+     /tmp/cci13Rzt.s:214    .text:00000000000000bc SysCtrlClockGet
+     /tmp/cci13Rzt.s:247    .text:00000000000000e0 $d
+     /tmp/cci13Rzt.s:255    .text:0000000000000100 $t
+     /tmp/cci13Rzt.s:321    .text:000000000000013c $d
+     /tmp/cci13Rzt.s:333    .text:0000000000000160 $t
+     /tmp/cci13Rzt.s:338    .text:0000000000000160 SysCtrlIOClockSet
+     /tmp/cci13Rzt.s:385    .text:0000000000000190 $d
+     /tmp/cci13Rzt.s:389    .text:0000000000000194 $t
+     /tmp/cci13Rzt.s:394    .text:0000000000000194 SysCtrlIOClockGet
+     /tmp/cci13Rzt.s:429    .text:00000000000001bc $d
+     /tmp/cci13Rzt.s:437    .text:00000000000001dc $t
+     /tmp/cci13Rzt.s:503    .text:0000000000000218 $d
+     /tmp/cci13Rzt.s:515    .text:000000000000023c $t
+     /tmp/cci13Rzt.s:546    .text:0000000000000248 SysCtrlReset
+     /tmp/cci13Rzt.s:568    .text:0000000000000254 $d
+     /tmp/cci13Rzt.s:572    .text:0000000000000258 $t
+     /tmp/cci13Rzt.s:577    .text:0000000000000258 SysCtrlSleep
+     /tmp/cci13Rzt.s:602    .text:0000000000000264 SysCtrlDeepSleep
+     /tmp/cci13Rzt.s:757    .text:0000000000000338 $d
+     /tmp/cci13Rzt.s:763    .text:0000000000000344 $t
+     /tmp/cci13Rzt.s:768    .text:0000000000000344 SysCtrlPeripheralPresent
+     /tmp/cci13Rzt.s:854    .text:00000000000003b4 $d
+     /tmp/cci13Rzt.s:860    .text:00000000000003c0 $t
+     /tmp/cci13Rzt.s:865    .text:00000000000003c0 SysCtrlPeripheralReset
+     /tmp/cci13Rzt.s:951    .text:0000000000000448 $d
+     /tmp/cci13Rzt.s:955    .text:000000000000044c $t
+     /tmp/cci13Rzt.s:960    .text:000000000000044c SysCtrlPeripheralEnable
+     /tmp/cci13Rzt.s:1010   .text:0000000000000490 $d
+     /tmp/cci13Rzt.s:1014   .text:0000000000000494 $t
+     /tmp/cci13Rzt.s:1019   .text:0000000000000494 SysCtrlPeripheralDisable
+     /tmp/cci13Rzt.s:1070   .text:00000000000004d8 $d
+     /tmp/cci13Rzt.s:1074   .text:00000000000004dc $t
+     /tmp/cci13Rzt.s:1079   .text:00000000000004dc SysCtrlPeripheralSleepEnable
+     /tmp/cci13Rzt.s:1129   .text:0000000000000520 $d
+     /tmp/cci13Rzt.s:1133   .text:0000000000000524 $t
+     /tmp/cci13Rzt.s:1138   .text:0000000000000524 SysCtrlPeripheralSleepDisable
+     /tmp/cci13Rzt.s:1189   .text:0000000000000568 $d
+     /tmp/cci13Rzt.s:1193   .text:000000000000056c $t
+     /tmp/cci13Rzt.s:1198   .text:000000000000056c SysCtrlPeripheralDeepSleepEnable
+     /tmp/cci13Rzt.s:1248   .text:00000000000005b0 $d
+     /tmp/cci13Rzt.s:1252   .text:00000000000005b4 $t
+     /tmp/cci13Rzt.s:1257   .text:00000000000005b4 SysCtrlPeripheralDeepSleepDisable
+     /tmp/cci13Rzt.s:1308   .text:00000000000005f8 $d
+     /tmp/cci13Rzt.s:1312   .text:00000000000005fc $t
+     /tmp/cci13Rzt.s:1317   .text:00000000000005fc SysCtrlPowerModeSet
+     /tmp/cci13Rzt.s:1350   .text:0000000000000614 $d
+     /tmp/cci13Rzt.s:1354   .text:0000000000000618 $t
+     /tmp/cci13Rzt.s:1359   .text:0000000000000618 SysCtrlPowerModeGet
+     /tmp/cci13Rzt.s:1397   .text:0000000000000638 $d
+     /tmp/cci13Rzt.s:1401   .text:000000000000063c $t
+     /tmp/cci13Rzt.s:1406   .text:000000000000063c SysCtrlClockLossDetectEnable
+     /tmp/cci13Rzt.s:1446   .text:0000000000000660 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.8e445c0106ab795ab4704214cba6f089
+                           .group:0000000000000000 wm4.hw_flash_ctrl.h.39.9e1b51558015e13f8d9f8700e513c4a2
+                           .group:0000000000000000 wm4.hw_ints.h.42.85b9479f2be35b086f1bb7cbb15bc097
+                           .group:0000000000000000 wm4.hw_nvic.h.42.f3b9efa2537e728866c85de74b3e5811
+                           .group:0000000000000000 wm4.hw_sys_ctrl.h.39.50b4d7775c38e82076d0eb3bdc2daf82
+                           .group:0000000000000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:0000000000000000 wm4.features.h.33.d97f2d646536517df901beeb5b9993f5
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.b82bf99f69d6a5c085fc866de0d3eb9b
+                           .group:0000000000000000 wm4._stdint.h.10.7a5f60e6741af4a5594a3867d347e1f9
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.stdbool.h.29.07dce69c3b78884144b7f7bd19483461
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.debug.h.41.b891e613993738d067c45a5ff528d11a
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.sys_ctrl.h.41.c6bbd4dace326d685c1afa45bc1ba1e2
+
+UNDEFINED SYMBOLS
+CPUwfi

@@ -1,0 +1,2607 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"whisper.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.rodata
+  20              		.align	2
+  23              	rreg_uriquery:
+  24 0000 683D7563 		.ascii	"h=ucb\000"
+  24      6200
+  25 0006 0000     		.align	2
+  28              	infoBoardname:
+  29 0008 43433235 		.ascii	"CC2538\000"
+  29      333800
+  30 000f 00       		.align	2
+  33              	infouCName:
+  34 0010 43433235 		.ascii	"CC2538\000"
+  34      333800
+  35 0017 00       		.align	2
+  38              	infoRadioName:
+  39 0018 43433235 		.ascii	"CC2538 SoC\000"
+  39      33382053 
+  39      6F4300
+  40 0023 00       		.align	2
+  43              	infoStackName:
+  44 0024 4F70656E 		.ascii	"OpenWSN \000"
+  44      57534E20 
+  44      00
+  45 002d 000000   		.align	2
+  48              	ipAddr_ipsoRD:
+  49 0030 26       		.byte	38
+  50 0031 07       		.byte	7
+  51 0032 F7       		.byte	-9
+  52 0033 40       		.byte	64
+  53 0034 00       		.byte	0
+  54 0035 00       		.byte	0
+  55 0036 00       		.byte	0
+  56 0037 3F       		.byte	63
+  57 0038 00       		.byte	0
+  58 0039 00       		.byte	0
+  59 003a 00       		.byte	0
+  60 003b 00       		.byte	0
+  61 003c 00       		.byte	0
+  62 003d 00       		.byte	0
+  63 003e 0E       		.byte	14
+  64 003f 29       		.byte	41
+  65              		.align	2
+  68              	ipAddr_motesEecs:
+  69 0040 20       		.byte	32
+  70 0041 01       		.byte	1
+  71 0042 04       		.byte	4
+  72 0043 70       		.byte	112
+  73 0044 00       		.byte	0
+  74 0045 66       		.byte	102
+  75 0046 00       		.byte	0
+  76 0047 19       		.byte	25
+  77 0048 00       		.byte	0
+  78 0049 00       		.byte	0
+  79 004a 00       		.byte	0
+  80 004b 00       		.byte	0
+  81 004c 00       		.byte	0
+  82 004d 00       		.byte	0
+  83 004e 00       		.byte	0
+  84 004f 02       		.byte	2
+  85              		.align	2
+  88              	ipAddr_local:
+  89 0050 26       		.byte	38
+  90 0051 07       		.byte	7
+  91 0052 F1       		.byte	-15
+  92 0053 40       		.byte	64
+  93 0054 04       		.byte	4
+  94 0055 00       		.byte	0
+  95 0056 10       		.byte	16
+  96 0057 36       		.byte	54
+  97 0058 4D       		.byte	77
+  98 0059 CD       		.byte	-51
+  99 005a AB       		.byte	-85
+ 100 005b 54       		.byte	84
+ 101 005c 81       		.byte	-127
+ 102 005d 99       		.byte	-103
+ 103 005e C1       		.byte	-63
+ 104 005f F7       		.byte	-9
+ 105              		.align	2
+ 108              	ipAddr_motedata:
+ 109 0060 20       		.byte	32
+ 110 0061 01       		.byte	1
+ 111 0062 04       		.byte	4
+ 112 0063 70       		.byte	112
+ 113 0064 00       		.byte	0
+ 114 0065 66       		.byte	102
+ 115 0066 00       		.byte	0
+ 116 0067 17       		.byte	23
+ 117 0068 00       		.byte	0
+ 118 0069 00       		.byte	0
+ 119 006a 00       		.byte	0
+ 120 006b 00       		.byte	0
+ 121 006c 00       		.byte	0
+ 122 006d 00       		.byte	0
+ 123 006e 00       		.byte	0
+ 124 006f 02       		.byte	2
+ 125              		.align	2
+ 128              	ipAddr_ringmaster:
+ 129 0070 BB       		.byte	-69
+ 130 0071 BB       		.byte	-69
+ 131 0072 00       		.byte	0
+ 132 0073 00       		.byte	0
+ 133 0074 00       		.byte	0
+ 134 0075 00       		.byte	0
+ 135 0076 00       		.byte	0
+ 136 0077 00       		.byte	0
+ 137 0078 00       		.byte	0
+ 138 0079 00       		.byte	0
+ 139 007a 00       		.byte	0
+ 140 007b 00       		.byte	0
+ 141 007c 00       		.byte	0
+ 142 007d 00       		.byte	0
+ 143 007e 00       		.byte	0
+ 144 007f 01       		.byte	1
+ 145              		.align	2
+ 148              	linklocalprefix:
+ 149 0080 FE       		.byte	-2
+ 150 0081 80       		.byte	-128
+ 151 0082 00       		.byte	0
+ 152 0083 00       		.byte	0
+ 153 0084 00       		.byte	0
+ 154 0085 00       		.byte	0
+ 155 0086 00       		.byte	0
+ 156 0087 00       		.byte	0
+ 157              		.align	2
+ 160              	all_routers_multicast:
+ 161 0088 FF       		.byte	-1
+ 162 0089 02       		.byte	2
+ 163 008a 00       		.byte	0
+ 164 008b 00       		.byte	0
+ 165 008c 00       		.byte	0
+ 166 008d 00       		.byte	0
+ 167 008e 00       		.byte	0
+ 168 008f 00       		.byte	0
+ 169 0090 00       		.byte	0
+ 170 0091 00       		.byte	0
+ 171 0092 00       		.byte	0
+ 172 0093 00       		.byte	0
+ 173 0094 00       		.byte	0
+ 174 0095 00       		.byte	0
+ 175 0096 00       		.byte	0
+ 176 0097 1A       		.byte	26
+ 177              		.align	2
+ 180              	chTemplate_default:
+ 181 0098 05       		.byte	5
+ 182 0099 06       		.byte	6
+ 183 009a 0C       		.byte	12
+ 184 009b 07       		.byte	7
+ 185 009c 0F       		.byte	15
+ 186 009d 04       		.byte	4
+ 187 009e 0E       		.byte	14
+ 188 009f 0B       		.byte	11
+ 189 00a0 08       		.byte	8
+ 190 00a1 00       		.byte	0
+ 191 00a2 01       		.byte	1
+ 192 00a3 02       		.byte	2
+ 193 00a4 0D       		.byte	13
+ 194 00a5 03       		.byte	3
+ 195 00a6 09       		.byte	9
+ 196 00a7 0A       		.byte	10
+ 197              		.align	2
+ 200              	ebIEsBytestream:
+ 201 00a8 1A       		.byte	26
+ 202 00a9 88       		.byte	-120
+ 203 00aa 06       		.byte	6
+ 204 00ab 1A       		.byte	26
+ 205 00ac 00       		.byte	0
+ 206 00ad 00       		.byte	0
+ 207 00ae 00       		.byte	0
+ 208 00af 00       		.byte	0
+ 209 00b0 00       		.byte	0
+ 210 00b1 00       		.byte	0
+ 211 00b2 01       		.byte	1
+ 212 00b3 1C       		.byte	28
+ 213 00b4 00       		.byte	0
+ 214 00b5 01       		.byte	1
+ 215 00b6 C8       		.byte	-56
+ 216 00b7 00       		.byte	0
+ 217 00b8 0A       		.byte	10
+ 218 00b9 1B       		.byte	27
+ 219 00ba 01       		.byte	1
+ 220 00bb 00       		.byte	0
+ 221 00bc 17       		.byte	23
+ 222 00bd 00       		.byte	0
+ 223 00be 01       		.byte	1
+ 224 00bf 00       		.byte	0
+ 225 00c0 00       		.byte	0
+ 226 00c1 00       		.byte	0
+ 227 00c2 00       		.byte	0
+ 228 00c3 0F       		.byte	15
+ 229              		.global	whisper_path0
+ 230              		.align	2
+ 233              	whisper_path0:
+ 234 00c4 7700     		.ascii	"w\000"
+ 235              		.comm	targetParentNew,1,1
+ 236              		.comm	targetParentOld,1,1
+ 237              		.comm	targetChildren,1,1
+ 238              		.comm	state,1,1
+ 239              		.comm	fakeSource,1,1
+ 240              		.comm	numSentDios,1,1
+ 241              		.comm	celllist_add,25,4
+ 242              		.comm	whisper_vars,60,4
+ 243              		.text
+ 244              		.align	2
+ 245              		.global	whisper_init
+ 246              		.thumb
+ 247              		.thumb_func
+ 249              	whisper_init:
+ 250              	.LFB0:
+ 251              		.file 1 "build/openmote-cc2538_armgcc/openapps/whisper/whisper.c"
+   1:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /**
+   2:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \brief A CoAP resource which indicates the board its running on.
+   3:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** */
+   4:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+   5:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "opendefs.h"
+   6:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "whisper.h"
+   7:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "opencoap.h"
+   8:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "openqueue.h"
+   9:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "packetfunctions.h"
+  10:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "openserial.h"
+  11:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "openrandom.h"
+  12:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "board.h"
+  13:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "idmanager.h"
+  14:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "msf.h"
+  15:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "neighbors.h"
+  16:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "schedule.h"
+  17:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "IEEE802154E.h"
+  18:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "scheduler.h"
+  19:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** #include "sixtop.h"
+  20:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  21:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //=========================== defines =========================================
+  22:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  23:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** const uint8_t whisper_path0[] = "w";
+  24:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  25:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //=========================== variables =======================================
+  26:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  27:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  28:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t targetParentNew;
+  29:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t targetParentOld;
+  30:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t targetChildren;
+  31:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t state;
+  32:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t fakeSource;
+  33:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t numSentDios;
+  34:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** cellInfo_ht          celllist_add[CELLLIST_MAX_LEN];
+  35:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  36:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** whisper_vars_t whisper_vars;
+  37:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  38:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb(opentimers_id_t id);
+  39:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb(void);
+  40:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  41:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb2(opentimers_id_t id);
+  42:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb2(void);
+  43:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  44:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb3(opentimers_id_t id);
+  45:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb3(void);
+  46:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  47:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb4(opentimers_id_t id);
+  48:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb4(void);
+  49:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  50:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //bool whisper_candidateAddCellList(cellInfo_ht* cellList,uint8_t requiredCells);
+  51:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //=========================== prototypes ======================================
+  52:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  53:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** owerror_t     whisper_receive(
+  54:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    OpenQueueEntry_t* msg,
+  55:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    coap_header_iht*  coap_header,
+  56:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    coap_option_iht*  coap_options
+  57:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** );
+  58:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void          whisper_sendDone(
+  59:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    OpenQueueEntry_t* msg,
+  60:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    owerror_t error
+  61:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** );
+  62:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  63:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //=========================== public ==========================================
+  64:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  65:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  66:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /**
+  67:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \brief Initialize this module.
+  68:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** */
+  69:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_init() {
+ 252              		.loc 1 69 0
+ 253              		.cfi_startproc
+ 254              		@ args = 0, pretend = 0, frame = 0
+ 255              		@ frame_needed = 1, uses_anonymous_args = 0
+ 256 0000 80B5     		push	{r7, lr}
+ 257              		.cfi_def_cfa_offset 8
+ 258              		.cfi_offset 7, -8
+ 259              		.cfi_offset 14, -4
+ 260 0002 00AF     		add	r7, sp, #0
+ 261              		.cfi_def_cfa_register 7
+  70:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  71:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  72:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // do not run if DAGroot
+  73:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    if(idmanager_getIsDAGroot()==TRUE) return; 
+ 262              		.loc 1 73 0
+ 263 0004 FFF7FEFF 		bl	idmanager_getIsDAGroot
+ 264 0008 0346     		mov	r3, r0
+ 265 000a 002B     		cmp	r3, #0
+ 266 000c 3DD1     		bne	.L5
+  74:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // do not run if not whisper node
+  75:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    if(idmanager_getMyID(ADDR_64B)->addr_64b[7] != 0x07) return;
+ 267              		.loc 1 75 0
+ 268 000e 0220     		movs	r0, #2
+ 269 0010 FFF7FEFF 		bl	idmanager_getMyID
+ 270 0014 0346     		mov	r3, r0
+ 271 0016 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 272 0018 072B     		cmp	r3, #7
+ 273 001a 38D1     		bne	.L6
+  76:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  77:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    leds_debug_toggle();
+ 274              		.loc 1 77 0
+ 275 001c FFF7FEFF 		bl	leds_debug_toggle
+  78:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  79:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // start ONESHOT timer
+  80:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //   whisper_vars.timerIdSixp = 0;
+  81:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //   whisper_vars.timerIdSixp2 = 2;
+  82:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //   whisper_vars.timerIdSixp3 = 3;
+  83:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //   whisper_vars.timerIdRpl = 1;
+  84:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  85:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // prepare the resource descriptor for the /w path
+  86:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  87:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_setState(0);
+ 276              		.loc 1 87 0
+ 277 0020 0020     		movs	r0, #0
+ 278 0022 FFF7FEFF 		bl	whisper_setState
+  88:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    targetParentOld=0;
+ 279              		.loc 1 88 0
+ 280 0026 1B4B     		ldr	r3, .L7
+ 281 0028 0022     		movs	r2, #0
+ 282 002a 1A70     		strb	r2, [r3]
+  89:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    targetParentNew=0;
+ 283              		.loc 1 89 0
+ 284 002c 1A4B     		ldr	r3, .L7+4
+ 285 002e 0022     		movs	r2, #0
+ 286 0030 1A70     		strb	r2, [r3]
+  90:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    targetChildren=0;
+ 287              		.loc 1 90 0
+ 288 0032 1A4B     		ldr	r3, .L7+8
+ 289 0034 0022     		movs	r2, #0
+ 290 0036 1A70     		strb	r2, [r3]
+  91:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    fakeSource=0;
+ 291              		.loc 1 91 0
+ 292 0038 194B     		ldr	r3, .L7+12
+ 293 003a 0022     		movs	r2, #0
+ 294 003c 1A70     		strb	r2, [r3]
+  92:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    numSentDios=0;
+ 295              		.loc 1 92 0
+ 296 003e 194B     		ldr	r3, .L7+16
+ 297 0040 0022     		movs	r2, #0
+ 298 0042 1A70     		strb	r2, [r3]
+  93:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  94:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  95:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+  96:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.path0len             = sizeof(whisper_path0)-1;
+ 299              		.loc 1 96 0
+ 300 0044 184B     		ldr	r3, .L7+20
+ 301 0046 0122     		movs	r2, #1
+ 302 0048 1A70     		strb	r2, [r3]
+  97:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.path0val             = (uint8_t*)(&whisper_path0);
+ 303              		.loc 1 97 0
+ 304 004a 174B     		ldr	r3, .L7+20
+ 305 004c 174A     		ldr	r2, .L7+24
+ 306 004e 5A60     		str	r2, [r3, #4]
+  98:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.path1len             = 0;
+ 307              		.loc 1 98 0
+ 308 0050 154B     		ldr	r3, .L7+20
+ 309 0052 0022     		movs	r2, #0
+ 310 0054 1A72     		strb	r2, [r3, #8]
+  99:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.path1val             = NULL;
+ 311              		.loc 1 99 0
+ 312 0056 144B     		ldr	r3, .L7+20
+ 313 0058 0022     		movs	r2, #0
+ 314 005a DA60     		str	r2, [r3, #12]
+ 100:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.componentID          = COMPONENT_WHISPER;
+ 315              		.loc 1 100 0
+ 316 005c 124B     		ldr	r3, .L7+20
+ 317 005e 2D22     		movs	r2, #45
+ 318 0060 1A74     		strb	r2, [r3, #16]
+ 101:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.discoverable         = TRUE;
+ 319              		.loc 1 101 0
+ 320 0062 114B     		ldr	r3, .L7+20
+ 321 0064 0122     		movs	r2, #1
+ 322 0066 1A76     		strb	r2, [r3, #24]
+ 102:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.callbackRx           = &whisper_receive;
+ 323              		.loc 1 102 0
+ 324 0068 0F4B     		ldr	r3, .L7+20
+ 325 006a 114A     		ldr	r2, .L7+28
+ 326 006c DA61     		str	r2, [r3, #28]
+ 103:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.desc.callbackSendDone     = &whisper_sendDone;
+ 327              		.loc 1 103 0
+ 328 006e 0E4B     		ldr	r3, .L7+20
+ 329 0070 104A     		ldr	r2, .L7+32
+ 330 0072 1A62     		str	r2, [r3, #32]
+ 104:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****   
+ 105:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    whisper_vars.timerIdWhisper = opentimers_create();
+ 331              		.loc 1 105 0
+ 332 0074 FFF7FEFF 		bl	opentimers_create
+ 333 0078 0346     		mov	r3, r0
+ 334 007a 1A46     		mov	r2, r3
+ 335 007c 0A4B     		ldr	r3, .L7+20
+ 336 007e 83F83820 		strb	r2, [r3, #56]
+ 106:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 107:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // register with the CoAP module
+ 108:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    opencoap_register(&whisper_vars.desc);
+ 337              		.loc 1 108 0
+ 338 0082 0948     		ldr	r0, .L7+20
+ 339 0084 FFF7FEFF 		bl	opencoap_register
+ 340 0088 02E0     		b	.L1
+ 341              	.L5:
+  73:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    // do not run if not whisper node
+ 342              		.loc 1 73 0
+ 343 008a 00BF     		nop
+ 344 008c 00E0     		b	.L1
+ 345              	.L6:
+  75:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 346              		.loc 1 75 0
+ 347 008e 00BF     		nop
+ 348              	.L1:
+ 109:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 349              		.loc 1 109 0
+ 350 0090 80BD     		pop	{r7, pc}
+ 351              	.L8:
+ 352 0092 00BF     		.align	2
+ 353              	.L7:
+ 354 0094 00000000 		.word	targetParentOld
+ 355 0098 00000000 		.word	targetParentNew
+ 356 009c 00000000 		.word	targetChildren
+ 357 00a0 00000000 		.word	fakeSource
+ 358 00a4 00000000 		.word	numSentDios
+ 359 00a8 00000000 		.word	whisper_vars
+ 360 00ac 00000000 		.word	whisper_path0
+ 361 00b0 00000000 		.word	whisper_receive
+ 362 00b4 00000000 		.word	whisper_sendDone
+ 363              		.cfi_endproc
+ 364              	.LFE0:
+ 366              		.align	2
+ 367              		.global	whisper_setSentDIOs
+ 368              		.thumb
+ 369              		.thumb_func
+ 371              	whisper_setSentDIOs:
+ 372              	.LFB1:
+ 110:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 111:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setSentDIOs(uint8_t i){
+ 373              		.loc 1 111 0
+ 374              		.cfi_startproc
+ 375              		@ args = 0, pretend = 0, frame = 8
+ 376              		@ frame_needed = 1, uses_anonymous_args = 0
+ 377              		@ link register save eliminated.
+ 378 00b8 80B4     		push	{r7}
+ 379              		.cfi_def_cfa_offset 4
+ 380              		.cfi_offset 7, -4
+ 381 00ba 83B0     		sub	sp, sp, #12
+ 382              		.cfi_def_cfa_offset 16
+ 383 00bc 00AF     		add	r7, sp, #0
+ 384              		.cfi_def_cfa_register 7
+ 385 00be 0346     		mov	r3, r0
+ 386 00c0 FB71     		strb	r3, [r7, #7]
+ 112:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	numSentDios=i;
+ 387              		.loc 1 112 0
+ 388 00c2 044A     		ldr	r2, .L10
+ 389 00c4 FB79     		ldrb	r3, [r7, #7]
+ 390 00c6 1370     		strb	r3, [r2]
+ 113:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 391              		.loc 1 113 0
+ 392 00c8 00BF     		nop
+ 393 00ca 0C37     		adds	r7, r7, #12
+ 394              		.cfi_def_cfa_offset 4
+ 395 00cc BD46     		mov	sp, r7
+ 396              		.cfi_def_cfa_register 13
+ 397              		@ sp needed
+ 398 00ce 80BC     		pop	{r7}
+ 399              		.cfi_restore 7
+ 400              		.cfi_def_cfa_offset 0
+ 401 00d0 7047     		bx	lr
+ 402              	.L11:
+ 403 00d2 00BF     		.align	2
+ 404              	.L10:
+ 405 00d4 00000000 		.word	numSentDios
+ 406              		.cfi_endproc
+ 407              	.LFE1:
+ 409              		.align	2
+ 410              		.global	whisper_getSentDIOs
+ 411              		.thumb
+ 412              		.thumb_func
+ 414              	whisper_getSentDIOs:
+ 415              	.LFB2:
+ 114:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 115:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getSentDIOs(){
+ 416              		.loc 1 115 0
+ 417              		.cfi_startproc
+ 418              		@ args = 0, pretend = 0, frame = 0
+ 419              		@ frame_needed = 1, uses_anonymous_args = 0
+ 420              		@ link register save eliminated.
+ 421 00d8 80B4     		push	{r7}
+ 422              		.cfi_def_cfa_offset 4
+ 423              		.cfi_offset 7, -4
+ 424 00da 00AF     		add	r7, sp, #0
+ 425              		.cfi_def_cfa_register 7
+ 116:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return numSentDios;
+ 426              		.loc 1 116 0
+ 427 00dc 024B     		ldr	r3, .L14
+ 428 00de 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 117:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 429              		.loc 1 117 0
+ 430 00e0 1846     		mov	r0, r3
+ 431 00e2 BD46     		mov	sp, r7
+ 432              		.cfi_def_cfa_register 13
+ 433              		@ sp needed
+ 434 00e4 80BC     		pop	{r7}
+ 435              		.cfi_restore 7
+ 436              		.cfi_def_cfa_offset 0
+ 437 00e6 7047     		bx	lr
+ 438              	.L15:
+ 439              		.align	2
+ 440              	.L14:
+ 441 00e8 00000000 		.word	numSentDios
+ 442              		.cfi_endproc
+ 443              	.LFE2:
+ 445              		.align	2
+ 446              		.global	whisper_setState
+ 447              		.thumb
+ 448              		.thumb_func
+ 450              	whisper_setState:
+ 451              	.LFB3:
+ 118:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 119:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setState(uint8_t i){
+ 452              		.loc 1 119 0
+ 453              		.cfi_startproc
+ 454              		@ args = 0, pretend = 0, frame = 8
+ 455              		@ frame_needed = 1, uses_anonymous_args = 0
+ 456              		@ link register save eliminated.
+ 457 00ec 80B4     		push	{r7}
+ 458              		.cfi_def_cfa_offset 4
+ 459              		.cfi_offset 7, -4
+ 460 00ee 83B0     		sub	sp, sp, #12
+ 461              		.cfi_def_cfa_offset 16
+ 462 00f0 00AF     		add	r7, sp, #0
+ 463              		.cfi_def_cfa_register 7
+ 464 00f2 0346     		mov	r3, r0
+ 465 00f4 FB71     		strb	r3, [r7, #7]
+ 120:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	state=i;
+ 466              		.loc 1 120 0
+ 467 00f6 044A     		ldr	r2, .L17
+ 468 00f8 FB79     		ldrb	r3, [r7, #7]
+ 469 00fa 1370     		strb	r3, [r2]
+ 121:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 470              		.loc 1 121 0
+ 471 00fc 00BF     		nop
+ 472 00fe 0C37     		adds	r7, r7, #12
+ 473              		.cfi_def_cfa_offset 4
+ 474 0100 BD46     		mov	sp, r7
+ 475              		.cfi_def_cfa_register 13
+ 476              		@ sp needed
+ 477 0102 80BC     		pop	{r7}
+ 478              		.cfi_restore 7
+ 479              		.cfi_def_cfa_offset 0
+ 480 0104 7047     		bx	lr
+ 481              	.L18:
+ 482 0106 00BF     		.align	2
+ 483              	.L17:
+ 484 0108 00000000 		.word	state
+ 485              		.cfi_endproc
+ 486              	.LFE3:
+ 488              		.align	2
+ 489              		.global	whisper_getState
+ 490              		.thumb
+ 491              		.thumb_func
+ 493              	whisper_getState:
+ 494              	.LFB4:
+ 122:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 123:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getState(){
+ 495              		.loc 1 123 0
+ 496              		.cfi_startproc
+ 497              		@ args = 0, pretend = 0, frame = 0
+ 498              		@ frame_needed = 1, uses_anonymous_args = 0
+ 499              		@ link register save eliminated.
+ 500 010c 80B4     		push	{r7}
+ 501              		.cfi_def_cfa_offset 4
+ 502              		.cfi_offset 7, -4
+ 503 010e 00AF     		add	r7, sp, #0
+ 504              		.cfi_def_cfa_register 7
+ 124:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return state;
+ 505              		.loc 1 124 0
+ 506 0110 024B     		ldr	r3, .L21
+ 507 0112 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 125:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 508              		.loc 1 125 0
+ 509 0114 1846     		mov	r0, r3
+ 510 0116 BD46     		mov	sp, r7
+ 511              		.cfi_def_cfa_register 13
+ 512              		@ sp needed
+ 513 0118 80BC     		pop	{r7}
+ 514              		.cfi_restore 7
+ 515              		.cfi_def_cfa_offset 0
+ 516 011a 7047     		bx	lr
+ 517              	.L22:
+ 518              		.align	2
+ 519              	.L21:
+ 520 011c 00000000 		.word	state
+ 521              		.cfi_endproc
+ 522              	.LFE4:
+ 524              		.align	2
+ 525              		.global	whisper_getTargetChildren
+ 526              		.thumb
+ 527              		.thumb_func
+ 529              	whisper_getTargetChildren:
+ 530              	.LFB5:
+ 126:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 127:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getTargetChildren(){
+ 531              		.loc 1 127 0
+ 532              		.cfi_startproc
+ 533              		@ args = 0, pretend = 0, frame = 0
+ 534              		@ frame_needed = 1, uses_anonymous_args = 0
+ 535              		@ link register save eliminated.
+ 536 0120 80B4     		push	{r7}
+ 537              		.cfi_def_cfa_offset 4
+ 538              		.cfi_offset 7, -4
+ 539 0122 00AF     		add	r7, sp, #0
+ 540              		.cfi_def_cfa_register 7
+ 128:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return targetChildren;
+ 541              		.loc 1 128 0
+ 542 0124 024B     		ldr	r3, .L25
+ 543 0126 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 129:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 544              		.loc 1 129 0
+ 545 0128 1846     		mov	r0, r3
+ 546 012a BD46     		mov	sp, r7
+ 547              		.cfi_def_cfa_register 13
+ 548              		@ sp needed
+ 549 012c 80BC     		pop	{r7}
+ 550              		.cfi_restore 7
+ 551              		.cfi_def_cfa_offset 0
+ 552 012e 7047     		bx	lr
+ 553              	.L26:
+ 554              		.align	2
+ 555              	.L25:
+ 556 0130 00000000 		.word	targetChildren
+ 557              		.cfi_endproc
+ 558              	.LFE5:
+ 560              		.align	2
+ 561              		.global	whisper_setTargetChildren
+ 562              		.thumb
+ 563              		.thumb_func
+ 565              	whisper_setTargetChildren:
+ 566              	.LFB6:
+ 130:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 131:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setTargetChildren(uint8_t i){
+ 567              		.loc 1 131 0
+ 568              		.cfi_startproc
+ 569              		@ args = 0, pretend = 0, frame = 8
+ 570              		@ frame_needed = 1, uses_anonymous_args = 0
+ 571              		@ link register save eliminated.
+ 572 0134 80B4     		push	{r7}
+ 573              		.cfi_def_cfa_offset 4
+ 574              		.cfi_offset 7, -4
+ 575 0136 83B0     		sub	sp, sp, #12
+ 576              		.cfi_def_cfa_offset 16
+ 577 0138 00AF     		add	r7, sp, #0
+ 578              		.cfi_def_cfa_register 7
+ 579 013a 0346     		mov	r3, r0
+ 580 013c FB71     		strb	r3, [r7, #7]
+ 132:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	targetChildren=i;
+ 581              		.loc 1 132 0
+ 582 013e 044A     		ldr	r2, .L28
+ 583 0140 FB79     		ldrb	r3, [r7, #7]
+ 584 0142 1370     		strb	r3, [r2]
+ 133:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 585              		.loc 1 133 0
+ 586 0144 00BF     		nop
+ 587 0146 0C37     		adds	r7, r7, #12
+ 588              		.cfi_def_cfa_offset 4
+ 589 0148 BD46     		mov	sp, r7
+ 590              		.cfi_def_cfa_register 13
+ 591              		@ sp needed
+ 592 014a 80BC     		pop	{r7}
+ 593              		.cfi_restore 7
+ 594              		.cfi_def_cfa_offset 0
+ 595 014c 7047     		bx	lr
+ 596              	.L29:
+ 597 014e 00BF     		.align	2
+ 598              	.L28:
+ 599 0150 00000000 		.word	targetChildren
+ 600              		.cfi_endproc
+ 601              	.LFE6:
+ 603              		.align	2
+ 604              		.global	whisper_getTargetParentNew
+ 605              		.thumb
+ 606              		.thumb_func
+ 608              	whisper_getTargetParentNew:
+ 609              	.LFB7:
+ 134:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 135:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getTargetParentNew(){
+ 610              		.loc 1 135 0
+ 611              		.cfi_startproc
+ 612              		@ args = 0, pretend = 0, frame = 0
+ 613              		@ frame_needed = 1, uses_anonymous_args = 0
+ 614              		@ link register save eliminated.
+ 615 0154 80B4     		push	{r7}
+ 616              		.cfi_def_cfa_offset 4
+ 617              		.cfi_offset 7, -4
+ 618 0156 00AF     		add	r7, sp, #0
+ 619              		.cfi_def_cfa_register 7
+ 136:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return targetParentNew;
+ 620              		.loc 1 136 0
+ 621 0158 024B     		ldr	r3, .L32
+ 622 015a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 137:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 623              		.loc 1 137 0
+ 624 015c 1846     		mov	r0, r3
+ 625 015e BD46     		mov	sp, r7
+ 626              		.cfi_def_cfa_register 13
+ 627              		@ sp needed
+ 628 0160 80BC     		pop	{r7}
+ 629              		.cfi_restore 7
+ 630              		.cfi_def_cfa_offset 0
+ 631 0162 7047     		bx	lr
+ 632              	.L33:
+ 633              		.align	2
+ 634              	.L32:
+ 635 0164 00000000 		.word	targetParentNew
+ 636              		.cfi_endproc
+ 637              	.LFE7:
+ 639              		.align	2
+ 640              		.global	whisper_setTargetParentNew
+ 641              		.thumb
+ 642              		.thumb_func
+ 644              	whisper_setTargetParentNew:
+ 645              	.LFB8:
+ 138:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 139:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setTargetParentNew(uint8_t i){
+ 646              		.loc 1 139 0
+ 647              		.cfi_startproc
+ 648              		@ args = 0, pretend = 0, frame = 8
+ 649              		@ frame_needed = 1, uses_anonymous_args = 0
+ 650              		@ link register save eliminated.
+ 651 0168 80B4     		push	{r7}
+ 652              		.cfi_def_cfa_offset 4
+ 653              		.cfi_offset 7, -4
+ 654 016a 83B0     		sub	sp, sp, #12
+ 655              		.cfi_def_cfa_offset 16
+ 656 016c 00AF     		add	r7, sp, #0
+ 657              		.cfi_def_cfa_register 7
+ 658 016e 0346     		mov	r3, r0
+ 659 0170 FB71     		strb	r3, [r7, #7]
+ 140:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	targetParentNew=i;
+ 660              		.loc 1 140 0
+ 661 0172 044A     		ldr	r2, .L35
+ 662 0174 FB79     		ldrb	r3, [r7, #7]
+ 663 0176 1370     		strb	r3, [r2]
+ 141:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 664              		.loc 1 141 0
+ 665 0178 00BF     		nop
+ 666 017a 0C37     		adds	r7, r7, #12
+ 667              		.cfi_def_cfa_offset 4
+ 668 017c BD46     		mov	sp, r7
+ 669              		.cfi_def_cfa_register 13
+ 670              		@ sp needed
+ 671 017e 80BC     		pop	{r7}
+ 672              		.cfi_restore 7
+ 673              		.cfi_def_cfa_offset 0
+ 674 0180 7047     		bx	lr
+ 675              	.L36:
+ 676 0182 00BF     		.align	2
+ 677              	.L35:
+ 678 0184 00000000 		.word	targetParentNew
+ 679              		.cfi_endproc
+ 680              	.LFE8:
+ 682              		.align	2
+ 683              		.global	whisper_getTargetParentOld
+ 684              		.thumb
+ 685              		.thumb_func
+ 687              	whisper_getTargetParentOld:
+ 688              	.LFB9:
+ 142:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 143:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getTargetParentOld(){
+ 689              		.loc 1 143 0
+ 690              		.cfi_startproc
+ 691              		@ args = 0, pretend = 0, frame = 0
+ 692              		@ frame_needed = 1, uses_anonymous_args = 0
+ 693              		@ link register save eliminated.
+ 694 0188 80B4     		push	{r7}
+ 695              		.cfi_def_cfa_offset 4
+ 696              		.cfi_offset 7, -4
+ 697 018a 00AF     		add	r7, sp, #0
+ 698              		.cfi_def_cfa_register 7
+ 144:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return targetParentOld;
+ 699              		.loc 1 144 0
+ 700 018c 024B     		ldr	r3, .L39
+ 701 018e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 145:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 702              		.loc 1 145 0
+ 703 0190 1846     		mov	r0, r3
+ 704 0192 BD46     		mov	sp, r7
+ 705              		.cfi_def_cfa_register 13
+ 706              		@ sp needed
+ 707 0194 80BC     		pop	{r7}
+ 708              		.cfi_restore 7
+ 709              		.cfi_def_cfa_offset 0
+ 710 0196 7047     		bx	lr
+ 711              	.L40:
+ 712              		.align	2
+ 713              	.L39:
+ 714 0198 00000000 		.word	targetParentOld
+ 715              		.cfi_endproc
+ 716              	.LFE9:
+ 718              		.align	2
+ 719              		.global	whisper_setTargetParentOld
+ 720              		.thumb
+ 721              		.thumb_func
+ 723              	whisper_setTargetParentOld:
+ 724              	.LFB10:
+ 146:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 147:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setTargetParentOld(uint8_t i){
+ 725              		.loc 1 147 0
+ 726              		.cfi_startproc
+ 727              		@ args = 0, pretend = 0, frame = 8
+ 728              		@ frame_needed = 1, uses_anonymous_args = 0
+ 729              		@ link register save eliminated.
+ 730 019c 80B4     		push	{r7}
+ 731              		.cfi_def_cfa_offset 4
+ 732              		.cfi_offset 7, -4
+ 733 019e 83B0     		sub	sp, sp, #12
+ 734              		.cfi_def_cfa_offset 16
+ 735 01a0 00AF     		add	r7, sp, #0
+ 736              		.cfi_def_cfa_register 7
+ 737 01a2 0346     		mov	r3, r0
+ 738 01a4 FB71     		strb	r3, [r7, #7]
+ 148:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	targetParentOld=i;
+ 739              		.loc 1 148 0
+ 740 01a6 044A     		ldr	r2, .L42
+ 741 01a8 FB79     		ldrb	r3, [r7, #7]
+ 742 01aa 1370     		strb	r3, [r2]
+ 149:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 743              		.loc 1 149 0
+ 744 01ac 00BF     		nop
+ 745 01ae 0C37     		adds	r7, r7, #12
+ 746              		.cfi_def_cfa_offset 4
+ 747 01b0 BD46     		mov	sp, r7
+ 748              		.cfi_def_cfa_register 13
+ 749              		@ sp needed
+ 750 01b2 80BC     		pop	{r7}
+ 751              		.cfi_restore 7
+ 752              		.cfi_def_cfa_offset 0
+ 753 01b4 7047     		bx	lr
+ 754              	.L43:
+ 755 01b6 00BF     		.align	2
+ 756              	.L42:
+ 757 01b8 00000000 		.word	targetParentOld
+ 758              		.cfi_endproc
+ 759              	.LFE10:
+ 761              		.align	2
+ 762              		.global	whisper_getFakeSource
+ 763              		.thumb
+ 764              		.thumb_func
+ 766              	whisper_getFakeSource:
+ 767              	.LFB11:
+ 150:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 151:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** uint8_t whisper_getFakeSource(){
+ 768              		.loc 1 151 0
+ 769              		.cfi_startproc
+ 770              		@ args = 0, pretend = 0, frame = 0
+ 771              		@ frame_needed = 1, uses_anonymous_args = 0
+ 772              		@ link register save eliminated.
+ 773 01bc 80B4     		push	{r7}
+ 774              		.cfi_def_cfa_offset 4
+ 775              		.cfi_offset 7, -4
+ 776 01be 00AF     		add	r7, sp, #0
+ 777              		.cfi_def_cfa_register 7
+ 152:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	return fakeSource;
+ 778              		.loc 1 152 0
+ 779 01c0 024B     		ldr	r3, .L46
+ 780 01c2 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 153:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 781              		.loc 1 153 0
+ 782 01c4 1846     		mov	r0, r3
+ 783 01c6 BD46     		mov	sp, r7
+ 784              		.cfi_def_cfa_register 13
+ 785              		@ sp needed
+ 786 01c8 80BC     		pop	{r7}
+ 787              		.cfi_restore 7
+ 788              		.cfi_def_cfa_offset 0
+ 789 01ca 7047     		bx	lr
+ 790              	.L47:
+ 791              		.align	2
+ 792              	.L46:
+ 793 01cc 00000000 		.word	fakeSource
+ 794              		.cfi_endproc
+ 795              	.LFE11:
+ 797              		.align	2
+ 798              		.global	whisper_setFakeSource
+ 799              		.thumb
+ 800              		.thumb_func
+ 802              	whisper_setFakeSource:
+ 803              	.LFB12:
+ 154:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 155:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_setFakeSource(uint8_t i){
+ 804              		.loc 1 155 0
+ 805              		.cfi_startproc
+ 806              		@ args = 0, pretend = 0, frame = 8
+ 807              		@ frame_needed = 1, uses_anonymous_args = 0
+ 808              		@ link register save eliminated.
+ 809 01d0 80B4     		push	{r7}
+ 810              		.cfi_def_cfa_offset 4
+ 811              		.cfi_offset 7, -4
+ 812 01d2 83B0     		sub	sp, sp, #12
+ 813              		.cfi_def_cfa_offset 16
+ 814 01d4 00AF     		add	r7, sp, #0
+ 815              		.cfi_def_cfa_register 7
+ 816 01d6 0346     		mov	r3, r0
+ 817 01d8 FB71     		strb	r3, [r7, #7]
+ 156:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	fakeSource=i;
+ 818              		.loc 1 156 0
+ 819 01da 044A     		ldr	r2, .L49
+ 820 01dc FB79     		ldrb	r3, [r7, #7]
+ 821 01de 1370     		strb	r3, [r2]
+ 157:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 822              		.loc 1 157 0
+ 823 01e0 00BF     		nop
+ 824 01e2 0C37     		adds	r7, r7, #12
+ 825              		.cfi_def_cfa_offset 4
+ 826 01e4 BD46     		mov	sp, r7
+ 827              		.cfi_def_cfa_register 13
+ 828              		@ sp needed
+ 829 01e6 80BC     		pop	{r7}
+ 830              		.cfi_restore 7
+ 831              		.cfi_def_cfa_offset 0
+ 832 01e8 7047     		bx	lr
+ 833              	.L50:
+ 834 01ea 00BF     		.align	2
+ 835              	.L49:
+ 836 01ec 00000000 		.word	fakeSource
+ 837              		.cfi_endproc
+ 838              	.LFE12:
+ 840              		.align	2
+ 841              		.global	whisper_receive
+ 842              		.thumb
+ 843              		.thumb_func
+ 845              	whisper_receive:
+ 846              	.LFB13:
+ 158:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 159:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_trigger_nextStep(void);
+ 160:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 161:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 162:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** ////sets the
+ 163:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //uint8_t whisper_getSeqNumOfNeigh(uint8_t n){
+ 164:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //	return sequenceNumber[n-1];
+ 165:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //}
+ 166:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 167:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //void whisper_setFakeSource(uint8_t n,uint8_t i){
+ 168:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //	sequenceNumber[n-1]=i;
+ 169:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //}
+ 170:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //=========================== private =========================================
+ 171:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 172:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /**
+ 173:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \brief Called when a CoAP message is received for this resource.
+ 174:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 175:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \param[in] msg          The received message. CoAP header and options already
+ 176:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    parsed.
+ 177:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \param[in] coap_header  The CoAP header contained in the message.
+ 178:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \param[in] coap_options The CoAP options contained in the message.
+ 179:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 180:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \return Whether the response is prepared successfully.
+ 181:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** */
+ 182:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** owerror_t whisper_receive(
+ 183:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       OpenQueueEntry_t* msg,
+ 184:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       coap_header_iht* coap_header,
+ 185:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       coap_option_iht* coap_options
+ 186:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    ) {
+ 847              		.loc 1 186 0
+ 848              		.cfi_startproc
+ 849              		@ args = 0, pretend = 0, frame = 40
+ 850              		@ frame_needed = 1, uses_anonymous_args = 0
+ 851 01f0 90B5     		push	{r4, r7, lr}
+ 852              		.cfi_def_cfa_offset 12
+ 853              		.cfi_offset 4, -12
+ 854              		.cfi_offset 7, -8
+ 855              		.cfi_offset 14, -4
+ 856 01f2 91B0     		sub	sp, sp, #68
+ 857              		.cfi_def_cfa_offset 80
+ 858 01f4 06AF     		add	r7, sp, #24
+ 859              		.cfi_def_cfa 7, 56
+ 860 01f6 F860     		str	r0, [r7, #12]
+ 861 01f8 B960     		str	r1, [r7, #8]
+ 862 01fa 7A60     		str	r2, [r7, #4]
+ 187:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    uint8_t          i;
+ 188:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    owerror_t outcome;
+ 189:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 190:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    if (msf_candidateAddCellList(celllist_add,1)==FALSE){
+ 863              		.loc 1 190 0
+ 864 01fc 0121     		movs	r1, #1
+ 865 01fe 5148     		ldr	r0, .L64
+ 866 0200 FFF7FEFF 		bl	msf_candidateAddCellList
+ 867 0204 0346     		mov	r3, r0
+ 868 0206 83F00103 		eor	r3, r3, #1
+ 869 020a DBB2     		uxtb	r3, r3
+ 870 020c 002B     		cmp	r3, #0
+ 871 020e 05D0     		beq	.L52
+ 191:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       // set the CoAP header
+ 192:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       outcome                       = E_FAIL;
+ 872              		.loc 1 192 0
+ 873 0210 0123     		movs	r3, #1
+ 874 0212 87F82630 		strb	r3, [r7, #38]
+ 193:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       coap_header->Code             = COAP_CODE_RESP_CHANGED;
+ 875              		.loc 1 193 0
+ 876 0216 BB68     		ldr	r3, [r7, #8]
+ 877 0218 4422     		movs	r2, #68
+ 878 021a DA70     		strb	r2, [r3, #3]
+ 879              	.L52:
+ 194:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    }
+ 195:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    openrandom_get16b();
+ 880              		.loc 1 195 0
+ 881 021c FFF7FEFF 		bl	openrandom_get16b
+ 196:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    open_addr_t      NeighborAddress;
+ 197:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 198:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /*   uint8_t whisper_sixp_neigh128[] = {*/
+ 199:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /*   	0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \*/
+ 200:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /*   	0x14, 0x15, 0x92, 0xcc, 0x00, 0x00, 0x00, 0x03*/
+ 201:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /*   };*/
+ 202:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    //whisper_newParent128[15]=fakedio_getTargetChildren();
+ 203:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    //memcpy(&(whisper_newParent128[15]),icmpv6rpl_vars.newParent,1);
+ 204:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    //memcpy(&icmpv6rpl_vars.dioFakeDestination.addr_128b[0],whisper_newParent128,sizeof(whisper_new
+ 205:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 206:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    switch (coap_header->Code) {
+ 882              		.loc 1 206 0
+ 883 0220 BB68     		ldr	r3, [r7, #8]
+ 884 0222 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 885 0224 032B     		cmp	r3, #3
+ 886 0226 40F08480 		bne	.L63
+ 207:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       case COAP_CODE_REQ_PUT:
+ 208:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         
+ 209:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		if (state==0){	//0 IDLE
+ 887              		.loc 1 209 0
+ 888 022a 474B     		ldr	r3, .L64+4
+ 889 022c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 890 022e 002B     		cmp	r3, #0
+ 891 0230 70D1     		bne	.L55
+ 210:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//printf("I am WHISPER node %d, received a COAP message to change parent of %d from %d to %d \n"
+ 211:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//sending FAKE DIO
+ 212:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//if ( (msg->payload[0]==120) && (msg->payload[1]==4) && (msg->payload[2]==2) && (msg->payload[3
+ 213:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if ( msg->payload[0]==120) { 	// ord('x')=120 , works only with node 4 changing from 2 to 3
+ 892              		.loc 1 213 0
+ 893 0232 FB68     		ldr	r3, [r7, #12]
+ 894 0234 5B68     		ldr	r3, [r3, #4]
+ 895 0236 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 896 0238 782B     		cmp	r3, #120
+ 897 023a 57D1     		bne	.L56
+ 214:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 215:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				whisper_setTargetChildren(msg->payload[1]);
+ 898              		.loc 1 215 0
+ 899 023c FB68     		ldr	r3, [r7, #12]
+ 900 023e 5B68     		ldr	r3, [r3, #4]
+ 901 0240 0133     		adds	r3, r3, #1
+ 902 0242 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 903 0244 1846     		mov	r0, r3
+ 904 0246 FFF7FEFF 		bl	whisper_setTargetChildren
+ 216:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				whisper_setTargetParentOld(msg->payload[2]);
+ 905              		.loc 1 216 0
+ 906 024a FB68     		ldr	r3, [r7, #12]
+ 907 024c 5B68     		ldr	r3, [r3, #4]
+ 908 024e 0233     		adds	r3, r3, #2
+ 909 0250 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 910 0252 1846     		mov	r0, r3
+ 911 0254 FFF7FEFF 		bl	whisper_setTargetParentOld
+ 217:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				whisper_setTargetParentNew(msg->payload[3]);
+ 912              		.loc 1 217 0
+ 913 0258 FB68     		ldr	r3, [r7, #12]
+ 914 025a 5B68     		ldr	r3, [r3, #4]
+ 915 025c 0333     		adds	r3, r3, #3
+ 916 025e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 917 0260 1846     		mov	r0, r3
+ 918 0262 FFF7FEFF 		bl	whisper_setTargetParentNew
+ 218:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 219:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//printf("I am WISHPER node %d, First, adding cells between %d and its new parent %d  \n", idma
+ 220:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//printf("I am WISHPER node %d, Sending DIO to 3. My rank is %d \n", idmanager_getMyID(ADDR_64B
+ 221:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//first add cells in new parent
+ 222:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				 for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 919              		.loc 1 222 0
+ 920 0266 0023     		movs	r3, #0
+ 921 0268 87F82730 		strb	r3, [r7, #39]
+ 922 026c 37E0     		b	.L57
+ 923              	.L59:
+ 223:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 924              		.loc 1 223 0
+ 925 026e 97F82720 		ldrb	r2, [r7, #39]	@ zero_extendqisi2
+ 926 0272 07F11403 		add	r3, r7, #20
+ 927 0276 0221     		movs	r1, #2
+ 928 0278 1846     		mov	r0, r3
+ 929 027a FFF7FEFF 		bl	neighbors_getNeighborEui64
+ 930 027e 0346     		mov	r3, r0
+ 931 0280 002B     		cmp	r3, #0
+ 932 0282 27D0     		beq	.L58
+ 224:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						if (NeighborAddress.addr_64b[7] == whisper_getTargetParentNew()){
+ 933              		.loc 1 224 0
+ 934 0284 3C7F     		ldrb	r4, [r7, #28]	@ zero_extendqisi2
+ 935 0286 FFF7FEFF 		bl	whisper_getTargetParentNew
+ 936 028a 0346     		mov	r3, r0
+ 937 028c 9C42     		cmp	r4, r3
+ 938 028e 21D1     		bne	.L58
+ 939              	.LBB2:
+ 225:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							//printf("Node %d is my neighbor I am going to send him a Fake 6P message\n",NeighborAddress
+ 226:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							whisper_setFakeSource(whisper_getTargetChildren());
+ 940              		.loc 1 226 0
+ 941 0290 FFF7FEFF 		bl	whisper_getTargetChildren
+ 942 0294 0346     		mov	r3, r0
+ 943 0296 1846     		mov	r0, r3
+ 944 0298 FFF7FEFF 		bl	whisper_setFakeSource
+ 227:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							//printf("with source address  %d\n",whisper_getFakeSource());
+ 228:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							 // call sixtop
+ 229:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							leds_debug_toggle();
+ 945              		.loc 1 229 0
+ 946 029c FFF7FEFF 		bl	leds_debug_toggle
+ 230:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							 outcome = sixtop_request(
+ 947              		.loc 1 230 0
+ 948 02a0 07F11401 		add	r1, r7, #20
+ 949 02a4 0023     		movs	r3, #0
+ 950 02a6 0493     		str	r3, [sp, #16]
+ 951 02a8 0023     		movs	r3, #0
+ 952 02aa 0393     		str	r3, [sp, #12]
+ 953 02ac 0523     		movs	r3, #5
+ 954 02ae 0293     		str	r3, [sp, #8]
+ 955 02b0 0023     		movs	r3, #0
+ 956 02b2 0193     		str	r3, [sp, #4]
+ 957 02b4 234B     		ldr	r3, .L64
+ 958 02b6 0093     		str	r3, [sp]
+ 959 02b8 0723     		movs	r3, #7
+ 960 02ba 0122     		movs	r2, #1
+ 961 02bc 0120     		movs	r0, #1
+ 962 02be FFF7FEFF 		bl	sixtop_request
+ 963 02c2 0346     		mov	r3, r0
+ 964 02c4 87F82630 		strb	r3, [r7, #38]
+ 231:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								IANA_6TOP_CMD_ADD,                  // code
+ 232:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								&NeighborAddress,                   // neighbor
+ 233:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								1,                                  // number cells
+ 234:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								CELLOPTIONS_MSF,                    // cellOptions
+ 235:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								celllist_add,                       // celllist to add
+ 236:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								NULL,                               // celllist to delete (not used)
+ 237:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								5,                      		    // sfid 5, means whsiper
+ 238:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								0,                                  // list command offset (not used)
+ 239:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 								0                                   // list command maximum celllist (not used)
+ 240:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							 );
+ 241:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							 i=100;
+ 965              		.loc 1 241 0
+ 966 02c8 6423     		movs	r3, #100
+ 967 02ca 87F82730 		strb	r3, [r7, #39]
+ 242:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							 whisper_setState(1);//1 Sending first 6P add
+ 968              		.loc 1 242 0
+ 969 02ce 0120     		movs	r0, #1
+ 970 02d0 FFF7FEFF 		bl	whisper_setState
+ 971              	.L58:
+ 972              	.LBE2:
+ 222:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 973              		.loc 1 222 0 discriminator 2
+ 974 02d4 97F82730 		ldrb	r3, [r7, #39]	@ zero_extendqisi2
+ 975 02d8 0133     		adds	r3, r3, #1
+ 976 02da 87F82730 		strb	r3, [r7, #39]
+ 977              	.L57:
+ 222:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 978              		.loc 1 222 0 is_stmt 0 discriminator 1
+ 979 02de 97F82730 		ldrb	r3, [r7, #39]	@ zero_extendqisi2
+ 980 02e2 1D2B     		cmp	r3, #29
+ 981 02e4 C3D9     		bls	.L59
+ 243:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						}
+ 244:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					}
+ 245:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				 }
+ 246:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//whisper_setState(1);
+ 247:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				whisper_trigger_nextStep();
+ 982              		.loc 1 247 0 is_stmt 1
+ 983 02e6 FFF7FEFF 		bl	whisper_trigger_nextStep
+ 984 02ea 13E0     		b	.L55
+ 985              	.L56:
+ 248:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 249:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			}else{
+ 250:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//skipping 6P
+ 251:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				if ( msg->payload[0]==122) {
+ 986              		.loc 1 251 0
+ 987 02ec FB68     		ldr	r3, [r7, #12]
+ 988 02ee 5B68     		ldr	r3, [r3, #4]
+ 989 02f0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 990 02f2 7A2B     		cmp	r3, #122
+ 991 02f4 04D1     		bne	.L60
+ 252:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					whisper_setState(2);
+ 992              		.loc 1 252 0
+ 993 02f6 0220     		movs	r0, #2
+ 994 02f8 FFF7FEFF 		bl	whisper_setState
+ 253:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					whisper_trigger_nextStep();
+ 995              		.loc 1 253 0
+ 996 02fc FFF7FEFF 		bl	whisper_trigger_nextStep
+ 997              	.L60:
+ 254:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				}
+ 255:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 256:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//printf("I am WISHPER node %d, end operation (bad Coap request: format -> x,source,oldParent,n
+ 257:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			    outcome                       = E_FAIL;
+ 998              		.loc 1 257 0
+ 999 0300 0123     		movs	r3, #1
+ 1000 0302 87F82630 		strb	r3, [r7, #38]
+ 258:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			    coap_header->Code             = COAP_CODE_RESP_CHANGED;
+ 1001              		.loc 1 258 0
+ 1002 0306 BB68     		ldr	r3, [r7, #8]
+ 1003 0308 4422     		movs	r2, #68
+ 1004 030a DA70     		strb	r2, [r3, #3]
+ 259:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				whisper_setState(0);	//back to IDLE
+ 1005              		.loc 1 259 0
+ 1006 030c 0020     		movs	r0, #0
+ 1007 030e FFF7FEFF 		bl	whisper_setState
+ 260:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				break;
+ 1008              		.loc 1 260 0
+ 1009 0312 11E0     		b	.L61
+ 1010              	.L55:
+ 261:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			}
+ 262:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		}
+ 263:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //		else{
+ 264:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			printf("I am WISHPER node %d, received COAP message, not idle. State = %d \n", idmanager_getMy
+ 265:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //		}
+ 266:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 267:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("Done COAP\n");
+ 268:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         //=== reset packet payload (we will reuse this packetBuffer)
+ 269:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         msg->payload                     = &(msg->packet[127]);
+ 1011              		.loc 1 269 0
+ 1012 0314 FB68     		ldr	r3, [r7, #12]
+ 1013 0316 03F23F12 		addw	r2, r3, #319
+ 1014 031a FB68     		ldr	r3, [r7, #12]
+ 1015 031c 5A60     		str	r2, [r3, #4]
+ 270:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         msg->length                      = 0;
+ 1016              		.loc 1 270 0
+ 1017 031e FB68     		ldr	r3, [r7, #12]
+ 1018 0320 0022     		movs	r2, #0
+ 1019 0322 1A72     		strb	r2, [r3, #8]
+ 271:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****                  
+ 272:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         // set the CoAP header
+ 273:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         coap_header->Code                = COAP_CODE_RESP_CONTENT;
+ 1020              		.loc 1 273 0
+ 1021 0324 BB68     		ldr	r3, [r7, #8]
+ 1022 0326 4522     		movs	r2, #69
+ 1023 0328 DA70     		strb	r2, [r3, #3]
+ 274:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****          
+ 275:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         outcome                          = E_SUCCESS;
+ 1024              		.loc 1 275 0
+ 1025 032a 0023     		movs	r3, #0
+ 1026 032c 87F82630 		strb	r3, [r7, #38]
+ 276:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         break;
+ 1027              		.loc 1 276 0
+ 1028 0330 02E0     		b	.L61
+ 1029              	.L63:
+ 277:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       default:
+ 278:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 //printf("I am WISHPER node %d, end operation (no cells in first 6P message)\n",idmanager_get
+ 279:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****          // return an error message
+ 280:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****          outcome = E_FAIL;
+ 1030              		.loc 1 280 0
+ 1031 0332 0123     		movs	r3, #1
+ 1032 0334 87F82630 		strb	r3, [r7, #38]
+ 1033              	.L61:
+ 281:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    }
+ 282:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    
+ 283:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    return outcome;
+ 1034              		.loc 1 283 0
+ 1035 0338 97F82630 		ldrb	r3, [r7, #38]	@ zero_extendqisi2
+ 284:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1036              		.loc 1 284 0
+ 1037 033c 1846     		mov	r0, r3
+ 1038 033e 2C37     		adds	r7, r7, #44
+ 1039              		.cfi_def_cfa_offset 12
+ 1040 0340 BD46     		mov	sp, r7
+ 1041              		.cfi_def_cfa_register 13
+ 1042              		@ sp needed
+ 1043 0342 90BD     		pop	{r4, r7, pc}
+ 1044              	.L65:
+ 1045              		.align	2
+ 1046              	.L64:
+ 1047 0344 00000000 		.word	celllist_add
+ 1048 0348 00000000 		.word	state
+ 1049              		.cfi_endproc
+ 1050              	.LFE13:
+ 1052              		.align	2
+ 1053              		.global	whisper_trigger_nextStep
+ 1054              		.thumb
+ 1055              		.thumb_func
+ 1057              	whisper_trigger_nextStep:
+ 1058              	.LFB14:
+ 285:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 286:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 287:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_trigger_nextStep(void){
+ 1059              		.loc 1 287 0
+ 1060              		.cfi_startproc
+ 1061              		@ args = 0, pretend = 0, frame = 32
+ 1062              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1063 034c 90B5     		push	{r4, r7, lr}
+ 1064              		.cfi_def_cfa_offset 12
+ 1065              		.cfi_offset 4, -12
+ 1066              		.cfi_offset 7, -8
+ 1067              		.cfi_offset 14, -4
+ 1068 034e 8BB0     		sub	sp, sp, #44
+ 1069              		.cfi_def_cfa_offset 56
+ 1070 0350 02AF     		add	r7, sp, #8
+ 1071              		.cfi_def_cfa 7, 48
+ 288:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 289:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	//bool          res=0;
+ 290:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	open_addr_t      NeighborAddress;
+ 291:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	uint8_t          i;
+ 292:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	cellInfo_ht   celllist_del[1];
+ 293:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 294:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	//printf("I am WHISPER node %d, next STEP \n", idmanager_getMyID(ADDR_64B)->addr_64b[7]);
+ 295:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	switch (whisper_getState()){
+ 1072              		.loc 1 295 0
+ 1073 0352 FFF7FEFF 		bl	whisper_getState
+ 1074 0356 0346     		mov	r3, r0
+ 1075 0358 013B     		subs	r3, r3, #1
+ 1076 035a 042B     		cmp	r3, #4
+ 1077 035c 00F28880 		bhi	.L81
+ 1078 0360 01A2     		adr	r2, .L69
+ 1079 0362 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1080 0366 00BF     		.p2align 2
+ 1081              	.L69:
+ 1082 0368 7D030000 		.word	.L68+1
+ 1083 036c 99030000 		.word	.L70+1
+ 1084 0370 B5030000 		.word	.L71+1
+ 1085 0374 C1030000 		.word	.L72+1
+ 1086 0378 D9030000 		.word	.L73+1
+ 1087              		.p2align 1
+ 1088              	.L68:
+ 1089              	.LBB3:
+ 296:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	case 1: //another 6P add
+ 297:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("I am WHISPER node %d, next STEP is send second 6P add timer id %d \n", idmanager_getMyI
+ 298:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		leds_debug_toggle();
+ 1090              		.loc 1 298 0
+ 1091 037c FFF7FEFF 		bl	leds_debug_toggle
+ 299:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 //whisper_vars.timerIdSixp = opentimers_create();
+ 300:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   opentimers_scheduleIn(
+ 1092              		.loc 1 300 0
+ 1093 0380 3E4B     		ldr	r3, .L83
+ 1094 0382 93F83800 		ldrb	r0, [r3, #56]	@ zero_extendqisi2
+ 1095 0386 3E4B     		ldr	r3, .L83+4
+ 1096 0388 0093     		str	r3, [sp]
+ 1097 038a 0123     		movs	r3, #1
+ 1098 038c 0022     		movs	r2, #0
+ 1099 038e 42F21071 		movw	r1, #10000
+ 1100 0392 FFF7FEFF 		bl	opentimers_scheduleIn
+ 301:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_vars.timerIdWhisper,
+ 302:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   10000,
+ 303:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIME_MS,
+ 304:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIMER_ONESHOT,
+ 305:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_timer_cb
+ 306:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   );
+ 307:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   break;
+ 1101              		.loc 1 307 0
+ 1102 0396 6CE0     		b	.L74
+ 1103              	.L70:
+ 308:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	case 2:	//send RPL fake DIOs
+ 309:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		leds_debug_toggle();
+ 1104              		.loc 1 309 0
+ 1105 0398 FFF7FEFF 		bl	leds_debug_toggle
+ 310:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//whisper_vars.timerIdRpl = opentimers_create();
+ 311:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("I am WHISPER node %d, NEXT step starting RPL timer id %d \n", idmanager_getMyID(ADDR_64
+ 312:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 313:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   opentimers_scheduleIn(
+ 1106              		.loc 1 313 0
+ 1107 039c 374B     		ldr	r3, .L83
+ 1108 039e 93F83800 		ldrb	r0, [r3, #56]	@ zero_extendqisi2
+ 1109 03a2 384B     		ldr	r3, .L83+8
+ 1110 03a4 0093     		str	r3, [sp]
+ 1111 03a6 0123     		movs	r3, #1
+ 1112 03a8 0022     		movs	r2, #0
+ 1113 03aa 42F21071 		movw	r1, #10000
+ 1114 03ae FFF7FEFF 		bl	opentimers_scheduleIn
+ 314:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_vars.timerIdWhisper,
+ 315:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   10000,
+ 316:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIME_MS,
+ 317:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIMER_ONESHOT,
+ 318:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_timer_cb2
+ 319:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   );
+ 320:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		  break;
+ 1115              		.loc 1 320 0
+ 1116 03b2 5EE0     		b	.L74
+ 1117              	.L71:
+ 321:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	case 3: //first 6P clear
+ 322:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//whisper_vars.timerIdSixp2 = opentimers_create();
+ 323:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("I am WHISPER node %d, next STEP clear 1 time id %d \n", idmanager_getMyID(ADDR_64B)->ad
+ 324:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		leds_debug_toggle();
+ 1118              		.loc 1 324 0
+ 1119 03b4 FFF7FEFF 		bl	leds_debug_toggle
+ 325:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 326:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//no Clearing for the moment
+ 327:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		whisper_setState(0);
+ 1120              		.loc 1 327 0
+ 1121 03b8 0020     		movs	r0, #0
+ 1122 03ba FFF7FEFF 		bl	whisper_setState
+ 328:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //		   opentimers_scheduleIn(
+ 329:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			   whisper_vars.timerIdWhisper,
+ 330:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			   10000,
+ 331:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			   TIME_MS,
+ 332:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			   TIMER_ONESHOT,
+ 333:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			   whisper_timer_cb3
+ 334:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //		   );
+ 335:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 336:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 337:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   break;
+ 1123              		.loc 1 337 0
+ 1124 03be 58E0     		b	.L74
+ 1125              	.L72:
+ 338:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	case 4: //another 6P clear
+ 339:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//whisper_vars.timerIdSixp3 = opentimers_create();
+ 340:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	     //printf("I am WHISPER node %d, next STEP clear 2 timer id %d\n", idmanager_getMyID(ADDR_64B)
+ 341:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 342:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   opentimers_scheduleIn(
+ 1126              		.loc 1 342 0
+ 1127 03c0 2E4B     		ldr	r3, .L83
+ 1128 03c2 93F83800 		ldrb	r0, [r3, #56]	@ zero_extendqisi2
+ 1129 03c6 304B     		ldr	r3, .L83+12
+ 1130 03c8 0093     		str	r3, [sp]
+ 1131 03ca 0123     		movs	r3, #1
+ 1132 03cc 0022     		movs	r2, #0
+ 1133 03ce 42F21071 		movw	r1, #10000
+ 1134 03d2 FFF7FEFF 		bl	opentimers_scheduleIn
+ 343:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_vars.timerIdWhisper,
+ 344:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   10000,
+ 345:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIME_MS,
+ 346:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   TIMER_ONESHOT,
+ 347:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			   whisper_timer_cb4
+ 348:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   );
+ 349:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		   break;
+ 1135              		.loc 1 349 0
+ 1136 03d6 4CE0     		b	.L74
+ 1137              	.L73:
+ 350:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	case 5:
+ 351:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 352:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("I am WHISPER node %d, FINISHED, but first I add 1 cell to fake-ack!! \n", idmanager_get
+ 353:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 1138              		.loc 1 353 0
+ 1139 03d8 0023     		movs	r3, #0
+ 1140 03da FB77     		strb	r3, [r7, #31]
+ 1141 03dc 12E0     		b	.L75
+ 1142              	.L78:
+ 354:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 1143              		.loc 1 354 0
+ 1144 03de FA7F     		ldrb	r2, [r7, #31]	@ zero_extendqisi2
+ 1145 03e0 07F10C03 		add	r3, r7, #12
+ 1146 03e4 0221     		movs	r1, #2
+ 1147 03e6 1846     		mov	r0, r3
+ 1148 03e8 FFF7FEFF 		bl	neighbors_getNeighborEui64
+ 1149 03ec 0346     		mov	r3, r0
+ 1150 03ee 002B     		cmp	r3, #0
+ 1151 03f0 05D0     		beq	.L76
+ 355:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						if (NeighborAddress.addr_64b[7] == whisper_getTargetParentOld()){
+ 1152              		.loc 1 355 0
+ 1153 03f2 3C7D     		ldrb	r4, [r7, #20]	@ zero_extendqisi2
+ 1154 03f4 FFF7FEFF 		bl	whisper_getTargetParentOld
+ 1155 03f8 0346     		mov	r3, r0
+ 1156 03fa 9C42     		cmp	r4, r3
+ 1157 03fc 06D0     		beq	.L82
+ 1158              	.L76:
+ 353:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 1159              		.loc 1 353 0 discriminator 2
+ 1160 03fe FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 1161 0400 0133     		adds	r3, r3, #1
+ 1162 0402 FB77     		strb	r3, [r7, #31]
+ 1163              	.L75:
+ 353:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in 
+ 1164              		.loc 1 353 0 is_stmt 0 discriminator 1
+ 1165 0404 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 1166 0406 1D2B     		cmp	r3, #29
+ 1167 0408 E9D9     		bls	.L78
+ 1168 040a 00E0     		b	.L77
+ 1169              	.L82:
+ 356:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							//printf("Node %d is my neighbor I am going to enable a fake cell \n",NeighborAddress.addr_6
+ 357:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 							break;
+ 1170              		.loc 1 357 0 is_stmt 1
+ 1171 040c 00BF     		nop
+ 1172              	.L77:
+ 358:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						}
+ 359:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					}
+ 360:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		}
+ 361:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 362:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		memset(celllist_del,0,101*sizeof(cellInfo_ht));
+ 1173              		.loc 1 362 0
+ 1174 040e 3B1D     		adds	r3, r7, #4
+ 1175 0410 40F2F912 		movw	r2, #505
+ 1176 0414 0021     		movs	r1, #0
+ 1177 0416 1846     		mov	r0, r3
+ 1178 0418 FFF7FEFF 		bl	memset
+ 363:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		celllist_del[0].slotoffset       = 5;
+ 1179              		.loc 1 363 0
+ 1180 041c 0023     		movs	r3, #0
+ 1181 041e 43F00503 		orr	r3, r3, #5
+ 1182 0422 7B71     		strb	r3, [r7, #5]
+ 1183 0424 0023     		movs	r3, #0
+ 1184 0426 BB71     		strb	r3, [r7, #6]
+ 364:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		celllist_del[0].channeloffset    = 0x0A;
+ 1185              		.loc 1 364 0
+ 1186 0428 0023     		movs	r3, #0
+ 1187 042a 43F00A03 		orr	r3, r3, #10
+ 1188 042e FB71     		strb	r3, [r7, #7]
+ 1189 0430 0023     		movs	r3, #0
+ 1190 0432 3B72     		strb	r3, [r7, #8]
+ 365:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		celllist_del[0].isUsed           = TRUE;
+ 1191              		.loc 1 365 0
+ 1192 0434 0123     		movs	r3, #1
+ 1193 0436 3B71     		strb	r3, [r7, #4]
+ 366:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 367:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        res=sixtop_addCells(
+ 368:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //            0,
+ 369:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			celllist_del,
+ 370:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //            &NeighborAddress,
+ 371:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //			CELLOPTIONS_MSF
+ 372:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        );
+ 373:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 374:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         schedule_addActiveSlot(
+ 1194              		.loc 1 374 0
+ 1195 0438 B7F80530 		ldrh	r3, [r7, #5]	@ unaligned
+ 1196 043c 98B2     		uxth	r0, r3
+ 375:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         		celllist_del[0].slotoffset,
+ 376:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			CELLTYPE_TXRX,
+ 377:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****             TRUE,
+ 378:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			celllist_del[0].channeloffset,
+ 1197              		.loc 1 378 0
+ 1198 043e B7F80730 		ldrh	r3, [r7, #7]	@ unaligned
+ 1199 0442 9BB2     		uxth	r3, r3
+ 374:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         		celllist_del[0].slotoffset,
+ 1200              		.loc 1 374 0
+ 1201 0444 DAB2     		uxtb	r2, r3
+ 1202 0446 07F10C03 		add	r3, r7, #12
+ 1203 044a 0093     		str	r3, [sp]
+ 1204 044c 1346     		mov	r3, r2
+ 1205 044e 0122     		movs	r2, #1
+ 1206 0450 0321     		movs	r1, #3
+ 1207 0452 FFF7FEFF 		bl	schedule_addActiveSlot
+ 379:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****             &NeighborAddress
+ 380:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         );
+ 381:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 382:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 1208              		.loc 1 382 0
+ 1209 0456 0023     		movs	r3, #0
+ 1210 0458 FB77     		strb	r3, [r7, #31]
+ 1211 045a 02E0     		b	.L79
+ 1212              	.L80:
+ 1213              		.loc 1 382 0 is_stmt 0 discriminator 3
+ 1214 045c FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 1215 045e 0133     		adds	r3, r3, #1
+ 1216 0460 FB77     		strb	r3, [r7, #31]
+ 1217              	.L79:
+ 1218              		.loc 1 382 0 discriminator 1
+ 1219 0462 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 1220 0464 1D2B     		cmp	r3, #29
+ 1221 0466 F9D9     		bls	.L80
+ 383:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 384:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         }
+ 385:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 386:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 387:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        if (res){
+ 388:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        	printf("I am WHISPER node %d, Adding fake cell ok \n", idmanager_getMyID(ADDR_64B)->addr
+ 389:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        }else{
+ 390:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        	printf("I am WHISPER node %d, Adding fake cell NOK \n", idmanager_getMyID(ADDR_64B)->add
+ 391:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //        }
+ 392:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****         whisper_setState(6);
+ 1222              		.loc 1 392 0 is_stmt 1
+ 1223 0468 0620     		movs	r0, #6
+ 1224 046a FFF7FEFF 		bl	whisper_setState
+ 393:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//whisper_setState(0); //0 IDLE
+ 394:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		break;
+ 1225              		.loc 1 394 0
+ 1226 046e 00E0     		b	.L74
+ 1227              	.L81:
+ 395:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	default:
+ 396:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		break;
+ 1228              		.loc 1 396 0
+ 1229 0470 00BF     		nop
+ 1230              	.L74:
+ 1231              	.LBE3:
+ 397:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//
+ 398:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//printf("ERROR\n");
+ 399:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	}
+ 400:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 401:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1232              		.loc 1 401 0 discriminator 1
+ 1233 0472 00BF     		nop
+ 1234 0474 2437     		adds	r7, r7, #36
+ 1235              		.cfi_def_cfa_offset 12
+ 1236 0476 BD46     		mov	sp, r7
+ 1237              		.cfi_def_cfa_register 13
+ 1238              		@ sp needed
+ 1239 0478 90BD     		pop	{r4, r7, pc}
+ 1240              	.L84:
+ 1241 047a 00BF     		.align	2
+ 1242              	.L83:
+ 1243 047c 00000000 		.word	whisper_vars
+ 1244 0480 00000000 		.word	whisper_timer_cb
+ 1245 0484 00000000 		.word	whisper_timer_cb2
+ 1246 0488 00000000 		.word	whisper_timer_cb4
+ 1247              		.cfi_endproc
+ 1248              	.LFE14:
+ 1250              		.align	2
+ 1251              		.global	whisper_timer_cb
+ 1252              		.thumb
+ 1253              		.thumb_func
+ 1255              	whisper_timer_cb:
+ 1256              	.LFB15:
+ 402:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 403:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /**
+ 404:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \note timer fired, but we don't want to execute task in ISR mode instead, push
+ 405:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    task to scheduler with CoAP priority, and let scheduler take care of it.
+ 406:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** */
+ 407:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb(opentimers_id_t id){
+ 1257              		.loc 1 407 0
+ 1258              		.cfi_startproc
+ 1259              		@ args = 0, pretend = 0, frame = 8
+ 1260              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1261 048c 80B5     		push	{r7, lr}
+ 1262              		.cfi_def_cfa_offset 8
+ 1263              		.cfi_offset 7, -8
+ 1264              		.cfi_offset 14, -4
+ 1265 048e 82B0     		sub	sp, sp, #8
+ 1266              		.cfi_def_cfa_offset 16
+ 1267 0490 00AF     		add	r7, sp, #0
+ 1268              		.cfi_def_cfa_register 7
+ 1269 0492 0346     		mov	r3, r0
+ 1270 0494 FB71     		strb	r3, [r7, #7]
+ 408:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 409:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    scheduler_push_task(whisper_task_cb,TASKPRIO_COAP);
+ 1271              		.loc 1 409 0
+ 1272 0496 0621     		movs	r1, #6
+ 1273 0498 0348     		ldr	r0, .L86
+ 1274 049a FFF7FEFF 		bl	scheduler_push_task
+ 410:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1275              		.loc 1 410 0
+ 1276 049e 00BF     		nop
+ 1277 04a0 0837     		adds	r7, r7, #8
+ 1278              		.cfi_def_cfa_offset 8
+ 1279 04a2 BD46     		mov	sp, r7
+ 1280              		.cfi_def_cfa_register 13
+ 1281              		@ sp needed
+ 1282 04a4 80BD     		pop	{r7, pc}
+ 1283              	.L87:
+ 1284 04a6 00BF     		.align	2
+ 1285              	.L86:
+ 1286 04a8 00000000 		.word	whisper_task_cb
+ 1287              		.cfi_endproc
+ 1288              	.LFE15:
+ 1290              		.align	2
+ 1291              		.global	whisper_timer_cb2
+ 1292              		.thumb
+ 1293              		.thumb_func
+ 1295              	whisper_timer_cb2:
+ 1296              	.LFB16:
+ 411:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 412:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb2(opentimers_id_t id){
+ 1297              		.loc 1 412 0
+ 1298              		.cfi_startproc
+ 1299              		@ args = 0, pretend = 0, frame = 8
+ 1300              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1301 04ac 80B5     		push	{r7, lr}
+ 1302              		.cfi_def_cfa_offset 8
+ 1303              		.cfi_offset 7, -8
+ 1304              		.cfi_offset 14, -4
+ 1305 04ae 82B0     		sub	sp, sp, #8
+ 1306              		.cfi_def_cfa_offset 16
+ 1307 04b0 00AF     		add	r7, sp, #0
+ 1308              		.cfi_def_cfa_register 7
+ 1309 04b2 0346     		mov	r3, r0
+ 1310 04b4 FB71     		strb	r3, [r7, #7]
+ 413:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 414:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    scheduler_push_task(whisper_task_cb2,TASKPRIO_COAP);
+ 1311              		.loc 1 414 0
+ 1312 04b6 0621     		movs	r1, #6
+ 1313 04b8 0348     		ldr	r0, .L89
+ 1314 04ba FFF7FEFF 		bl	scheduler_push_task
+ 415:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1315              		.loc 1 415 0
+ 1316 04be 00BF     		nop
+ 1317 04c0 0837     		adds	r7, r7, #8
+ 1318              		.cfi_def_cfa_offset 8
+ 1319 04c2 BD46     		mov	sp, r7
+ 1320              		.cfi_def_cfa_register 13
+ 1321              		@ sp needed
+ 1322 04c4 80BD     		pop	{r7, pc}
+ 1323              	.L90:
+ 1324 04c6 00BF     		.align	2
+ 1325              	.L89:
+ 1326 04c8 00000000 		.word	whisper_task_cb2
+ 1327              		.cfi_endproc
+ 1328              	.LFE16:
+ 1330              		.align	2
+ 1331              		.global	whisper_timer_cb3
+ 1332              		.thumb
+ 1333              		.thumb_func
+ 1335              	whisper_timer_cb3:
+ 1336              	.LFB17:
+ 416:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 417:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb3(opentimers_id_t id){
+ 1337              		.loc 1 417 0
+ 1338              		.cfi_startproc
+ 1339              		@ args = 0, pretend = 0, frame = 8
+ 1340              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1341 04cc 80B5     		push	{r7, lr}
+ 1342              		.cfi_def_cfa_offset 8
+ 1343              		.cfi_offset 7, -8
+ 1344              		.cfi_offset 14, -4
+ 1345 04ce 82B0     		sub	sp, sp, #8
+ 1346              		.cfi_def_cfa_offset 16
+ 1347 04d0 00AF     		add	r7, sp, #0
+ 1348              		.cfi_def_cfa_register 7
+ 1349 04d2 0346     		mov	r3, r0
+ 1350 04d4 FB71     		strb	r3, [r7, #7]
+ 418:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 419:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    scheduler_push_task(whisper_task_cb3,TASKPRIO_COAP);
+ 1351              		.loc 1 419 0
+ 1352 04d6 0621     		movs	r1, #6
+ 1353 04d8 0348     		ldr	r0, .L92
+ 1354 04da FFF7FEFF 		bl	scheduler_push_task
+ 420:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1355              		.loc 1 420 0
+ 1356 04de 00BF     		nop
+ 1357 04e0 0837     		adds	r7, r7, #8
+ 1358              		.cfi_def_cfa_offset 8
+ 1359 04e2 BD46     		mov	sp, r7
+ 1360              		.cfi_def_cfa_register 13
+ 1361              		@ sp needed
+ 1362 04e4 80BD     		pop	{r7, pc}
+ 1363              	.L93:
+ 1364 04e6 00BF     		.align	2
+ 1365              	.L92:
+ 1366 04e8 00000000 		.word	whisper_task_cb3
+ 1367              		.cfi_endproc
+ 1368              	.LFE17:
+ 1370              		.align	2
+ 1371              		.global	whisper_timer_cb4
+ 1372              		.thumb
+ 1373              		.thumb_func
+ 1375              	whisper_timer_cb4:
+ 1376              	.LFB18:
+ 421:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 422:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_timer_cb4(opentimers_id_t id){
+ 1377              		.loc 1 422 0
+ 1378              		.cfi_startproc
+ 1379              		@ args = 0, pretend = 0, frame = 8
+ 1380              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1381 04ec 80B5     		push	{r7, lr}
+ 1382              		.cfi_def_cfa_offset 8
+ 1383              		.cfi_offset 7, -8
+ 1384              		.cfi_offset 14, -4
+ 1385 04ee 82B0     		sub	sp, sp, #8
+ 1386              		.cfi_def_cfa_offset 16
+ 1387 04f0 00AF     		add	r7, sp, #0
+ 1388              		.cfi_def_cfa_register 7
+ 1389 04f2 0346     		mov	r3, r0
+ 1390 04f4 FB71     		strb	r3, [r7, #7]
+ 423:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 424:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    scheduler_push_task(whisper_task_cb4,TASKPRIO_COAP);
+ 1391              		.loc 1 424 0
+ 1392 04f6 0621     		movs	r1, #6
+ 1393 04f8 0348     		ldr	r0, .L95
+ 1394 04fa FFF7FEFF 		bl	scheduler_push_task
+ 425:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1395              		.loc 1 425 0
+ 1396 04fe 00BF     		nop
+ 1397 0500 0837     		adds	r7, r7, #8
+ 1398              		.cfi_def_cfa_offset 8
+ 1399 0502 BD46     		mov	sp, r7
+ 1400              		.cfi_def_cfa_register 13
+ 1401              		@ sp needed
+ 1402 0504 80BD     		pop	{r7, pc}
+ 1403              	.L96:
+ 1404 0506 00BF     		.align	2
+ 1405              	.L95:
+ 1406 0508 00000000 		.word	whisper_task_cb4
+ 1407              		.cfi_endproc
+ 1408              	.LFE18:
+ 1410              		.align	2
+ 1411              		.global	whisper_task_cb
+ 1412              		.thumb
+ 1413              		.thumb_func
+ 1415              	whisper_task_cb:
+ 1416              	.LFB19:
+ 426:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 427:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb() {
+ 1417              		.loc 1 427 0
+ 1418              		.cfi_startproc
+ 1419              		@ args = 0, pretend = 0, frame = 24
+ 1420              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1421 050c 90B5     		push	{r4, r7, lr}
+ 1422              		.cfi_def_cfa_offset 12
+ 1423              		.cfi_offset 4, -12
+ 1424              		.cfi_offset 7, -8
+ 1425              		.cfi_offset 14, -4
+ 1426 050e 8DB0     		sub	sp, sp, #52
+ 1427              		.cfi_def_cfa_offset 64
+ 1428 0510 06AF     		add	r7, sp, #24
+ 1429              		.cfi_def_cfa 7, 40
+ 428:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	   // run only in Whisper node
+ 429:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 430:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WHISPER node %d, timer has expired!! Sending second 6P message \n", idmanager_
+ 431:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 432:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       if (state==1){
+ 1430              		.loc 1 432 0
+ 1431 0512 1F4B     		ldr	r3, .L106
+ 1432 0514 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1433 0516 012B     		cmp	r3, #1
+ 1434 0518 35D1     		bne	.L105
+ 1435              	.LBB4:
+ 433:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 434:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	  whisper_trigger_nextStep();
+ 1436              		.loc 1 434 0
+ 1437 051a FFF7FEFF 		bl	whisper_trigger_nextStep
+ 435:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 open_addr_t      NeighborAddress;
+ 436:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 uint8_t          i;
+ 437:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 438:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  if (msf_candidateAddCellList(celllist_add,1)==FALSE){
+ 439:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 440:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      printf("I am WHISPER node %d, end operation (no cells in second 6P message)\n",idmanag
+ 441:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      whisper_setState(0);
+ 442:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 443:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  opentimers_destroy(whisper_vars.timerIdWhisper);
+ 444:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  return;
+ 445:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  }
+ 446:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 //printf("I am WHISPER node %d, I have some cells \n", idmanager_getMyID(ADDR_64B)->addr_64b[
+ 447:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 1438              		.loc 1 447 0
+ 1439 051e 0023     		movs	r3, #0
+ 1440 0520 FB75     		strb	r3, [r7, #23]
+ 1441 0522 28E0     		b	.L99
+ 1442              	.L102:
+ 448:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1443              		.loc 1 448 0
+ 1444 0524 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 1445 0526 3B1D     		adds	r3, r7, #4
+ 1446 0528 0221     		movs	r1, #2
+ 1447 052a 1846     		mov	r0, r3
+ 1448 052c FFF7FEFF 		bl	neighbors_getNeighborEui64
+ 1449 0530 0346     		mov	r3, r0
+ 1450 0532 002B     		cmp	r3, #0
+ 1451 0534 1CD0     		beq	.L100
+ 449:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				if (NeighborAddress.addr_64b[7] == whisper_getTargetChildren()){
+ 1452              		.loc 1 449 0
+ 1453 0536 3C7B     		ldrb	r4, [r7, #12]	@ zero_extendqisi2
+ 1454 0538 FFF7FEFF 		bl	whisper_getTargetChildren
+ 1455 053c 0346     		mov	r3, r0
+ 1456 053e 9C42     		cmp	r4, r3
+ 1457 0540 16D1     		bne	.L100
+ 450:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//		printf("Node %d is my neighbor I am going to send him a Fake 6P message\n",NeighborAddress.a
+ 451:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 // call sixtop
+ 452:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					whisper_setFakeSource(whisper_getTargetParentNew());
+ 1458              		.loc 1 452 0
+ 1459 0542 FFF7FEFF 		bl	whisper_getTargetParentNew
+ 1460 0546 0346     		mov	r3, r0
+ 1461 0548 1846     		mov	r0, r3
+ 1462 054a FFF7FEFF 		bl	whisper_setFakeSource
+ 453:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//	printf("with source address  %d\n",whisper_getFakeSource());
+ 454:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 sixtop_request(
+ 1463              		.loc 1 454 0
+ 1464 054e 391D     		adds	r1, r7, #4
+ 1465 0550 0023     		movs	r3, #0
+ 1466 0552 0493     		str	r3, [sp, #16]
+ 1467 0554 0023     		movs	r3, #0
+ 1468 0556 0393     		str	r3, [sp, #12]
+ 1469 0558 0523     		movs	r3, #5
+ 1470 055a 0293     		str	r3, [sp, #8]
+ 1471 055c 0023     		movs	r3, #0
+ 1472 055e 0193     		str	r3, [sp, #4]
+ 1473 0560 0C4B     		ldr	r3, .L106+4
+ 1474 0562 0093     		str	r3, [sp]
+ 1475 0564 0723     		movs	r3, #7
+ 1476 0566 0122     		movs	r2, #1
+ 1477 0568 0120     		movs	r0, #1
+ 1478 056a FFF7FEFF 		bl	sixtop_request
+ 455:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						IANA_6TOP_CMD_ADD,                  // code
+ 456:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						&NeighborAddress,                   // neighbor
+ 457:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						1,                                  // number cells
+ 458:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						CELLOPTIONS_MSF,                    // cellOptions
+ 459:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						celllist_add,                       // celllist to add
+ 460:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						NULL,                               // celllist to delete (not used)
+ 461:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						5,                      		    // sfid 5, means whsiper
+ 462:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						0,                                  // list command offset (not used)
+ 463:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						0                                   // list command maximum celllist (not used)
+ 464:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 );
+ 465:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 break;
+ 1479              		.loc 1 465 0
+ 1480 056e 05E0     		b	.L103
+ 1481              	.L100:
+ 447:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1482              		.loc 1 447 0 discriminator 2
+ 1483 0570 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1484 0572 0133     		adds	r3, r3, #1
+ 1485 0574 FB75     		strb	r3, [r7, #23]
+ 1486              	.L99:
+ 447:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1487              		.loc 1 447 0 is_stmt 0 discriminator 1
+ 1488 0576 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1489 0578 1D2B     		cmp	r3, #29
+ 1490 057a D3D9     		bls	.L102
+ 1491              	.L103:
+ 1492              	.LBE4:
+ 466:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				}
+ 467:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				else{
+ 468:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //					printf("I am WISHPER node %d, node %d is not my my target children %d \n", idmanager_getMyID
+ 469:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				}
+ 470:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			}
+ 471:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 }
+ 472:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }else{
+ 473:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//printf("I am WISHPER node %d, wrong state in second 6P message. State = %d \n", idmanager_getM
+ 474:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			return;
+ 475:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 476:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       whisper_setState(2);//2 Sending second 6P add
+ 1493              		.loc 1 476 0 is_stmt 1
+ 1494 057c 0220     		movs	r0, #2
+ 1495 057e FFF7FEFF 		bl	whisper_setState
+ 477:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WISHPER node %d, end operation\n",idmanager_getMyID(ADDR_64B)->addr_64b[7]);
+ 478:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //whisper_trigger_nextStep();
+ 479:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 480:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //opentimers_destroy(whisper_vars.timerIdSixp);
+ 481:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  return;
+ 1496              		.loc 1 481 0
+ 1497 0582 00BF     		nop
+ 1498 0584 00E0     		b	.L97
+ 1499              	.L105:
+ 474:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 1500              		.loc 1 474 0
+ 1501 0586 00BF     		nop
+ 1502              	.L97:
+ 482:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 483:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1503              		.loc 1 483 0
+ 1504 0588 1C37     		adds	r7, r7, #28
+ 1505              		.cfi_def_cfa_offset 12
+ 1506 058a BD46     		mov	sp, r7
+ 1507              		.cfi_def_cfa_register 13
+ 1508              		@ sp needed
+ 1509 058c 90BD     		pop	{r4, r7, pc}
+ 1510              	.L107:
+ 1511 058e 00BF     		.align	2
+ 1512              	.L106:
+ 1513 0590 00000000 		.word	state
+ 1514 0594 00000000 		.word	celllist_add
+ 1515              		.cfi_endproc
+ 1516              	.LFE19:
+ 1518              		.align	2
+ 1519              		.global	whisper_task_cb2
+ 1520              		.thumb
+ 1521              		.thumb_func
+ 1523              	whisper_task_cb2:
+ 1524              	.LFB20:
+ 484:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 485:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb2() {
+ 1525              		.loc 1 485 0
+ 1526              		.cfi_startproc
+ 1527              		@ args = 0, pretend = 0, frame = 8
+ 1528              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1529 0598 90B5     		push	{r4, r7, lr}
+ 1530              		.cfi_def_cfa_offset 12
+ 1531              		.cfi_offset 4, -12
+ 1532              		.cfi_offset 7, -8
+ 1533              		.cfi_offset 14, -4
+ 1534 059a 83B0     		sub	sp, sp, #12
+ 1535              		.cfi_def_cfa_offset 24
+ 1536 059c 00AF     		add	r7, sp, #0
+ 1537              		.cfi_def_cfa_register 7
+ 486:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 487:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	 //printf("I am WHISPER node %d, RPL timer has expired!! Doing some RPL tasks \n", idmanager_getMy
+ 488:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	 uint16_t		  rank;
+ 489:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 490:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  if (state==2){
+ 1538              		.loc 1 490 0
+ 1539 059e 164B     		ldr	r3, .L113
+ 1540 05a0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1541 05a2 022B     		cmp	r3, #2
+ 1542 05a4 23D1     		bne	.L112
+ 491:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 492:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		  rank=((3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE)-1;
+ 1543              		.loc 1 492 0
+ 1544 05a6 40F6FF13 		movw	r3, #2559
+ 1545 05aa FB80     		strh	r3, [r7, #6]	@ movhi
+ 493:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		  icmpv6rpl_sendWhisperDIO(whisper_getTargetChildren(),whisper_getTargetParentOld(),rank);
+ 1546              		.loc 1 493 0
+ 1547 05ac FFF7FEFF 		bl	whisper_getTargetChildren
+ 1548 05b0 0346     		mov	r3, r0
+ 1549 05b2 1C46     		mov	r4, r3
+ 1550 05b4 FFF7FEFF 		bl	whisper_getTargetParentOld
+ 1551 05b8 0346     		mov	r3, r0
+ 1552 05ba 1946     		mov	r1, r3
+ 1553 05bc FB88     		ldrh	r3, [r7, #6]
+ 1554 05be 1A46     		mov	r2, r3
+ 1555 05c0 2046     		mov	r0, r4
+ 1556 05c2 FFF7FEFF 		bl	icmpv6rpl_sendWhisperDIO
+ 494:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		//  printf("Sending 2nd DIO\n");
+ 495:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		  icmpv6rpl_sendWhisperDIO(whisper_getTargetChildren(),whisper_getTargetParentOld(),2*rank);
+ 1557              		.loc 1 495 0
+ 1558 05c6 FFF7FEFF 		bl	whisper_getTargetChildren
+ 1559 05ca 0346     		mov	r3, r0
+ 1560 05cc 1C46     		mov	r4, r3
+ 1561 05ce FFF7FEFF 		bl	whisper_getTargetParentOld
+ 1562 05d2 0346     		mov	r3, r0
+ 1563 05d4 1946     		mov	r1, r3
+ 1564 05d6 FB88     		ldrh	r3, [r7, #6]	@ movhi
+ 1565 05d8 5B00     		lsls	r3, r3, #1
+ 1566 05da 9BB2     		uxth	r3, r3
+ 1567 05dc 1A46     		mov	r2, r3
+ 1568 05de 2046     		mov	r0, r4
+ 1569 05e0 FFF7FEFF 		bl	icmpv6rpl_sendWhisperDIO
+ 496:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  }else{
+ 497:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 // printf("I am WISHPER node %d, wrong state in sending RPL DIOs. State = %d \n", idmanager_getM
+ 498:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		  return;
+ 499:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  }
+ 500:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  whisper_setState(0);	//3 Sending DIOs
+ 1570              		.loc 1 500 0
+ 1571 05e4 0020     		movs	r0, #0
+ 1572 05e6 FFF7FEFF 		bl	whisper_setState
+ 501:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 502:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //printf("I am WHISPER node %d, preparing next step, send frist 6p clear \n", idmanager_getMyID(
+ 503:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //opentimers_destroy(whisper_vars.timerIdRpl);
+ 504:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //whisper_trigger_nextStep();
+ 505:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //whisper_trigger_nextStep();
+ 506:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 507:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  return;
+ 1573              		.loc 1 507 0
+ 1574 05ea 00BF     		nop
+ 1575 05ec 00E0     		b	.L108
+ 1576              	.L112:
+ 498:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  }
+ 1577              		.loc 1 498 0
+ 1578 05ee 00BF     		nop
+ 1579              	.L108:
+ 508:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 509:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1580              		.loc 1 509 0
+ 1581 05f0 0C37     		adds	r7, r7, #12
+ 1582              		.cfi_def_cfa_offset 12
+ 1583 05f2 BD46     		mov	sp, r7
+ 1584              		.cfi_def_cfa_register 13
+ 1585              		@ sp needed
+ 1586 05f4 90BD     		pop	{r4, r7, pc}
+ 1587              	.L114:
+ 1588 05f6 00BF     		.align	2
+ 1589              	.L113:
+ 1590 05f8 00000000 		.word	state
+ 1591              		.cfi_endproc
+ 1592              	.LFE20:
+ 1594              		.align	2
+ 1595              		.global	whisper_task_cb3
+ 1596              		.thumb
+ 1597              		.thumb_func
+ 1599              	whisper_task_cb3:
+ 1600              	.LFB21:
+ 510:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 511:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb3() {
+ 1601              		.loc 1 511 0
+ 1602              		.cfi_startproc
+ 1603              		@ args = 0, pretend = 0, frame = 24
+ 1604              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1605 05fc 90B5     		push	{r4, r7, lr}
+ 1606              		.cfi_def_cfa_offset 12
+ 1607              		.cfi_offset 4, -12
+ 1608              		.cfi_offset 7, -8
+ 1609              		.cfi_offset 14, -4
+ 1610 05fe 8DB0     		sub	sp, sp, #52
+ 1611              		.cfi_def_cfa_offset 64
+ 1612 0600 06AF     		add	r7, sp, #24
+ 1613              		.cfi_def_cfa 7, 40
+ 512:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	   // run only in Whisper node
+ 513:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 514:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WHISPER node %d, timer has expired!! Sending first 6P clear message \n", idman
+ 515:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 516:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       if (state==3){
+ 1614              		.loc 1 516 0
+ 1615 0602 1E4B     		ldr	r3, .L124
+ 1616 0604 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1617 0606 032B     		cmp	r3, #3
+ 1618 0608 33D1     		bne	.L123
+ 1619              	.LBB5:
+ 517:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	  //whisper_setState(4);
+ 518:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	  //whisper_trigger_nextStep();
+ 519:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 open_addr_t      NeighborAddress;
+ 520:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 uint8_t          i;
+ 521:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 522:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  if (msf_candidateAddCellList(celllist_add,1)==FALSE){
+ 523:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 524:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      printf("I am WISHPER node %d, end operation (no cells in second 6P message)\n",idmanag
+ 525:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      whisper_setState(0);
+ 526:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 527:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  opentimers_destroy(whisper_vars.timerIdSixp);
+ 528:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  return;
+ 529:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  }
+ 530:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 //printf("I am WHISPER node %d, I have some cells \n", idmanager_getMyID(ADDR_64B)->addr_64b[
+ 531:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 1620              		.loc 1 531 0
+ 1621 060a 0023     		movs	r3, #0
+ 1622 060c FB75     		strb	r3, [r7, #23]
+ 1623 060e 28E0     		b	.L117
+ 1624              	.L120:
+ 532:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1625              		.loc 1 532 0
+ 1626 0610 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 1627 0612 3B1D     		adds	r3, r7, #4
+ 1628 0614 0221     		movs	r1, #2
+ 1629 0616 1846     		mov	r0, r3
+ 1630 0618 FFF7FEFF 		bl	neighbors_getNeighborEui64
+ 1631 061c 0346     		mov	r3, r0
+ 1632 061e 002B     		cmp	r3, #0
+ 1633 0620 1CD0     		beq	.L118
+ 533:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				if (NeighborAddress.addr_64b[7] == whisper_getTargetChildren()){
+ 1634              		.loc 1 533 0
+ 1635 0622 3C7B     		ldrb	r4, [r7, #12]	@ zero_extendqisi2
+ 1636 0624 FFF7FEFF 		bl	whisper_getTargetChildren
+ 1637 0628 0346     		mov	r3, r0
+ 1638 062a 9C42     		cmp	r4, r3
+ 1639 062c 16D1     		bne	.L118
+ 534:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//		printf("Node %d is my neighbor I am going to send him a Fake 6P message\n",NeighborAddress.a
+ 535:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 // call sixtop
+ 536:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					whisper_setFakeSource(whisper_getTargetParentOld());
+ 1640              		.loc 1 536 0
+ 1641 062e FFF7FEFF 		bl	whisper_getTargetParentOld
+ 1642 0632 0346     		mov	r3, r0
+ 1643 0634 1846     		mov	r0, r3
+ 1644 0636 FFF7FEFF 		bl	whisper_setFakeSource
+ 537:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				//	printf("with source address  %d\n",whisper_getFakeSource());
+ 538:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			        sixtop_request(
+ 1645              		.loc 1 538 0
+ 1646 063a 391D     		adds	r1, r7, #4
+ 1647 063c 0023     		movs	r3, #0
+ 1648 063e 0493     		str	r3, [sp, #16]
+ 1649 0640 0023     		movs	r3, #0
+ 1650 0642 0393     		str	r3, [sp, #12]
+ 1651 0644 0523     		movs	r3, #5
+ 1652 0646 0293     		str	r3, [sp, #8]
+ 1653 0648 0023     		movs	r3, #0
+ 1654 064a 0193     		str	r3, [sp, #4]
+ 1655 064c 0023     		movs	r3, #0
+ 1656 064e 0093     		str	r3, [sp]
+ 1657 0650 0723     		movs	r3, #7
+ 1658 0652 0122     		movs	r2, #1
+ 1659 0654 0620     		movs	r0, #6
+ 1660 0656 FFF7FEFF 		bl	sixtop_request
+ 539:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            IANA_6TOP_CMD_CLEAR,                // code
+ 540:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						&NeighborAddress,                           // neighbor
+ 541:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            NUMCELLS_MSF,                       // number cells
+ 542:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            CELLOPTIONS_MSF,                    // cellOptions
+ 543:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            NULL,                               // celllist to add (not used)
+ 544:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            NULL,                               // celllist to delete (not used)
+ 545:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            5,               // sfid
+ 546:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            0,                                  // list command offset (not used)
+ 547:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			            0                                   // list command maximum celllist (not used)
+ 548:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			        );
+ 549:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 550:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 break;
+ 1661              		.loc 1 550 0
+ 1662 065a 05E0     		b	.L121
+ 1663              	.L118:
+ 531:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1664              		.loc 1 531 0 discriminator 2
+ 1665 065c FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1666 065e 0133     		adds	r3, r3, #1
+ 1667 0660 FB75     		strb	r3, [r7, #23]
+ 1668              	.L117:
+ 531:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1669              		.loc 1 531 0 is_stmt 0 discriminator 1
+ 1670 0662 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1671 0664 1D2B     		cmp	r3, #29
+ 1672 0666 D3D9     		bls	.L120
+ 1673              	.L121:
+ 1674              	.LBE5:
+ 551:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				}
+ 552:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			}
+ 553:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 }
+ 554:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }else{
+ 555:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//printf("I am WISHPER node %d, wrong state in first 6P clear. State = %d \n", idmanager_getMyID
+ 556:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			return;
+ 557:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 558:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       whisper_setState(4);	//4 Sending first 6P clear
+ 1675              		.loc 1 558 0 is_stmt 1
+ 1676 0668 0420     		movs	r0, #4
+ 1677 066a FFF7FEFF 		bl	whisper_setState
+ 559:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WISHPER node %d, prepare next step, last 6p clear\n",idmanager_getMyID(ADDR_64
+ 560:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //whisper_trigger_nextStep();
+ 561:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 562:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  //opentimers_destroy(whisper_vars.timerIdSixp2);
+ 563:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  return;
+ 1678              		.loc 1 563 0
+ 1679 066e 00BF     		nop
+ 1680 0670 00E0     		b	.L115
+ 1681              	.L123:
+ 556:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 1682              		.loc 1 556 0
+ 1683 0672 00BF     		nop
+ 1684              	.L115:
+ 564:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 565:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1685              		.loc 1 565 0
+ 1686 0674 1C37     		adds	r7, r7, #28
+ 1687              		.cfi_def_cfa_offset 12
+ 1688 0676 BD46     		mov	sp, r7
+ 1689              		.cfi_def_cfa_register 13
+ 1690              		@ sp needed
+ 1691 0678 90BD     		pop	{r4, r7, pc}
+ 1692              	.L125:
+ 1693 067a 00BF     		.align	2
+ 1694              	.L124:
+ 1695 067c 00000000 		.word	state
+ 1696              		.cfi_endproc
+ 1697              	.LFE21:
+ 1699              		.align	2
+ 1700              		.global	whisper_task_cb4
+ 1701              		.thumb
+ 1702              		.thumb_func
+ 1704              	whisper_task_cb4:
+ 1705              	.LFB22:
+ 566:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 567:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_task_cb4() {
+ 1706              		.loc 1 567 0
+ 1707              		.cfi_startproc
+ 1708              		@ args = 0, pretend = 0, frame = 24
+ 1709              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1710 0680 90B5     		push	{r4, r7, lr}
+ 1711              		.cfi_def_cfa_offset 12
+ 1712              		.cfi_offset 4, -12
+ 1713              		.cfi_offset 7, -8
+ 1714              		.cfi_offset 14, -4
+ 1715 0682 8DB0     		sub	sp, sp, #52
+ 1716              		.cfi_def_cfa_offset 64
+ 1717 0684 06AF     		add	r7, sp, #24
+ 1718              		.cfi_def_cfa 7, 40
+ 568:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	   // run only in Whisper node
+ 569:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 570:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WHISPER node %d, timer has expired!! Sending second 6P clear message \n", idma
+ 571:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //bool          res=0;
+ 572:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       if (state==4){
+ 1719              		.loc 1 572 0
+ 1720 0686 214B     		ldr	r3, .L135
+ 1721 0688 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1722 068a 042B     		cmp	r3, #4
+ 1723 068c 39D1     		bne	.L134
+ 1724              	.LBB6:
+ 573:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	//  printf("I am WHISPER node %d, DONE! \n", idmanager_getMyID(ADDR_64B)->addr_64b[7]);
+ 574:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 575:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 open_addr_t      NeighborAddress;
+ 576:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 uint8_t          i;
+ 577:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 578:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  if (msf_candidateAddCellList(celllist_add,1)==FALSE){
+ 579:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 580:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      printf("I am WISHPER node %d, end operation (no cells in second 6P message)\n",idmanag
+ 581:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	      whisper_setState(0);
+ 582:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //
+ 583:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  opentimers_destroy(whisper_vars.timerIdSixp);
+ 584:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    		  return;
+ 585:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //    	  }
+ 586:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****     	 //printf("I am WHISPER node %d, I have some cells \n", idmanager_getMyID(ADDR_64B)->addr_64b[
+ 587:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 for (i=0;i<MAXNUMNEIGHBORS;i++) {
+ 1725              		.loc 1 587 0
+ 1726 068e 0023     		movs	r3, #0
+ 1727 0690 FB75     		strb	r3, [r7, #23]
+ 1728 0692 28E0     		b	.L128
+ 1729              	.L131:
+ 588:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1730              		.loc 1 588 0
+ 1731 0694 FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 1732 0696 3B1D     		adds	r3, r7, #4
+ 1733 0698 0221     		movs	r1, #2
+ 1734 069a 1846     		mov	r0, r3
+ 1735 069c FFF7FEFF 		bl	neighbors_getNeighborEui64
+ 1736 06a0 0346     		mov	r3, r0
+ 1737 06a2 002B     		cmp	r3, #0
+ 1738 06a4 1CD0     		beq	.L129
+ 589:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				if (NeighborAddress.addr_64b[7] == whisper_getTargetParentOld()){
+ 1739              		.loc 1 589 0
+ 1740 06a6 3C7B     		ldrb	r4, [r7, #12]	@ zero_extendqisi2
+ 1741 06a8 FFF7FEFF 		bl	whisper_getTargetParentOld
+ 1742 06ac 0346     		mov	r3, r0
+ 1743 06ae 9C42     		cmp	r4, r3
+ 1744 06b0 16D1     		bne	.L129
+ 590:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					//printf("Node %d is my neighbor I am going to send him a Fake 6P message\n",NeighborAddress.a
+ 591:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 // call sixtop
+ 592:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 593:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 594:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 595:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 596:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					whisper_setFakeSource(whisper_getTargetChildren());
+ 1745              		.loc 1 596 0
+ 1746 06b2 FFF7FEFF 		bl	whisper_getTargetChildren
+ 1747 06b6 0346     		mov	r3, r0
+ 1748 06b8 1846     		mov	r0, r3
+ 1749 06ba FFF7FEFF 		bl	whisper_setFakeSource
+ 597:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					//printf("with source address  %d\n",whisper_getFakeSource());
+ 598:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				        sixtop_request(
+ 599:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            IANA_6TOP_CMD_CLEAR,                // code
+ 600:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //							&NeighborAddress,                           // neighbor
+ 601:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            NUMCELLS_MSF,                       // number cells
+ 602:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            CELLOPTIONS_MSF,                    // cellOptions
+ 603:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            NULL,                               // celllist to add (not used)
+ 604:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            NULL,                               // celllist to delete (not used)
+ 605:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            5,               // sfid
+ 606:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            0,                                  // list command offset (not used)
+ 607:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				            0                                   // list command maximum celllist (not used)
+ 608:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** //				        );
+ 609:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				    sixtop_request(
+ 1750              		.loc 1 609 0
+ 1751 06be 391D     		adds	r1, r7, #4
+ 1752 06c0 0023     		movs	r3, #0
+ 1753 06c2 0493     		str	r3, [sp, #16]
+ 1754 06c4 0023     		movs	r3, #0
+ 1755 06c6 0393     		str	r3, [sp, #12]
+ 1756 06c8 0523     		movs	r3, #5
+ 1757 06ca 0293     		str	r3, [sp, #8]
+ 1758 06cc 0023     		movs	r3, #0
+ 1759 06ce 0193     		str	r3, [sp, #4]
+ 1760 06d0 0023     		movs	r3, #0
+ 1761 06d2 0093     		str	r3, [sp]
+ 1762 06d4 0723     		movs	r3, #7
+ 1763 06d6 0122     		movs	r2, #1
+ 1764 06d8 0620     		movs	r0, #6
+ 1765 06da FFF7FEFF 		bl	sixtop_request
+ 610:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        IANA_6TOP_CMD_CLEAR,   // code
+ 611:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						&NeighborAddress,              // neighbor
+ 612:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        NUMCELLS_MSF,           // number cells
+ 613:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        CELLOPTIONS_MSF,        // cellOptions
+ 614:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        NULL,                   // celllist to add (not used)
+ 615:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 						NULL,        // celllist to delete
+ 616:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        5,   // sfid
+ 617:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        0,                      // list command offset (not used)
+ 618:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				        0                       // list command maximum celllist (not used)
+ 619:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				    );
+ 620:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 					 break;
+ 1766              		.loc 1 620 0
+ 1767 06de 05E0     		b	.L132
+ 1768              	.L129:
+ 587:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1769              		.loc 1 587 0 discriminator 2
+ 1770 06e0 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1771 06e2 0133     		adds	r3, r3, #1
+ 1772 06e4 FB75     		strb	r3, [r7, #23]
+ 1773              	.L128:
+ 587:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			if (neighbors_getNeighborEui64(&NeighborAddress, ADDR_64B, i)) { // this neighbor entry is in us
+ 1774              		.loc 1 587 0 is_stmt 0 discriminator 1
+ 1775 06e6 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1776 06e8 1D2B     		cmp	r3, #29
+ 1777 06ea D3D9     		bls	.L131
+ 1778              	.L132:
+ 1779              	.LBE6:
+ 621:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 				}
+ 622:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			}
+ 623:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 		 }
+ 624:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }else{
+ 625:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			//printf("I am WISHPER node %d, wrong state in second 6P clear message. State = %d \n", idmanage
+ 626:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 			return;
+ 627:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 628:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 629:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       //printf("I am WISHPER node %d, end TOTAL operation\n",idmanager_getMyID(ADDR_64B)->addr_64b[
+ 630:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 631:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       whisper_setState(5);
+ 1780              		.loc 1 631 0 is_stmt 1
+ 1781 06ec 0520     		movs	r0, #5
+ 1782 06ee FFF7FEFF 		bl	whisper_setState
+ 632:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  opentimers_destroy(whisper_vars.timerIdWhisper);
+ 1783              		.loc 1 632 0
+ 1784 06f2 074B     		ldr	r3, .L135+4
+ 1785 06f4 93F83830 		ldrb	r3, [r3, #56]	@ zero_extendqisi2
+ 1786 06f8 1846     		mov	r0, r3
+ 1787 06fa FFF7FEFF 		bl	opentimers_destroy
+ 633:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 634:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 	  return;
+ 1788              		.loc 1 634 0
+ 1789 06fe 00BF     		nop
+ 1790 0700 00E0     		b	.L126
+ 1791              	.L134:
+ 626:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****       }
+ 1792              		.loc 1 626 0
+ 1793 0702 00BF     		nop
+ 1794              	.L126:
+ 635:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 636:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1795              		.loc 1 636 0
+ 1796 0704 1C37     		adds	r7, r7, #28
+ 1797              		.cfi_def_cfa_offset 12
+ 1798 0706 BD46     		mov	sp, r7
+ 1799              		.cfi_def_cfa_register 13
+ 1800              		@ sp needed
+ 1801 0708 90BD     		pop	{r4, r7, pc}
+ 1802              	.L136:
+ 1803 070a 00BF     		.align	2
+ 1804              	.L135:
+ 1805 070c 00000000 		.word	state
+ 1806 0710 00000000 		.word	whisper_vars
+ 1807              		.cfi_endproc
+ 1808              	.LFE22:
+ 1810              		.align	2
+ 1811              		.global	whisper_sendDone
+ 1812              		.thumb
+ 1813              		.thumb_func
+ 1815              	whisper_sendDone:
+ 1816              	.LFB23:
+ 637:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 638:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** /**
+ 639:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \brief The stack indicates that the packet was sent.
+ 640:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 641:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \param[in] msg The CoAP message just sent.
+ 642:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** \param[in] error The outcome of sending it.
+ 643:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** */
+ 644:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** void whisper_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
+ 1817              		.loc 1 644 0
+ 1818              		.cfi_startproc
+ 1819              		@ args = 0, pretend = 0, frame = 8
+ 1820              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1821 0714 80B5     		push	{r7, lr}
+ 1822              		.cfi_def_cfa_offset 8
+ 1823              		.cfi_offset 7, -8
+ 1824              		.cfi_offset 14, -4
+ 1825 0716 82B0     		sub	sp, sp, #8
+ 1826              		.cfi_def_cfa_offset 16
+ 1827 0718 00AF     		add	r7, sp, #0
+ 1828              		.cfi_def_cfa_register 7
+ 1829 071a 7860     		str	r0, [r7, #4]
+ 1830 071c 0B46     		mov	r3, r1
+ 1831 071e FB70     		strb	r3, [r7, #3]
+ 645:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 646:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** 
+ 647:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c ****    openqueue_freePacketBuffer(msg);
+ 1832              		.loc 1 647 0
+ 1833 0720 7868     		ldr	r0, [r7, #4]
+ 1834 0722 FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 648:build/openmote-cc2538_armgcc/openapps/whisper/whisper.c **** }
+ 1835              		.loc 1 648 0
+ 1836 0726 00BF     		nop
+ 1837 0728 0837     		adds	r7, r7, #8
+ 1838              		.cfi_def_cfa_offset 8
+ 1839 072a BD46     		mov	sp, r7
+ 1840              		.cfi_def_cfa_register 13
+ 1841              		@ sp needed
+ 1842 072c 80BD     		pop	{r7, pc}
+ 1843              		.cfi_endproc
+ 1844              	.LFE23:
+ 1846              	.Letext0:
+ 1847              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1848              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1849              		.file 4 "inc/opendefs.h"
+ 1850              		.file 5 "drivers/common/opentimers.h"
+ 1851              		.file 6 "openapps/opencoap/opencoap.h"
+ 1852              		.file 7 "build/openmote-cc2538_armgcc/openapps/whisper/whisper.h"
+ 1853              		.file 8 "openstack/02b-MAChigh/schedule.h"
+ 1854              		.file 9 "kernel/scheduler.h"
+ 1855              		.file 10 "bsp/boards/openmote-cc2538/board_info.h"
+ 1856              		.file 11 "openstack/cross-layers/idmanager.h"
+ 1857              		.file 12 "openstack/03b-IPv6/icmpv6rpl.h"
+ 1858              		.file 13 "openstack/02a-MAClow/IEEE802154E.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 whisper.c
+     /tmp/ccWIsA9c.s:20     .rodata:0000000000000000 $d
+     /tmp/ccWIsA9c.s:23     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccWIsA9c.s:28     .rodata:0000000000000008 infoBoardname
+     /tmp/ccWIsA9c.s:33     .rodata:0000000000000010 infouCName
+     /tmp/ccWIsA9c.s:38     .rodata:0000000000000018 infoRadioName
+     /tmp/ccWIsA9c.s:43     .rodata:0000000000000024 infoStackName
+     /tmp/ccWIsA9c.s:48     .rodata:0000000000000030 ipAddr_ipsoRD
+     /tmp/ccWIsA9c.s:68     .rodata:0000000000000040 ipAddr_motesEecs
+     /tmp/ccWIsA9c.s:88     .rodata:0000000000000050 ipAddr_local
+     /tmp/ccWIsA9c.s:108    .rodata:0000000000000060 ipAddr_motedata
+     /tmp/ccWIsA9c.s:128    .rodata:0000000000000070 ipAddr_ringmaster
+     /tmp/ccWIsA9c.s:148    .rodata:0000000000000080 linklocalprefix
+     /tmp/ccWIsA9c.s:160    .rodata:0000000000000088 all_routers_multicast
+     /tmp/ccWIsA9c.s:180    .rodata:0000000000000098 chTemplate_default
+     /tmp/ccWIsA9c.s:200    .rodata:00000000000000a8 ebIEsBytestream
+     /tmp/ccWIsA9c.s:233    .rodata:00000000000000c4 whisper_path0
+                            *COM*:0000000000000001 targetParentNew
+                            *COM*:0000000000000001 targetParentOld
+                            *COM*:0000000000000001 targetChildren
+                            *COM*:0000000000000001 state
+                            *COM*:0000000000000001 fakeSource
+                            *COM*:0000000000000001 numSentDios
+                            *COM*:0000000000000019 celllist_add
+                            *COM*:000000000000003c whisper_vars
+     /tmp/ccWIsA9c.s:244    .text:0000000000000000 $t
+     /tmp/ccWIsA9c.s:249    .text:0000000000000000 whisper_init
+     /tmp/ccWIsA9c.s:450    .text:00000000000000ec whisper_setState
+     /tmp/ccWIsA9c.s:354    .text:0000000000000094 $d
+     /tmp/ccWIsA9c.s:845    .text:00000000000001f0 whisper_receive
+     /tmp/ccWIsA9c.s:1815   .text:0000000000000714 whisper_sendDone
+     /tmp/ccWIsA9c.s:366    .text:00000000000000b8 $t
+     /tmp/ccWIsA9c.s:371    .text:00000000000000b8 whisper_setSentDIOs
+     /tmp/ccWIsA9c.s:405    .text:00000000000000d4 $d
+     /tmp/ccWIsA9c.s:409    .text:00000000000000d8 $t
+     /tmp/ccWIsA9c.s:414    .text:00000000000000d8 whisper_getSentDIOs
+     /tmp/ccWIsA9c.s:441    .text:00000000000000e8 $d
+     /tmp/ccWIsA9c.s:445    .text:00000000000000ec $t
+     /tmp/ccWIsA9c.s:484    .text:0000000000000108 $d
+     /tmp/ccWIsA9c.s:488    .text:000000000000010c $t
+     /tmp/ccWIsA9c.s:493    .text:000000000000010c whisper_getState
+     /tmp/ccWIsA9c.s:520    .text:000000000000011c $d
+     /tmp/ccWIsA9c.s:524    .text:0000000000000120 $t
+     /tmp/ccWIsA9c.s:529    .text:0000000000000120 whisper_getTargetChildren
+     /tmp/ccWIsA9c.s:556    .text:0000000000000130 $d
+     /tmp/ccWIsA9c.s:560    .text:0000000000000134 $t
+     /tmp/ccWIsA9c.s:565    .text:0000000000000134 whisper_setTargetChildren
+     /tmp/ccWIsA9c.s:599    .text:0000000000000150 $d
+     /tmp/ccWIsA9c.s:603    .text:0000000000000154 $t
+     /tmp/ccWIsA9c.s:608    .text:0000000000000154 whisper_getTargetParentNew
+     /tmp/ccWIsA9c.s:635    .text:0000000000000164 $d
+     /tmp/ccWIsA9c.s:639    .text:0000000000000168 $t
+     /tmp/ccWIsA9c.s:644    .text:0000000000000168 whisper_setTargetParentNew
+     /tmp/ccWIsA9c.s:678    .text:0000000000000184 $d
+     /tmp/ccWIsA9c.s:682    .text:0000000000000188 $t
+     /tmp/ccWIsA9c.s:687    .text:0000000000000188 whisper_getTargetParentOld
+     /tmp/ccWIsA9c.s:714    .text:0000000000000198 $d
+     /tmp/ccWIsA9c.s:718    .text:000000000000019c $t
+     /tmp/ccWIsA9c.s:723    .text:000000000000019c whisper_setTargetParentOld
+     /tmp/ccWIsA9c.s:757    .text:00000000000001b8 $d
+     /tmp/ccWIsA9c.s:761    .text:00000000000001bc $t
+     /tmp/ccWIsA9c.s:766    .text:00000000000001bc whisper_getFakeSource
+     /tmp/ccWIsA9c.s:793    .text:00000000000001cc $d
+     /tmp/ccWIsA9c.s:797    .text:00000000000001d0 $t
+     /tmp/ccWIsA9c.s:802    .text:00000000000001d0 whisper_setFakeSource
+     /tmp/ccWIsA9c.s:836    .text:00000000000001ec $d
+     /tmp/ccWIsA9c.s:840    .text:00000000000001f0 $t
+     /tmp/ccWIsA9c.s:1057   .text:000000000000034c whisper_trigger_nextStep
+     /tmp/ccWIsA9c.s:1047   .text:0000000000000344 $d
+     /tmp/ccWIsA9c.s:1052   .text:000000000000034c $t
+     /tmp/ccWIsA9c.s:1082   .text:0000000000000368 $d
+     /tmp/ccWIsA9c.s:1087   .text:000000000000037c $t
+     /tmp/ccWIsA9c.s:1243   .text:000000000000047c $d
+     /tmp/ccWIsA9c.s:1255   .text:000000000000048c whisper_timer_cb
+     /tmp/ccWIsA9c.s:1295   .text:00000000000004ac whisper_timer_cb2
+     /tmp/ccWIsA9c.s:1375   .text:00000000000004ec whisper_timer_cb4
+     /tmp/ccWIsA9c.s:1250   .text:000000000000048c $t
+     /tmp/ccWIsA9c.s:1286   .text:00000000000004a8 $d
+     /tmp/ccWIsA9c.s:1415   .text:000000000000050c whisper_task_cb
+     /tmp/ccWIsA9c.s:1290   .text:00000000000004ac $t
+     /tmp/ccWIsA9c.s:1326   .text:00000000000004c8 $d
+     /tmp/ccWIsA9c.s:1523   .text:0000000000000598 whisper_task_cb2
+     /tmp/ccWIsA9c.s:1330   .text:00000000000004cc $t
+     /tmp/ccWIsA9c.s:1335   .text:00000000000004cc whisper_timer_cb3
+     /tmp/ccWIsA9c.s:1366   .text:00000000000004e8 $d
+     /tmp/ccWIsA9c.s:1599   .text:00000000000005fc whisper_task_cb3
+     /tmp/ccWIsA9c.s:1370   .text:00000000000004ec $t
+     /tmp/ccWIsA9c.s:1406   .text:0000000000000508 $d
+     /tmp/ccWIsA9c.s:1704   .text:0000000000000680 whisper_task_cb4
+     /tmp/ccWIsA9c.s:1410   .text:000000000000050c $t
+     /tmp/ccWIsA9c.s:1513   .text:0000000000000590 $d
+     /tmp/ccWIsA9c.s:1518   .text:0000000000000598 $t
+     /tmp/ccWIsA9c.s:1590   .text:00000000000005f8 $d
+     /tmp/ccWIsA9c.s:1594   .text:00000000000005fc $t
+     /tmp/ccWIsA9c.s:1695   .text:000000000000067c $d
+     /tmp/ccWIsA9c.s:1699   .text:0000000000000680 $t
+     /tmp/ccWIsA9c.s:1805   .text:000000000000070c $d
+     /tmp/ccWIsA9c.s:1810   .text:0000000000000714 $t
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.8e445c0106ab795ab4704214cba6f089
+                           .group:0000000000000000 wm4._newlib_version.h.4.ad342815780c8db09778091a421b5b5b
+                           .group:0000000000000000 wm4.features.h.33.d97f2d646536517df901beeb5b9993f5
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.b82bf99f69d6a5c085fc866de0d3eb9b
+                           .group:0000000000000000 wm4._stdint.h.10.7a5f60e6741af4a5594a3867d347e1f9
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.36dd0417407b0a085bc04c49cc2ed13a
+                           .group:0000000000000000 wm4.config.h.219.65a553ab5bef5482f0d7880b0d33015e
+                           .group:0000000000000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:0000000000000000 wm4.stddef.h.39.a38874c8f8a57e66301090908ec2a69f
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.125.5cf8a495f1f7ef36777ad868a1e32068
+                           .group:0000000000000000 wm4.stddef.h.161.5349cb105733e8777bfb0cf53c4e3f34
+                           .group:0000000000000000 wm4._types.h.183.c226d164ceca1f2ecb9ae9360c54a098
+                           .group:0000000000000000 wm4.reent.h.17.850ac0a908956e5fb788be1b80de2f32
+                           .group:0000000000000000 wm4.cdefs.h.47.ba62642086d429b4f95c2381cae1c0aa
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.161.19e15733342b50ead2919490b095303e
+                           .group:0000000000000000 wm4.stdbool.h.29.07dce69c3b78884144b7f7bd19483461
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.1291259c351bc018e4d4402148b3c6db
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.opencoap.h.32.4fd89a1f25836020968932a0f7dffe46
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.openserial.h.9.80102eae1ecef6075819c4ea201ac3a9
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+                           .group:0000000000000000 wm4.msf.h.2.5fb7d8d59fc37db0794adadf7f268765
+                           .group:0000000000000000 wm4.icmpv6rpl.h.2.f00b74af734e37e670811ca7fb590996
+                           .group:0000000000000000 wm4.neighbors.h.15.fcaa645de5cf4f9d77d36838589f9838
+                           .group:0000000000000000 wm4.schedule.h.2.f2fa95bbe9ed29a9f7520419b69ab7c7
+                           .group:0000000000000000 wm4.IEEE802154E.h.2.20e31ed57f1fb01244440ae9a1e056a8
+                           .group:0000000000000000 wm4.scheduler.h.2.d8d85f436d0d4b3991926a15b8490cf4
+                           .group:0000000000000000 wm4.sixtop.h.2.f5e0b2a452b4d1f75e53a759db81a2cb
+
+UNDEFINED SYMBOLS
+idmanager_getIsDAGroot
+idmanager_getMyID
+leds_debug_toggle
+opentimers_create
+opencoap_register
+msf_candidateAddCellList
+openrandom_get16b
+neighbors_getNeighborEui64
+sixtop_request
+opentimers_scheduleIn
+memset
+schedule_addActiveSlot
+scheduler_push_task
+icmpv6rpl_sendWhisperDIO
+opentimers_destroy
+openqueue_freePacketBuffer
