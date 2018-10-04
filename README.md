@@ -6,7 +6,7 @@ This repository contains the software used for Whisper proof of concept. It incl
 * The Whisper controller:
 	- Algorithms for translating Policies to Primitives"
 	- Firmware run in the root"
-	- Interface for link the controller with the root node
+	- Interface for linking the controller with the root node
 * Firmware for the Whisper nodes
 	- Modified version of OpenWSN that comunicates with the controller through COAP
 * Monitoring tools
