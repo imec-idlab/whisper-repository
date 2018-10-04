@@ -1,0 +1,23 @@
+#Unix global
+
+.*
+!.gitignore
+*~
+.directory
+
+#Windows global
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+#Project specific
+
+*.o
+build
+build*
+dist
+.dep.inc
+info
+*.user*
