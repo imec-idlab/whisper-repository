@@ -4,3 +4,6 @@
 [submodule "root-node/openwsn-fw-root"]
 	path = root-node/openwsn-fw-root
 	url = https://github.com/imec-idlab/openwsn-fw-root
+[submodule "whisper-nodes/openwsn-fw-whispernode"]
+	path = whisper-nodes/openwsn-fw-whispernode
+	url = https://github.com/imec-idlab/openwsn-fw-whispernode
