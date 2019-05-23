@@ -1,3 +1,6 @@
 [submodule "openwsn-nodes"]
 	path = openwsn-nodes
 	url = https://github.com/openwsn-berkeley/openwsn-fw
+[submodule "root-node/openwsn-fw-root"]
+	path = root-node/openwsn-fw-root
+	url = https://github.com/imec-idlab/openwsn-fw-root
