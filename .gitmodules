@@ -10,3 +10,6 @@
 [submodule "whisper-controller/coap"]
 	path = whisper-controller/coap
 	url = https://github.com/openwsn-berkeley/coap
+[submodule "whisper-controller/openvisualizer"]
+	path = whisper-controller/openvisualizer
+	url = https://github.com/imec-idlab/whisper-controller
