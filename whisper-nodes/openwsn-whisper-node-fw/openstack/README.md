@@ -1,1 +1,0 @@
-The OpenWSN stack presents a simple interface to the application, thereby hiding all networking complexities (medium access, routing, etc.).

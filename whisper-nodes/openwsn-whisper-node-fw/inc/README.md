@@ -1,1 +1,0 @@
-This directory contains header files common to most OpenWSN projects.

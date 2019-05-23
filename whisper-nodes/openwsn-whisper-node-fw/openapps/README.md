@@ -1,1 +1,0 @@
-Applications sit on top of the OpenWSN stack, and can use either TCP, UDP or CoAP to communicate over the network.
