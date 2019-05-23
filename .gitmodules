@@ -1,0 +1,3 @@
+[submodule "openwsn-nodes"]
+	path = openwsn-nodes
+	url = https://github.com/openwsn-berkeley/openwsn-fw
