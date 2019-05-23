@@ -1,6 +1,6 @@
 # Whisper-repository
 ===================
-Collection of software used for implementing Whisper
+Collection of software used for implementing Whisper (init version with simple use cases)
 
 This repository contains the software used for Whisper proof of concept. It includes:
 * The Whisper controller:
