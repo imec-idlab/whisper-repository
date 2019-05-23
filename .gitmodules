@@ -7,3 +7,6 @@
 [submodule "whisper-nodes/openwsn-fw-whispernode"]
 	path = whisper-nodes/openwsn-fw-whispernode
 	url = https://github.com/imec-idlab/openwsn-fw-whispernode
+[submodule "whisper-controller/coap"]
+	path = whisper-controller/coap
+	url = https://github.com/openwsn-berkeley/coap
