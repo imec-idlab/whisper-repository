@@ -1,1 +1,0 @@
-This folder contains applications that make use OpenWSN.

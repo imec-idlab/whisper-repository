@@ -1,1 +1,0 @@
-Drivers sit on top of the BSP (i.e. they are hardware-independent) and implement useful functions such as a building and parsing HDLC frames.
