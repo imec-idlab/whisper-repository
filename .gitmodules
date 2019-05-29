@@ -13,3 +13,6 @@
 [submodule "whisper-controller/openvisualizer"]
 	path = whisper-controller/openvisualizer
 	url = https://github.com/imec-idlab/whisper-controller
+[submodule "onos/onos-whisper"]
+	path = onos/onos-whisper
+	url = https://github.com/imec-idlab/onos-whisper
