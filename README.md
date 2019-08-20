@@ -15,10 +15,9 @@ This repository includes:
     - Misc tools.
 2. Current OpenWSN firmware:
 	- Current original OpenWSN firmware for the normal nodes.
-3. Firmware for the Whisper nodes:
+3. Firmware for the Whisper nodes and the Whisper root node:
 	- Modified version of OpenWSN that comunicates with the controller through COAP.
-4. Firmware for the Whisper root node:
-	- Modified version of OpenWSN that comunicates with the controller through serial.
+	- Modified version of OpenWSN (root) that comunicates with the controller through serial.
 5. Monitoring tools:
  	- A sniffer for OpenMote that captures traffic from the network.
 	- A modified version of Foren6 to process and display information from the captured traffic:
@@ -29,6 +28,9 @@ This repository includes:
     - Whisper provider.
     - Whisper protocol (southband).
     - Whisper App (GUI+CLI)
+        - 6TiSCH Topology Component
+        - 6TiSCH schedules UI Component
+        - Whisper Controllers UI Table Components
 
 ##Supports:
 ---
@@ -38,6 +40,21 @@ This repository includes:
     - Neighbors of the Whisper node
     - Logic and physical topology
 * Orchestration from ONOS via edge metrics and intents.
+
+
+##Examples:
+
+Augmented Topology
+
+<img src="pics/exampleGui2.png">
+
+6TiSCH Schedules
+
+<img src="pics/onosScheduleGUI.png" width="1814" height="700">
+
+Whisper Controllers View
+
+<img src="pics/GUIControllers1.png" width="1814" height="235">
 
 Questions, issues and bugs
 ---------------
