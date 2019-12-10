@@ -11,13 +11,12 @@ This repository includes:
     - Algorithms for translating Policies to Primitives.
     - Local Whisper Controller that runs in Openvisualizer.
     - Coap repository.
-    - Sample opologies to test the switch-parent algorithm.
+    - Sample topologies to test the switch-parent algorithm.
     - Misc tools.
 2. Current OpenWSN firmware:
-	- Current original OpenWSN firmware for the normal nodes.
-3. Firmware for the Whisper nodes and the Whisper root node:
-	- Modified version of OpenWSN that comunicates with the controller through COAP.
-	- Modified version of OpenWSN (root) that comunicates with the controller through serial.
+	- Current original OpenWSN firmware for the normal nodes (updated 10 Dec 2019).
+3. Firmware for the Whisper nodes (root and leaf):
+	- Modified version of OpenWSN that comunicates with the controller through COAP (leaf) and through serial (root).
 5. Monitoring tools:
  	- A sniffer for OpenMote that captures traffic from the network.
 	- A modified version of Foren6 to process and display information from the captured traffic:
@@ -35,7 +34,7 @@ This repository includes:
 ##Supports:
 ---
 * Parent switching through DIOs
-* Schedule modification through 6P commands (e.g. to allocate cells before the parent switch)
+* Schedule modification through 6P commands (e.g. to allocate cells before the parent switch or 6P List)
 * Monitoring capabilities:
     - Neighbors of the Whisper node
     - Logic and physical topology
