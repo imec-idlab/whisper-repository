@@ -1,4 +1,4 @@
-# How to configure the set-up
+# How to configure the set-up's of "Extending Network Programmability to the Things Overlay using Distributed Industrial IoT Protocols"
 Here we are using existing Fed4FIRE+ testbeds, specifically, Citylab in Antwerp for the IoT segment and the Virtual Wall 2 in Ghent. If you have already you own testbeds, skip this part!
 
 <u>Preparing the testbeds</u>
@@ -8,13 +8,14 @@ Here we are using existing Fed4FIRE+ testbeds, specifically, Citylab in Antwerp 
 * One experiment should use Wireless Nodes (e.g., in our case 5 Wireless nodes from Citylab) for the IoT network. Pick nodes according to their location and be sure they are in range in their frecuency band (e.g., in our case 2.4 GHz). The other experiment should use Physical Nodes or Virtual Machines (e.g., 7 Phy Nodes from Virtual Wall).
 
 
-<u>IoT segment:</u>
+# IoT segment:
+-------
 
 **Clone the Whisper repositoy in each node:**
 
 > git clone --recursive https://github.com/imec-idlab/whisper-repository
 
-Alternatively, you can only clone the subrepositories separately:
+Alternatively, you can also clone the subrepositories separately:
 
 * For the OpenWSN nodes. Whisper has been tested up to the 'faced32ae8' commit from Dec 9, 2019:
 
@@ -30,7 +31,7 @@ Alternatively, you can only clone the subrepositories separately:
 
 > git clone https://github.com/openwsn-berkeley/coap/tree/62be96c8e636c0be748aa4633ab5626a4ad38d73
 
-**Flash the firmare in the nodes:**
+**Flash the firmware in the nodes:**
 
 In the Whisper node and root node:
 > sudo scons board=openmote-cc2538 toolchain=armgcc bootload=/dev/ttyUSB1 apps=whisper oos_openwsn
@@ -42,7 +43,8 @@ In any other node (For the normal nodes, you should create a dumb application to
 
 >sudo ip link add gretap1 type ip6gretap local localIPv6Address remote remoteIPv6Address
 
-<u>Wired segment:</u>
+# Wired segment:
+-------
 
 **Pick the node where the ONOS controller will be installed:**
 
