@@ -1,9 +1,16 @@
 # Whisper-repository
-===================
 
-Collection of software used for using Whisper in a 6TiSCH network
+Collection of software for using Whisper in a 6TiSCH network
 
-##Contains
+## Publications
+
+Municio, Esteban, Johann Marquez-Barja, Steven Latré, and Stefano Vissicchio. "Whisper: Programmable and flexible control on industrial IoT networks." Sensors 18, no. 11 (2018): 4048.
+
+Municio, Esteban, Steven Latre, and Johann M. Marquez-Barja. "Extending Network Programmability to the Things Overlay using Distributed Industrial IoT Protocols." IEEE Transactions on Industrial Informatics 17, no. 1 (2020): 251-259.
+
+Municio, Esteban, Niels Balemans, Steven Latré, and Johann Marquez-Barjal. "Leveraging distributed protocols for full end-to-end softwarization in iot networks." In 2020 IEEE 17th Annual Consumer Communications & Networking Conference (CCNC), pp. 1-6. IEEE, 2020.
+
+## Contains
 ---
 This repository includes:
 
@@ -31,7 +38,7 @@ This repository includes:
         - 6TiSCH schedules UI Component
         - Whisper Controllers UI Table Components
 
-##Supports:
+## Supports:
 ---
 * Parent switching through DIOs
 * Schedule modification through 6P commands (e.g. to allocate cells before the parent switch or 6P List)
@@ -41,7 +48,7 @@ This repository includes:
 * Orchestration from ONOS via edge metrics and intents.
 
 
-##Examples:
+## Examples:
 ---
 
 Augmented Topology
@@ -55,6 +62,7 @@ Augmented Topology
 Whisper Controllers View
 
 <img src="pics/GUIControllers1.png" width="1814" height="235">
+
 
 Questions, issues and bugs
 ---------------
